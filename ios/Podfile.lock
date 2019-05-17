@@ -1,0 +1,28 @@
+PODS:
+  - Flutter (1.0.0)
+  - get_version (0.0.1):
+    - Flutter
+  - package_info (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `.symlinks/flutter/ios`)
+  - get_version (from `.symlinks/plugins/get_version/ios`)
+  - package_info (from `.symlinks/plugins/package_info/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: ".symlinks/flutter/ios"
+  get_version:
+    :path: ".symlinks/plugins/get_version/ios"
+  package_info:
+    :path: ".symlinks/plugins/package_info/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
+  get_version: a59b7bd8fbf7543739bd853218b6685899419d05
+  package_info: d7c98b64f60add4c2908b9d94d82a45d3c8827ad
+
+PODFILE CHECKSUM: 3de8dabdb379cbd85b674ed1070c43af1b08e957
+
+COCOAPODS: 1.5.3
