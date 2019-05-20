@@ -9,6 +9,7 @@ import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
+import 'package:ofypets_mobile_app/screens/brandslisting.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -30,7 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
     Colors.blue.shade200,
     Colors.orangeAccent,
     Colors.purple.shade200,
-    Colors.green.shade300
+    Colors.green.shade300,
+    Colors.red.shade300
   ];
 
   @override
@@ -52,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
         bannerCards('images/banners/slider5.jpg'),
       ],
       autoPlay: true,
+      enlargeCenterPage: true,
     );
     return Scaffold(
       appBar: AppBar(
@@ -123,9 +126,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisCount: 2),
                 delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
-                  return categoryBox(categoryObjs[index], colorList[index],
-                      categoryImageUrls[index]);
-                }, childCount: categoryObjs.length),
+                  return categoryBox(index);
+                }, childCount: categoryObjs.length + 1),
               ),
         SliverList(
           delegate: SliverChildListDelegate([
@@ -200,12 +202,20 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               items: [
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.person_outline),
+                  icon: Icon(Icons.person_outline, color: Colors.green),
                   title: Text('SIGN IN'),
                 ),
                 BottomNavigationBarItem(
-                    icon: Icon(Icons.person_outline),
-                    title: Text('CREATE ACCOUNT')),
+                    icon: Icon(
+                      Icons.person_outline,
+                      color: Colors.green,
+                    ),
+                    title: Text('CREATE ACCOUNT',
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600
+                        ))),
               ],
             )
           : null,
@@ -288,29 +298,69 @@ class _HomeScreenState extends State<HomeScreen> {
         ));
   }
 
-  Widget categoryBox(String categoryName, Color color, String imageUrl) {
-    return Container(
-        margin: EdgeInsets.all(10.0),
-        color: color,
-        width: _deviceSize.width * 0.4,
-        child: Stack(children: [
-          Container(
-            alignment: Alignment.bottomRight,
-            child: Image.network(
-              imageUrl,
+  Widget categoryBox(int index) {
+    if (index > 4) {
+      return GestureDetector(
+          onTap: () {
+            MaterialPageRoute route =
+                MaterialPageRoute(builder: (context) => BrandList());
+            Navigator.push(context, route);
+          },
+          child: Container(
+              margin: EdgeInsets.all(10.0),
+              width: _deviceSize.width * 0.4,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: colorList[index],
+              ),
+              child: Stack(children: [
+                Container(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(
+                            'Shop By Brand',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 25,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          Text('A-Z',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 50,
+                                  fontWeight: FontWeight.w700)),
+                        ])),
+              ])));
+    }
+    return GestureDetector(
+        onTap: () {},
+        child: Container(
+            margin: EdgeInsets.all(10.0),
+            width: _deviceSize.width * 0.4,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: colorList[index],
             ),
-          ),
-          Container(
-            padding: EdgeInsets.only(left: 10),
-            child: Text(
-              categoryName,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 25,
-                  fontWeight: FontWeight.w700),
-            ),
-          ),
-        ]));
+            child: Stack(children: [
+              Container(
+                alignment: Alignment.bottomRight,
+                child: Image.network(
+                  categoryImageUrls[index],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.only(left: 10, top: 10),
+                child: Text(
+                  categoryObjs[index],
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25,
+                      fontWeight: FontWeight.w700),
+                ),
+              ),
+            ])));
   }
 
   getCategories() async {
@@ -339,7 +389,6 @@ class _HomeScreenState extends State<HomeScreen> {
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['products'].forEach((product) {
-        print(product['master']['images'][0]['mini_url']);
         setState(() {
           todaysDealProducts.add(Product(
               name: product['name'],
