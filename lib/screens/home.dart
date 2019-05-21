@@ -6,10 +6,13 @@ import 'package:carousel_slider/carousel_slider.dart';
 
 import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/utils/color_list.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
+import 'package:ofypets_mobile_app/models/category.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
 import 'package:ofypets_mobile_app/screens/brandslisting.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
+import 'package:ofypets_mobile_app/screens/categorylisting.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -24,17 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isLoading = true;
   bool _isAuthenticated = false;
   List<Product> todaysDealProducts = [];
-  List<String> categoryObjs = [];
-  List<String> categoryImageUrls = [];
+  List<Category> categories = [];
   List<String> bannerImageUrls = [];
-  List<Color> colorList = [
-    Colors.pink.shade200,
-    Colors.cyan.shade200,
-    Colors.orangeAccent,
-    Colors.indigo.shade200,
-    Colors.green.shade300,
-    Colors.red.shade300
-  ];
 
   @override
   void initState() {
@@ -129,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
                   return categoryBox(index);
-                }, childCount: categoryObjs.length + 1),
+                }, childCount: categories.length + 1),
               ),
         SliverList(
           delegate: SliverChildListDelegate([
@@ -348,7 +342,12 @@ class _HomeScreenState extends State<HomeScreen> {
               ])));
     }
     return GestureDetector(
-        onTap: () {},
+        onTap: () {
+          MaterialPageRoute route = MaterialPageRoute(
+              builder: (context) => CategoryListing(categories[index].name,
+                  categories[index].id, categories[index].parentId));
+          Navigator.push(context, route);
+        },
         child: Container(
             margin: EdgeInsets.all(10.0),
             width: _deviceSize.width * 0.4,
@@ -359,14 +358,12 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Stack(children: [
               Container(
                 alignment: Alignment.bottomRight,
-                child: Image.network(
-                  categoryImageUrls[index],
-                ),
+                child: Image.network(categories[index].image),
               ),
               Container(
                 padding: EdgeInsets.only(left: 10, top: 10),
                 child: Text(
-                  categoryObjs[index],
+                  categories[index].name,
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -377,14 +374,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   getCategories() async {
+    int petsId;
+    http.Response response =
+        await http.get(Settings.SERVER_URL + 'taxonomies?q[name_cont]=Pets');
+    responseBody = json.decode(response.body);
+    petsId = responseBody['taxonomies'][0]['id'];
     http
         .get(Settings.SERVER_URL + 'taxonomies?q[name_cont]=Pets&set=nested')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['taxonomies'][0]['root']['taxons'].forEach((category) {
         setState(() {
-          categoryObjs.add(category['name']);
-          categoryImageUrls.add(category['icon']);
+          categories.add(Category(
+              parentId: petsId,
+              name: category['name'],
+              image: category['icon'],
+              id: category['id']));
         });
       });
     });

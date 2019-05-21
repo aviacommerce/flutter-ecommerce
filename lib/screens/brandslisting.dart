@@ -7,7 +7,7 @@ import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/models/brand.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
+import 'package:ofypets_mobile_app/widgets/product_container.dart';
 
 class BrandList extends StatefulWidget {
   @override
@@ -154,82 +154,12 @@ class _BrandListState extends State<BrandList> {
                               ]));
                         } else {
                           return GestureDetector(
-                              onTap: () {}, child: productContainer(index));
+                              onTap: () {},
+                              child: productContainer(productsByBrand[index]));
                         }
                       },
                     ),
             )));
-  }
-
-  Widget productContainer(int index) {
-    return Container(
-        color: Colors.white,
-        child: Row(
-          children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 150,
-                  width: 150,
-                  color: Colors.white,
-                  child: FadeInImage(
-                    image: NetworkImage(productsByBrand[index].image),
-                    placeholder:
-                        AssetImage('images/placeholders/no-product-image.png'),
-                  ),
-                ),
-                Container(
-                  height: 150,
-                  width: 150,
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    alignment: Alignment.topRight,
-                    icon: Icon(Icons.favorite_border),
-                    color: Colors.orange,
-                    onPressed: () {},
-                  ),
-                )
-              ],
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Expanded(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  child: Text(
-                    productsByBrand[index].name,
-                    textAlign: TextAlign.left,
-                    style: TextStyle(fontSize: 15),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Container(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    productsByBrand[index].displayPrice,
-                    textAlign: TextAlign.left,
-                    style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    ratingBar(productsByBrand[index].avgRating, 20),
-                    Text(productsByBrand[index].reviewsCount),
-                  ],
-                ),
-              ],
-            )),
-          ],
-        ));
   }
 
   getBrandsList() {
