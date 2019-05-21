@@ -169,13 +169,15 @@ class _BrandListState extends State<BrandList> {
             Stack(
               children: <Widget>[
                 Container(
-                    height: 150,
-                    width: 150,
-                    color: Colors.white,
-                    child: Image.network(
-                      productsByBrand[index].image,
-                      // width: 80,
-                    )),
+                  height: 150,
+                  width: 150,
+                  color: Colors.white,
+                  child: FadeInImage(
+                    image: NetworkImage(productsByBrand[index].image),
+                    placeholder:
+                        AssetImage('images/placeholders/no-product-image.png'),
+                  ),
+                ),
                 Container(
                   height: 150,
                   width: 150,
@@ -269,13 +271,13 @@ class _BrandListState extends State<BrandList> {
   }
 
   Future<bool> _canLeave() {
-if(!_isSelected) {
-            return Future<bool>.value(true);
-          } else {
-            setState(() {
-              _isSelected = false;
-            });
-            return Future<bool>.value(false);
-          }
+    if (!_isSelected) {
+      return Future<bool>.value(true);
+    } else {
+      setState(() {
+        _isSelected = false;
+      });
+      return Future<bool>.value(false);
+    }
   }
 }

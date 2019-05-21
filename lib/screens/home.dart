@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
 import 'package:ofypets_mobile_app/screens/brandslisting.dart';
+import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -26,11 +26,12 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Product> todaysDealProducts = [];
   List<String> categoryObjs = [];
   List<String> categoryImageUrls = [];
+  List<String> bannerImageUrls = [];
   List<Color> colorList = [
-    Colors.yellow.shade300,
-    Colors.blue.shade200,
+    Colors.pink.shade200,
+    Colors.cyan.shade200,
     Colors.orangeAccent,
-    Colors.purple.shade200,
+    Colors.indigo.shade200,
     Colors.green.shade300,
     Colors.red.shade300
   ];
@@ -38,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    getBanners();
     getCategories();
     getTodaysDeals();
   }
@@ -47,11 +49,11 @@ class _HomeScreenState extends State<HomeScreen> {
     _deviceSize = MediaQuery.of(context).size;
     Widget bannerCarousel = CarouselSlider(
       items: <Widget>[
-        bannerCards('images/banners/slider1.jpg'),
-        bannerCards('images/banners/slider2.jpg'),
-        bannerCards('images/banners/slider3.jpg'),
-        bannerCards('images/banners/slider4.jpg'),
-        bannerCards('images/banners/slider5.jpg'),
+        bannerCards(0),
+        bannerCards(1),
+        bannerCards(2),
+        bannerCards(3),
+        bannerCards(4),
       ],
       autoPlay: true,
       enlargeCenterPage: true,
@@ -212,34 +214,53 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     title: Text('CREATE ACCOUNT',
                         style: TextStyle(
-                          color: Colors.green,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600
-                        ))),
+                            color: Colors.green,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600))),
               ],
             )
           : null,
     );
   }
 
-  Widget bannerCards(String imagePath) {
-    return Container(
-      width: _deviceSize.width * 0.8,
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        elevation: 2,
-        margin: EdgeInsets.symmetric(
-            vertical: _deviceSize.height * 0.05,
-            horizontal: _deviceSize.width * 0.02),
-        child: ClipRRect(
-          borderRadius: BorderRadius.all(Radius.circular(4)),
-          child: Image.asset(
-            imagePath,
-            fit: BoxFit.fill,
+  Widget bannerCards(int index) {
+    if (_isLoading) {
+      return Container(
+        width: _deviceSize.width * 0.8,
+        child: Card(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+          elevation: 2,
+          margin: EdgeInsets.symmetric(
+              vertical: _deviceSize.height * 0.05,
+              horizontal: _deviceSize.width * 0.02),
+          child: ClipRRect(
+              borderRadius: BorderRadius.all(Radius.circular(4)),
+              child: Image.asset(
+                'images/placeholders/slider1.jpg',
+                fit: BoxFit.fill,
+              )),
+        ),
+      );
+    } else {
+      return Container(
+        width: _deviceSize.width * 0.8,
+        child: Card(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+          elevation: 2,
+          margin: EdgeInsets.symmetric(
+              vertical: _deviceSize.height * 0.05,
+              horizontal: _deviceSize.width * 0.02),
+          child: ClipRRect(
+            borderRadius: BorderRadius.all(Radius.circular(4)),
+            child: FadeInImage(
+              image: NetworkImage(bannerImageUrls[index]),
+              placeholder: AssetImage('images/placeholders/slider1.jpg'),
+              fit: BoxFit.fill,
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   Widget todaysDealsCard(int index) {
@@ -250,13 +271,14 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              Image.network(
-                todaysDealProducts[index].image,
+              FadeInImage(
+                image: NetworkImage(todaysDealProducts[index].image),
+                placeholder:
+                    AssetImage('images/placeholders/no-product-image.png'),
                 height: _deviceSize.height * 0.2,
               ),
               Container(
-                height: 50,
-                padding: EdgeInsets.symmetric(horizontal: 5.0),
+                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
                 child: Text(
                   todaysDealProducts[index].name,
                   maxLines: 3,
@@ -272,16 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  FlutterRatingBar(
-                    itemCount: 5,
-                    allowHalfRating: true,
-                    fillColor: Colors.orange,
-                    borderColor: Colors.orange,
-                    ignoreGestures: true,
-                    initialRating: todaysDealProducts[index].avgRating,
-                    onRatingUpdate: (index) {},
-                    itemSize: 20,
-                  ),
+                  ratingBar(todaysDealProducts[index].avgRating, 20),
                   Text(todaysDealProducts[index].reviewsCount),
                 ],
               ),
@@ -356,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   categoryObjs[index],
                   style: TextStyle(
                       color: Colors.white,
-                      fontSize: 25,
+                      fontSize: 20,
                       fontWeight: FontWeight.w700),
                 ),
               ),
@@ -385,7 +398,7 @@ class _HomeScreenState extends State<HomeScreen> {
     todaysDealsId = responseBody['taxonomies'][0]['id'].toString();
     http
         .get(Settings.SERVER_URL +
-            'taxons/products?id=${todaysDealsId}&per_page=10&data_set=small')
+            'taxons/products?id=$todaysDealsId&per_page=10&data_set=small')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['products'].forEach((product) {
@@ -400,6 +413,20 @@ class _HomeScreenState extends State<HomeScreen> {
       });
       setState(() {
         _isLoading = false;
+      });
+    });
+  }
+
+  getBanners() async {
+    http
+        .get(Settings.SERVER_URL +
+            'taxonomies?q[name_cont]=Landing_Banner&set=nested')
+        .then((response) {
+      responseBody = json.decode(response.body);
+      responseBody['taxonomies'][0]['root']['taxons'].forEach((banner) {
+        setState(() {
+          bannerImageUrls.add(banner['icon']);
+        });
       });
     });
   }
