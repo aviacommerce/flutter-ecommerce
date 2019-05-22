@@ -24,7 +24,9 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   Size _deviceSize;
   Map<dynamic, dynamic> responseBody;
-  bool _isLoading = true;
+  bool _isBannerLoading = true;
+  bool _isCategoryLoading = true;
+  bool _isDealsLoading = true;
   bool _isAuthenticated = false;
   List<Product> todaysDealProducts = [];
   List<Category> categories = [];
@@ -106,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ))
           ]),
         ),
-        _isLoading
+        _isCategoryLoading
             ? SliverList(
                 delegate: SliverChildListDelegate([
                 Container(
@@ -144,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ))
           ]),
         ),
-        _isLoading
+        _isDealsLoading
             ? SliverList(
                 delegate: SliverChildListDelegate([
                 Container(
@@ -218,7 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget bannerCards(int index) {
-    if (_isLoading) {
+    if (_isBannerLoading) {
       return Container(
         width: _deviceSize.width * 0.8,
         child: Card(
@@ -392,6 +394,9 @@ class _HomeScreenState extends State<HomeScreen> {
               id: category['id']));
         });
       });
+      setState(() {
+        _isCategoryLoading = false;
+      });
     });
   }
 
@@ -407,17 +412,29 @@ class _HomeScreenState extends State<HomeScreen> {
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['products'].forEach((product) {
-        setState(() {
-          todaysDealProducts.add(Product(
-              name: product['name'],
-              displayPrice: product['display_price'],
-              avgRating: double.parse(product['avg_rating']),
-              reviewsCount: product['reviews_count'].toString(),
-              image: product['master']['images'][0]['product_url']));
-        });
+        print(product['has_variants']);
+        if (product['has_variants']) {
+          setState(() {
+            todaysDealProducts.add(Product(
+                name: product['variants'][0]['name'],
+                displayPrice: product['variants'][0]['display_price'],
+                avgRating: double.parse(product['avg_rating']),
+                reviewsCount: product['reviews_count'].toString(),
+                image: product['variants'][0]['images'][0]['product_url']));
+          });
+        } else {
+          setState(() {
+            todaysDealProducts.add(Product(
+                name: product['name'],
+                displayPrice: product['display_price'],
+                avgRating: double.parse(product['avg_rating']),
+                reviewsCount: product['reviews_count'].toString(),
+                image: product['master']['images'][0]['product_url']));
+          });
+        }
       });
       setState(() {
-        _isLoading = false;
+        _isDealsLoading = false;
       });
     });
   }
@@ -432,6 +449,9 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           bannerImageUrls.add(banner['icon']);
         });
+      });
+      setState(() {
+        _isBannerLoading = false;
       });
     });
   }
