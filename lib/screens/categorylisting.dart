@@ -179,7 +179,7 @@ class _CategoryListingState extends State<CategoryListing> {
     categoryList = [];
     http
         .get(Settings.SERVER_URL +
-            'taxonomies/${widget.parentId}/taxons/${widget.categoryId}')
+            'api/v1/taxonomies/${widget.parentId}/taxons/${widget.categoryId}')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['taxons'].forEach((category) {
@@ -202,7 +202,7 @@ class _CategoryListingState extends State<CategoryListing> {
     });
     http
         .get(Settings.SERVER_URL +
-            'taxonomies/${widget.parentId}/taxons/$categoryId')
+            'api/v1/taxonomies/${widget.parentId}/taxons/$categoryId')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['taxons'].forEach((category) {
@@ -225,7 +225,7 @@ class _CategoryListingState extends State<CategoryListing> {
     });
     http
         .get(Settings.SERVER_URL +
-            'taxons/products?id=$categoryId&per_page=10&data_set=small')
+            'api/v1/taxons/products?id=$categoryId&per_page=10&data_set=small')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['products'].forEach((product) {

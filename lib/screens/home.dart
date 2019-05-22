@@ -378,11 +378,11 @@ class _HomeScreenState extends State<HomeScreen> {
   getCategories() async {
     int petsId;
     http.Response response =
-        await http.get(Settings.SERVER_URL + 'taxonomies?q[name_cont]=Pets');
+        await http.get(Settings.SERVER_URL + 'api/v1/taxonomies?q[name_cont]=Pets');
     responseBody = json.decode(response.body);
     petsId = responseBody['taxonomies'][0]['id'];
     http
-        .get(Settings.SERVER_URL + 'taxonomies?q[name_cont]=Pets&set=nested')
+        .get(Settings.SERVER_URL + 'api/v1/taxonomies?q[name_cont]=Pets&set=nested')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['taxonomies'][0]['root']['taxons'].forEach((category) {
@@ -403,12 +403,12 @@ class _HomeScreenState extends State<HomeScreen> {
   getTodaysDeals() async {
     String todaysDealsId;
     http.Response response = await http
-        .get(Settings.SERVER_URL + 'taxonomies?q[name_cont]=Today\'s Deals');
+        .get(Settings.SERVER_URL + 'api/v1/taxonomies?q[name_cont]=Today\'s Deals');
     responseBody = json.decode(response.body);
     todaysDealsId = responseBody['taxonomies'][0]['id'].toString();
     http
         .get(Settings.SERVER_URL +
-            'taxons/products?id=$todaysDealsId&per_page=10&data_set=small')
+            'api/v1/taxons/products?id=$todaysDealsId&per_page=10&data_set=small')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['products'].forEach((product) {
@@ -442,7 +442,7 @@ class _HomeScreenState extends State<HomeScreen> {
   getBanners() async {
     http
         .get(Settings.SERVER_URL +
-            'taxonomies?q[name_cont]=Landing_Banner&set=nested')
+            'api/v1/taxonomies?q[name_cont]=Landing_Banner&set=nested')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['taxonomies'][0]['root']['taxons'].forEach((banner) {

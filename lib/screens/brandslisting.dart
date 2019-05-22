@@ -164,7 +164,7 @@ class _BrandListState extends State<BrandList> {
 
   getBrandsList() {
     http
-        .get(Settings.SERVER_URL + 'taxonomies?q[name_cont]=Brands&set=nested')
+        .get(Settings.SERVER_URL + 'api/v1/taxonomies?q[name_cont]=Brands&set=nested')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['taxonomies'][0]['root']['taxons'].forEach((brandObj) {
@@ -181,7 +181,7 @@ class _BrandListState extends State<BrandList> {
   getBrandProducts(int id) {
     http
         .get(Settings.SERVER_URL +
-            'taxons/products?id=$id&per_page=20&data_set=small')
+            'api/v1/taxons/products?id=$id&per_page=20&data_set=small')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['products'].forEach((product) {
