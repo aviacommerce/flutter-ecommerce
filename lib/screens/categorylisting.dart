@@ -10,6 +10,7 @@ import 'package:ofypets_mobile_app/utils/color_list.dart';
 import 'package:ofypets_mobile_app/models/category.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/widgets/product_container.dart';
+import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 
 class CategoryListing extends StatefulWidget {
   final String categoryName;
@@ -51,10 +52,7 @@ class _CategoryListingState extends State<CategoryListing> {
                 icon: Icon(Icons.search),
                 onPressed: () {},
               ),
-              IconButton(
-                icon: Icon(Icons.shopping_cart),
-                onPressed: () {},
-              )
+              shoppingCartIconButton()
             ],
             bottom: PreferredSize(
               preferredSize: Size(_deviceSize.width, 40),
@@ -219,6 +217,8 @@ class _CategoryListingState extends State<CategoryListing> {
   }
 
   getProductsByCategory(int categoryId) {
+    List<Product> variants = [];
+    List<Map<dynamic, dynamic>> optionValues = [];
     setState(() {
       _isLoading = true;
       productsByCategory = [];
@@ -229,14 +229,52 @@ class _CategoryListingState extends State<CategoryListing> {
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['products'].forEach((product) {
-        setState(() {
-          productsByCategory.add(Product(
+        variants = [];
+        if (product['has_variants']) {
+          product['variants'].forEach((variant) {
+            optionValues = [];
+            variant['option_values'].forEach((option) {
+              setState(() {
+                optionValues.add(option);
+              });
+            });
+            setState(() {
+              variants.add(Product(
+                name: variant['name'],
+                description: variant['description'],
+                optionValues: optionValues,
+                displayPrice: variant['display_price'],
+                image: variant['images'][0]['product_url'],
+                isOrderable: variant['is_orderable'],
+                avgRating: double.parse(product['avg_rating']),
+                reviewsCount: product['reviews_count'].toString(),
+              ));
+            });
+          });
+          setState(() {
+            productsByCategory.add(Product(
+                name: product['name'],
+                displayPrice: product['display_price'],
+                avgRating: double.parse(product['avg_rating']),
+                reviewsCount: product['reviews_count'].toString(),
+                image: product['master']['images'][0]['product_url'],
+                variants: variants,
+                hasVariants: product['has_variants']));
+          });
+        } else {
+          setState(() {
+            productsByCategory.add(Product(
               name: product['name'],
               displayPrice: product['display_price'],
               avgRating: double.parse(product['avg_rating']),
               reviewsCount: product['reviews_count'].toString(),
-              image: product['master']['images'][0]['product_url']));
-        });
+              image: product['master']['images'][0]['product_url'],
+              hasVariants: product['has_variants'],
+              isOrderable: product['master']['is_orderable'],
+              description: product['description'],
+            ));
+          });
+        }
       });
       setState(() {
         level = 2;

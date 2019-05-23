@@ -5,6 +5,7 @@ import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/scoped-models/cart.dart';
 import 'package:ofypets_mobile_app/screens/cart.dart';
+import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -19,7 +20,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
   Size _deviceSize;
-  int quantity = 0;
+  int quantity = 1;
   Product selectedProduct;
   bool _hasVariants = false;
 
@@ -47,15 +48,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               icon: Icon(Icons.search),
               onPressed: () {},
             ),
-            IconButton(
-              icon: Icon(Icons.shopping_cart),
-              onPressed: () {
-                MaterialPageRoute route =
-                    MaterialPageRoute(builder: (context) => Cart());
-
-                Navigator.push(context, route);
-              },
-            )
+            shoppingCartIconButton()
           ],
           bottom: TabBar(
             controller: _tabController,
@@ -133,7 +126,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             IconButton(
               icon: Icon(Icons.remove),
               onPressed: () {
-                if (quantity > 0) {
+                if (quantity > 1) {
                   setState(() {
                     quantity = quantity - 1;
                   });
@@ -186,14 +179,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     return ScopedModelDescendant<CartModel>(
       builder: (BuildContext context, Widget child, CartModel model) {
         return FlatButton(
-          
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           child: Text(
               selectedProduct.isOrderable ? 'ADD TO CART' : 'OUT OF STOCK'),
           onPressed: () {
             if (selectedProduct.isOrderable) {
-              model.addProduct();
+              model.addProduct(
+                  variantId: selectedProduct.id, quantity: quantity);
             }
           },
         );
@@ -210,7 +203,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             color: Colors.white,
           ),
           onPressed: () {
-            selectedProduct.isOrderable ? model.addProduct() : null;
+            selectedProduct.isOrderable
+                ? model.addProduct(
+                    variantId: selectedProduct.id, quantity: quantity)
+                : null;
           },
           backgroundColor:
               selectedProduct.isOrderable ? Colors.orange : Colors.grey,

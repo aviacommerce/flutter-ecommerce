@@ -6,14 +6,14 @@ import 'package:carousel_slider/carousel_slider.dart';
 
 import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/color_list.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/models/category.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
-import 'package:ofypets_mobile_app/screens/brandslisting.dart';
+
 import 'package:ofypets_mobile_app/widgets/todays_deals_card.dart';
-import 'package:ofypets_mobile_app/screens/categorylisting.dart';
 import 'package:ofypets_mobile_app/screens/cart.dart';
+import 'package:ofypets_mobile_app/widgets/category_box.dart';
+import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -63,20 +63,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           actions: <Widget>[
             Padding(
-              padding: EdgeInsets.only(right: _deviceSize.width * 0.01),
-              child: IconButton(
-                onPressed: () {
-                  MaterialPageRoute route =
-                      MaterialPageRoute(builder: (context) => Cart());
-
-                  Navigator.push(context, route);
-                },
-                icon: Icon(
-                  Icons.shopping_cart,
-                  semanticLabel: 'Shopping Cart',
-                ),
-              ),
-            ),
+                padding: EdgeInsets.only(right: _deviceSize.width * 0.01),
+                child: shoppingCartIconButton()),
           ],
           bottom: PreferredSize(
             preferredSize: Size(_deviceSize.width, 50),
@@ -134,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisCount: 2),
                 delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
-                  return categoryBox(index);
+                  return categoryBox(index, context, _deviceSize, categories);
                 }, childCount: categories.length + 1),
               ),
         SliverList(
@@ -269,75 +257,6 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
   }
-
-  Widget categoryBox(int index) {
-    if (index > 4) {
-      return GestureDetector(
-          onTap: () {
-            MaterialPageRoute route =
-                MaterialPageRoute(builder: (context) => BrandList());
-            Navigator.push(context, route);
-          },
-          child: Container(
-              margin: EdgeInsets.all(10.0),
-              width: _deviceSize.width * 0.4,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: colorList[index],
-              ),
-              child: Stack(children: [
-                Container(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text(
-                            'Shop By Brand',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 25,
-                                fontWeight: FontWeight.w700),
-                          ),
-                          Text('A-Z',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 50,
-                                  fontWeight: FontWeight.w700)),
-                        ])),
-              ])));
-    }
-    return GestureDetector(
-        onTap: () {
-          MaterialPageRoute route = MaterialPageRoute(
-              builder: (context) => CategoryListing(categories[index].name,
-                  categories[index].id, categories[index].parentId));
-          Navigator.push(context, route);
-        },
-        child: Container(
-            margin: EdgeInsets.all(10.0),
-            width: _deviceSize.width * 0.4,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: colorList[index],
-            ),
-            child: Stack(children: [
-              Container(
-                alignment: Alignment.bottomRight,
-                child: Image.network(categories[index].image),
-              ),
-              Container(
-                padding: EdgeInsets.only(left: 10, top: 10),
-                child: Text(
-                  categories[index].name,
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700),
-                ),
-              ),
-            ])));
-  }
-
   getCategories() async {
     int petsId;
     http.Response response = await http

@@ -2,12 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:scoped_model/scoped_model.dart';
 
 import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/models/brand.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/widgets/product_container.dart';
+import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 
 class BrandList extends StatefulWidget {
   @override
@@ -46,10 +48,7 @@ class _BrandListState extends State<BrandList> {
                       icon: Icon(Icons.search),
                       onPressed: () {},
                     ),
-                    IconButton(
-                      icon: Icon(Icons.shopping_cart),
-                      onPressed: () {},
-                    )
+                    shoppingCartIconButton()
                   ],
                   bottom: PreferredSize(
                       preferredSize: Size(_deviceSize.width, 40),
@@ -196,11 +195,12 @@ class _BrandListState extends State<BrandList> {
             optionValues = [];
             variant['option_values'].forEach((option) {
               setState(() {
-              optionValues.add(option);                
+                optionValues.add(option);
               });
             });
             setState(() {
               variants.add(Product(
+                id: variant['id'],
                 name: variant['name'],
                 description: variant['description'],
                 optionValues: optionValues,
@@ -225,15 +225,16 @@ class _BrandListState extends State<BrandList> {
         } else {
           setState(() {
             productsByBrand.add(Product(
-                name: product['name'],
-                displayPrice: product['display_price'],
-                avgRating: double.parse(product['avg_rating']),
-                reviewsCount: product['reviews_count'].toString(),
-                image: product['master']['images'][0]['product_url'],
-                hasVariants: product['has_variants'],
-                isOrderable: product['master']['is_orderable'],
-                description: product['description'],
-                ));
+              id: product['id'],
+              name: product['name'],
+              displayPrice: product['display_price'],
+              avgRating: double.parse(product['avg_rating']),
+              reviewsCount: product['reviews_count'].toString(),
+              image: product['master']['images'][0]['product_url'],
+              hasVariants: product['has_variants'],
+              isOrderable: product['master']['is_orderable'],
+              description: product['description'],
+            ));
           });
         }
       });
