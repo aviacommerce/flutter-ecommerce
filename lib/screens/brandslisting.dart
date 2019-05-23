@@ -155,7 +155,7 @@ class _BrandListState extends State<BrandList> {
                         } else {
                           return GestureDetector(
                               onTap: () {},
-                              child: productContainer(productsByBrand[index]));
+                              child: productContainer(productsByBrand[index], context));
                         }
                       },
                     ),

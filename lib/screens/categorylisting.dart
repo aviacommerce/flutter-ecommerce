@@ -106,7 +106,7 @@ class _CategoryListingState extends State<CategoryListing> {
           itemBuilder: (BuildContext context, int index) {
             return GestureDetector(
                 onTap: () {},
-                child: productContainer(productsByCategory[index]));
+                child: productContainer(productsByCategory[index], context));
           },
         );
         break;
