@@ -155,7 +155,8 @@ class _BrandListState extends State<BrandList> {
                         } else {
                           return GestureDetector(
                               onTap: () {},
-                              child: productContainer(productsByBrand[index], context));
+                              child: productContainer(
+                                  productsByBrand[index], context));
                         }
                       },
                     ),
@@ -164,7 +165,8 @@ class _BrandListState extends State<BrandList> {
 
   getBrandsList() {
     http
-        .get(Settings.SERVER_URL + 'api/v1/taxonomies?q[name_cont]=Brands&set=nested')
+        .get(Settings.SERVER_URL +
+            'api/v1/taxonomies?q[name_cont]=Brands&set=nested')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['taxonomies'][0]['root']['taxons'].forEach((brandObj) {
@@ -179,20 +181,61 @@ class _BrandListState extends State<BrandList> {
   }
 
   getBrandProducts(int id) {
+    List<Product> variants = [];
+    List<Map<dynamic, dynamic>> optionValues = [];
+
     http
         .get(Settings.SERVER_URL +
             'api/v1/taxons/products?id=$id&per_page=20&data_set=small')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['products'].forEach((product) {
-        setState(() {
-          productsByBrand.add(Product(
-              name: product['name'],
-              displayPrice: product['display_price'],
-              avgRating: double.parse(product['avg_rating']),
-              reviewsCount: product['reviews_count'].toString(),
-              image: product['master']['images'][0]['product_url']));
-        });
+        variants = [];
+        if (product['has_variants']) {
+          product['variants'].forEach((variant) {
+            optionValues = [];
+            variant['option_values'].forEach((option) {
+              setState(() {
+              optionValues.add(option);                
+              });
+            });
+            setState(() {
+              variants.add(Product(
+                name: variant['name'],
+                description: variant['description'],
+                optionValues: optionValues,
+                displayPrice: variant['display_price'],
+                image: variant['images'][0]['product_url'],
+                isOrderable: variant['is_orderable'],
+                avgRating: double.parse(product['avg_rating']),
+                reviewsCount: product['reviews_count'].toString(),
+              ));
+            });
+          });
+          setState(() {
+            productsByBrand.add(Product(
+                name: product['name'],
+                displayPrice: product['display_price'],
+                avgRating: double.parse(product['avg_rating']),
+                reviewsCount: product['reviews_count'].toString(),
+                image: product['master']['images'][0]['product_url'],
+                variants: variants,
+                hasVariants: product['has_variants']));
+          });
+        } else {
+          setState(() {
+            productsByBrand.add(Product(
+                name: product['name'],
+                displayPrice: product['display_price'],
+                avgRating: double.parse(product['avg_rating']),
+                reviewsCount: product['reviews_count'].toString(),
+                image: product['master']['images'][0]['product_url'],
+                hasVariants: product['has_variants'],
+                isOrderable: product['master']['is_orderable'],
+                description: product['description'],
+                ));
+          });
+        }
       });
       setState(() {
         _isLoading = false;

@@ -50,6 +50,10 @@ class HomeDrawer extends StatelessWidget {
             decoration: BoxDecoration(color: Colors.green),
           ),
           ListTile(
+            onTap: () {
+              Navigator.popUntil(
+                  context, ModalRoute.withName(Navigator.defaultRouteName));
+            },
             leading: Icon(
               Icons.home,
               color: Colors.green,

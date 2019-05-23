@@ -9,8 +9,8 @@ Widget productContainer(Product product, BuildContext context) {
       color: Colors.white,
       child: GestureDetector(
           onTap: () {
-            MaterialPageRoute route =
-                MaterialPageRoute(builder: (context) => ProductDetailScreen(product));
+            MaterialPageRoute route = MaterialPageRoute(
+                builder: (context) => ProductDetailScreen(product));
             Navigator.push(context, route);
           },
           child: Row(

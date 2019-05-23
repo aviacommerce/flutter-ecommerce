@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
+import 'package:ofypets_mobile_app/scoped-models/cart.dart';
+import 'package:ofypets_mobile_app/screens/cart.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -17,10 +20,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   TabController _tabController;
   Size _deviceSize;
   int quantity = 0;
+  Product selectedProduct;
+  bool _hasVariants = false;
 
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
+    if (widget.product.hasVariants) {
+      _hasVariants = widget.product.hasVariants;
+      selectedProduct = widget.product.variants.first;
+    } else {
+      selectedProduct = widget.product;
+    }
     super.initState();
   }
 
@@ -38,7 +49,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             ),
             IconButton(
               icon: Icon(Icons.shopping_cart),
-              onPressed: () {},
+              onPressed: () {
+                MaterialPageRoute route =
+                    MaterialPageRoute(builder: (context) => Cart());
+
+                Navigator.push(context, route);
+              },
             )
           ],
           bottom: TabBar(
@@ -72,7 +88,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     alignment: Alignment.center,
                     height: 300,
                     child: FadeInImage(
-                      image: NetworkImage(widget.product.image),
+                      image: NetworkImage(selectedProduct.image),
                       placeholder: AssetImage(
                           'images/placeholders/no-product-image.png'),
                     ),
@@ -88,17 +104,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                ratingBar(widget.product.avgRating, 20),
+                ratingBar(selectedProduct.avgRating, 20),
                 Container(
                     margin: EdgeInsets.only(right: 10),
-                    child: Text(widget.product.reviewsCount)),
+                    child: Text(selectedProduct.reviewsCount)),
               ],
             ),
           ),
           Container(
             padding: EdgeInsets.all(10),
             child: Text(
-              widget.product.name,
+              selectedProduct.name,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -151,7 +167,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 alignment: Alignment.centerLeft,
                 padding: EdgeInsets.all(10),
                 child: Text(
-                  widget.product.displayPrice,
+                  selectedProduct.displayPrice,
                   style: TextStyle(
                       fontSize: 18,
                       color: Colors.red,
@@ -167,20 +183,39 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   }
 
   Widget addToCartFlatButton() {
-    return FlatButton(
-      child: Text('ADD TO CART'),
-      onPressed: () {},
+    return ScopedModelDescendant<CartModel>(
+      builder: (BuildContext context, Widget child, CartModel model) {
+        return FlatButton(
+          
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: Text(
+              selectedProduct.isOrderable ? 'ADD TO CART' : 'OUT OF STOCK'),
+          onPressed: () {
+            if (selectedProduct.isOrderable) {
+              model.addProduct();
+            }
+          },
+        );
+      },
     );
   }
 
   Widget addToCartFAB() {
-    return FloatingActionButton(
-      child: Icon(
-        Icons.shopping_cart,
-        color: Colors.white,
-      ),
-      onPressed: () {},
-      backgroundColor: Colors.orange,
+    return ScopedModelDescendant<CartModel>(
+      builder: (BuildContext context, Widget child, CartModel model) {
+        return FloatingActionButton(
+          child: Icon(
+            Icons.shopping_cart,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            selectedProduct.isOrderable ? model.addProduct() : null;
+          },
+          backgroundColor:
+              selectedProduct.isOrderable ? Colors.orange : Colors.grey,
+        );
+      },
     );
   }
 }

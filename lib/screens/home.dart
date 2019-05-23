@@ -11,8 +11,9 @@ import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/models/category.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
 import 'package:ofypets_mobile_app/screens/brandslisting.dart';
-import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
+import 'package:ofypets_mobile_app/widgets/todays_deals_card.dart';
 import 'package:ofypets_mobile_app/screens/categorylisting.dart';
+import 'package:ofypets_mobile_app/screens/cart.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -62,11 +63,20 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           actions: <Widget>[
             Padding(
-                padding: EdgeInsets.only(right: _deviceSize.width * 0.01),
-                child: Icon(
+              padding: EdgeInsets.only(right: _deviceSize.width * 0.01),
+              child: IconButton(
+                onPressed: () {
+                  MaterialPageRoute route =
+                      MaterialPageRoute(builder: (context) => Cart());
+
+                  Navigator.push(context, route);
+                },
+                icon: Icon(
                   Icons.shopping_cart,
                   semanticLabel: 'Shopping Cart',
-                ))
+                ),
+              ),
+            ),
           ],
           bottom: PreferredSize(
             preferredSize: Size(_deviceSize.width, 50),
@@ -164,7 +174,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     scrollDirection: Axis.horizontal,
                     itemCount: 10,
                     itemBuilder: (context, index) {
-                      return todaysDealsCard(index);
+                      return todaysDealsCard(
+                          index, todaysDealProducts, _deviceSize);
                     },
                   ),
                 ),
@@ -259,54 +270,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget todaysDealsCard(int index) {
-    return SizedBox(
-        width: _deviceSize.width * 0.4,
-        child: Card(
-          borderOnForeground: true,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              FadeInImage(
-                image: NetworkImage(todaysDealProducts[index].image),
-                placeholder:
-                    AssetImage('images/placeholders/no-product-image.png'),
-                height: _deviceSize.height * 0.2,
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-                child: Text(
-                  todaysDealProducts[index].name,
-                  maxLines: 3,
-                ),
-              ),
-              Text(
-                todaysDealProducts[index].displayPrice,
-                style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 15),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  ratingBar(todaysDealProducts[index].avgRating, 20),
-                  Text(todaysDealProducts[index].reviewsCount),
-                ],
-              ),
-              Divider(),
-              Text(
-                'ADD TO CART',
-                style: TextStyle(
-                    color: Colors.green,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold),
-              )
-            ],
-          ),
-        ));
-  }
-
   Widget categoryBox(int index) {
     if (index > 4) {
       return GestureDetector(
@@ -377,12 +340,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   getCategories() async {
     int petsId;
-    http.Response response =
-        await http.get(Settings.SERVER_URL + 'api/v1/taxonomies?q[name_cont]=Pets');
+    http.Response response = await http
+        .get(Settings.SERVER_URL + 'api/v1/taxonomies?q[name_cont]=Pets');
     responseBody = json.decode(response.body);
     petsId = responseBody['taxonomies'][0]['id'];
     http
-        .get(Settings.SERVER_URL + 'api/v1/taxonomies?q[name_cont]=Pets&set=nested')
+        .get(Settings.SERVER_URL +
+            'api/v1/taxonomies?q[name_cont]=Pets&set=nested')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['taxonomies'][0]['root']['taxons'].forEach((category) {
@@ -402,8 +366,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   getTodaysDeals() async {
     String todaysDealsId;
-    http.Response response = await http
-        .get(Settings.SERVER_URL + 'api/v1/taxonomies?q[name_cont]=Today\'s Deals');
+    http.Response response = await http.get(
+        Settings.SERVER_URL + 'api/v1/taxonomies?q[name_cont]=Today\'s Deals');
     responseBody = json.decode(response.body);
     todaysDealsId = responseBody['taxonomies'][0]['id'].toString();
     http
@@ -412,7 +376,6 @@ class _HomeScreenState extends State<HomeScreen> {
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['products'].forEach((product) {
-        print(product['has_variants']);
         if (product['has_variants']) {
           setState(() {
             todaysDealProducts.add(Product(
@@ -420,7 +383,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 displayPrice: product['variants'][0]['display_price'],
                 avgRating: double.parse(product['avg_rating']),
                 reviewsCount: product['reviews_count'].toString(),
-                image: product['variants'][0]['images'][0]['product_url']));
+                image: product['variants'][0]['images'][0]['product_url'],
+                isOrderable: product['variants'][0]['is_orderable']));
           });
         } else {
           setState(() {
@@ -429,7 +393,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 displayPrice: product['display_price'],
                 avgRating: double.parse(product['avg_rating']),
                 reviewsCount: product['reviews_count'].toString(),
-                image: product['master']['images'][0]['product_url']));
+                image: product['master']['images'][0]['product_url'],
+                isOrderable: product['master']['is_orderable']));
           });
         }
       });
