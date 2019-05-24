@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:ofypets_mobile_app/models/order.dart';
 
-import 'package:ofypets_mobile_app/scoped-models/cart.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 
 class Cart extends StatefulWidget {
   @override

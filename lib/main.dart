@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'package:ofypets_mobile_app/screens/home.dart';
-import 'package:ofypets_mobile_app/scoped-models/cart.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
+  final MainModel _model = MainModel();
   // This widget is the root of your application.
 
   @override
@@ -26,7 +27,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModel<CartModel>(
+    return ScopedModel<MainModel>(
       model: _model,
       child: MaterialApp(
         title: 'Flutter Demo',

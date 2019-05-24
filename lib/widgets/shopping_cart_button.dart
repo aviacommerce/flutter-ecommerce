@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:scoped_model/scoped_model.dart';
-import 'package:ofypets_mobile_app/scoped-models/cart.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/cart.dart';
 
 Widget shoppingCartIconButton() {
-  return ScopedModelDescendant<CartModel>(
-      builder: (BuildContext context, Widget child, CartModel model) {
+  return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
     return new Padding(
       padding: const EdgeInsets.all(10.0),
       child: new Container(

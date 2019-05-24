@@ -4,11 +4,11 @@ import 'package:scoped_model/scoped_model.dart';
 
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/scoped-models/cart.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 
 Widget addToCartButton(List<Product> todaysDealProducts, int index) {
-  return ScopedModelDescendant<CartModel>(
-      builder: (BuildContext context, Widget child, CartModel model) {
+  return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
     return FlatButton(
       onPressed: () {
         if (todaysDealProducts[index].isOrderable) {

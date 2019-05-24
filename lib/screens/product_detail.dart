@@ -3,7 +3,7 @@ import 'package:scoped_model/scoped_model.dart';
 
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
-import 'package:ofypets_mobile_app/scoped-models/cart.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/cart.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 
@@ -176,8 +176,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   }
 
   Widget addToCartFlatButton() {
-    return ScopedModelDescendant<CartModel>(
-      builder: (BuildContext context, Widget child, CartModel model) {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
         return FlatButton(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -195,8 +195,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   }
 
   Widget addToCartFAB() {
-    return ScopedModelDescendant<CartModel>(
-      builder: (BuildContext context, Widget child, CartModel model) {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
         return FloatingActionButton(
           child: Icon(
             Icons.shopping_cart,

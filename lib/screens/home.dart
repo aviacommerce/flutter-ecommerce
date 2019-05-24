@@ -14,6 +14,8 @@ import 'package:ofypets_mobile_app/widgets/todays_deals_card.dart';
 import 'package:ofypets_mobile_app/screens/cart.dart';
 import 'package:ofypets_mobile_app/widgets/category_box.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -23,6 +25,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final MainModel _model = MainModel();
   Size _deviceSize;
   Map<dynamic, dynamic> responseBody;
   bool _isBannerLoading = true;

@@ -8,7 +8,7 @@ import 'package:ofypets_mobile_app/models/order.dart';
 import 'package:ofypets_mobile_app/models/line_item.dart';
 import 'package:ofypets_mobile_app/models/variant.dart';
 
-class CartModel extends Model {
+mixin CartModel on Model {
   List<LineItem> _lineItems = [];
   Order order;
   bool _isLoading = false;
