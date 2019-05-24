@@ -1,6 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 
 class HomeDrawer extends StatelessWidget {
+  Widget logOutButton() {
+    return ScopedModelDescendant(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        if (model.isAuthenticated) {
+          return ListTile(
+            leading: Icon(
+              Icons.reply,
+              color: Colors.green,
+            ),
+            title: Text(
+              'Logout',
+              style: TextStyle(color: Colors.green),
+            ),
+            onTap: () {
+              print('LOGOUT TO BE IMPLEMENTED HERE');
+            },
+          );
+        } else {
+          return Container();
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -147,6 +174,7 @@ class HomeDrawer extends StatelessWidget {
               'Terms and Policies',
             ),
           ),
+          logOutButton()
         ],
       ),
     );

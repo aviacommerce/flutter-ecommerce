@@ -15,9 +15,10 @@ mixin UserModel on Model {
     final String token = prefs.getString('spreeApiKey');
     if (token != null) {
       _isAuthenticated = true;
+      notifyListeners();
+    } else {
+      _isAuthenticated = false;
+      notifyListeners();
     }
-    _isAuthenticated = false;
   }
-
-  notifyListeners();
 }

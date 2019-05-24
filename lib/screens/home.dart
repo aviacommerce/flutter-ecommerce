@@ -196,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ]),
         bottomNavigationBar:
-            model.isAuthenticated ? bottomNavigationBar() : null,
+            !model.isAuthenticated ? bottomNavigationBar() : null,
       );
     });
   }
