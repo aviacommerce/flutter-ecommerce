@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
@@ -58,166 +59,172 @@ class _HomeScreenState extends State<HomeScreen> {
       autoPlay: true,
       enlargeCenterPage: true,
     );
-    return Scaffold(
-      appBar: AppBar(
-          title: Text(
-            'ofypets',
-            style: TextStyle(fontFamily: 'HolyFat', fontSize: 50),
-          ),
-          actions: <Widget>[
-            Padding(
-                padding: EdgeInsets.only(right: _deviceSize.width * 0.01),
-                child: shoppingCartIconButton()),
-          ],
-          bottom: PreferredSize(
-            preferredSize: Size(_deviceSize.width, 50),
-            child: Container(
-              width: _deviceSize.width,
-              height: 50,
-              margin: EdgeInsets.all(10),
-              color: Colors.white,
-              child: ListTile(
-                leading: Icon(Icons.search),
-                title: Text(
-                  'Find the best for your pet...',
-                  style: TextStyle(fontWeight: FontWeight.w300),
-                ),
-              ),
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return Scaffold(
+        appBar: AppBar(
+            title: Text(
+              'ofypets',
+              style: TextStyle(fontFamily: 'HolyFat', fontSize: 50),
             ),
-          )),
-      drawer: HomeDrawer(),
-      body: CustomScrollView(slivers: [
-        SliverList(
-          delegate: SliverChildListDelegate([bannerCarousel]),
-        ),
-        SliverList(
-          delegate: SliverChildListDelegate([
-            Container(
+            actions: <Widget>[
+              Padding(
+                  padding: EdgeInsets.only(right: _deviceSize.width * 0.01),
+                  child: shoppingCartIconButton()),
+            ],
+            bottom: PreferredSize(
+              preferredSize: Size(_deviceSize.width, 50),
+              child: Container(
                 width: _deviceSize.width,
+                height: 50,
+                margin: EdgeInsets.all(10),
                 color: Colors.white,
                 child: ListTile(
-                  dense: true,
-                  leading: Icon(
-                    Icons.category,
-                    color: Colors.blue,
-                  ),
-                  title: Text('Categories',
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.blue)),
-                ))
-          ]),
-        ),
-        _isCategoryLoading
-            ? SliverList(
-                delegate: SliverChildListDelegate([
-                Container(
-                  height: _deviceSize.height * 0.5,
-                  alignment: Alignment.center,
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.blue,
-                  ),
-                )
-              ]))
-            : SliverGrid(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2),
-                delegate: SliverChildBuilderDelegate(
-                    (BuildContext context, int index) {
-                  return categoryBox(index, context, _deviceSize, categories);
-                }, childCount: categories.length + 1),
-              ),
-        SliverList(
-          delegate: SliverChildListDelegate([
-            Container(
-                width: _deviceSize.width,
-                color: Colors.white,
-                child: ListTile(
-                  dense: true,
-                  leading: Icon(
-                    Icons.today,
-                    color: Colors.deepOrange,
-                  ),
-                  title: Text('Today\'s Deals',
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.deepOrange)),
-                ))
-          ]),
-        ),
-        _isDealsLoading
-            ? SliverList(
-                delegate: SliverChildListDelegate([
-                Container(
-                  height: _deviceSize.height * 0.5,
-                  alignment: Alignment.center,
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.blue,
-                  ),
-                )
-              ]))
-            : SliverToBoxAdapter(
-                child: Container(
-                  height: _deviceSize.height * 0.5,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: 10,
-                    itemBuilder: (context, index) {
-                      return todaysDealsCard(
-                          index, todaysDealProducts, _deviceSize);
-                    },
+                  leading: Icon(Icons.search),
+                  title: Text(
+                    'Find the best for your pet...',
+                    style: TextStyle(fontWeight: FontWeight.w300),
                   ),
                 ),
               ),
-        SliverToBoxAdapter(
-          child: Divider(),
+            )),
+        drawer: HomeDrawer(),
+        body: CustomScrollView(slivers: [
+          SliverList(
+            delegate: SliverChildListDelegate([bannerCarousel]),
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              Container(
+                  width: _deviceSize.width,
+                  color: Colors.white,
+                  child: ListTile(
+                    dense: true,
+                    leading: Icon(
+                      Icons.category,
+                      color: Colors.blue,
+                    ),
+                    title: Text('Categories',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.blue)),
+                  ))
+            ]),
+          ),
+          _isCategoryLoading
+              ? SliverList(
+                  delegate: SliverChildListDelegate([
+                  Container(
+                    height: _deviceSize.height * 0.5,
+                    alignment: Alignment.center,
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.blue,
+                    ),
+                  )
+                ]))
+              : SliverGrid(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2),
+                  delegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                    return categoryBox(index, context, _deviceSize, categories);
+                  }, childCount: categories.length + 1),
+                ),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              Container(
+                  width: _deviceSize.width,
+                  color: Colors.white,
+                  child: ListTile(
+                    dense: true,
+                    leading: Icon(
+                      Icons.today,
+                      color: Colors.deepOrange,
+                    ),
+                    title: Text('Today\'s Deals',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.deepOrange)),
+                  ))
+            ]),
+          ),
+          _isDealsLoading
+              ? SliverList(
+                  delegate: SliverChildListDelegate([
+                  Container(
+                    height: _deviceSize.height * 0.5,
+                    alignment: Alignment.center,
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.blue,
+                    ),
+                  )
+                ]))
+              : SliverToBoxAdapter(
+                  child: Container(
+                    height: _deviceSize.height * 0.5,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: 10,
+                      itemBuilder: (context, index) {
+                        return todaysDealsCard(
+                            index, todaysDealProducts, _deviceSize);
+                      },
+                    ),
+                  ),
+                ),
+          SliverToBoxAdapter(
+            child: Divider(),
+          ),
+          SliverList(
+            delegate: SliverChildListDelegate([
+              Container(
+                width: _deviceSize.width,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                color: Colors.white,
+                alignment: Alignment.centerRight,
+                child: Text(
+                  'SEE ALL',
+                  style: TextStyle(
+                      color: Colors.green,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold),
+                ),
+              )
+            ]),
+          ),
+        ]),
+        bottomNavigationBar:
+            model.isAuthenticated ? bottomNavigationBar() : null,
+      );
+    });
+  }
+
+  Widget bottomNavigationBar() {
+    return BottomNavigationBar(
+      onTap: (index) {
+        MaterialPageRoute route =
+            MaterialPageRoute(builder: (context) => Authentication(index));
+
+        Navigator.push(context, route);
+      },
+      items: [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person_outline, color: Colors.green),
+          title: Text('SIGN IN'),
         ),
-        SliverList(
-          delegate: SliverChildListDelegate([
-            Container(
-              width: _deviceSize.width,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              color: Colors.white,
-              alignment: Alignment.centerRight,
-              child: Text(
-                'SEE ALL',
+        BottomNavigationBarItem(
+            icon: Icon(
+              Icons.person_outline,
+              color: Colors.green,
+            ),
+            title: Text('CREATE ACCOUNT',
                 style: TextStyle(
                     color: Colors.green,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold),
-              ),
-            )
-          ]),
-        ),
-      ]),
-      bottomNavigationBar: !_isAuthenticated
-          ? BottomNavigationBar(
-              onTap: (index) {
-                MaterialPageRoute route = MaterialPageRoute(
-                    builder: (context) => Authentication(index));
-
-                Navigator.push(context, route);
-              },
-              items: [
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.person_outline, color: Colors.green),
-                  title: Text('SIGN IN'),
-                ),
-                BottomNavigationBarItem(
-                    icon: Icon(
-                      Icons.person_outline,
-                      color: Colors.green,
-                    ),
-                    title: Text('CREATE ACCOUNT',
-                        style: TextStyle(
-                            color: Colors.green,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600))),
-              ],
-            )
-          : null,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600))),
+      ],
     );
   }
 
@@ -260,6 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
   }
+
   getCategories() async {
     int petsId;
     http.Response response = await http

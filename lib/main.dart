@@ -6,7 +6,7 @@ import 'package:ofypets_mobile_app/scoped-models/main.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final MainModel _model = MainModel();
   // This widget is the root of your application.
 
@@ -17,10 +17,11 @@ class MyApp extends StatelessWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final CartModel _model = CartModel();
+  final MainModel _model = MainModel();
 
   @override
   void initState() {
+    _model.loggedInUser();
     _model.fetchCurrentOrder();
     super.initState();
   }

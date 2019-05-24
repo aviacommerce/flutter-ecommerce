@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:scoped_model/scoped_model.dart';
-import 'package:ofypets_mobile_app/models/order.dart';
 
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 
@@ -16,8 +15,8 @@ class _CartState extends State<Cart> {
   List<int> quantities = [];
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<CartModel>(
-        builder: (BuildContext context, Widget child, CartModel model) {
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
       return Scaffold(
         appBar: AppBar(
             leading: IconButton(
@@ -45,15 +44,15 @@ class _CartState extends State<Cart> {
   }
 
   Widget deleteButton(int index) {
-    return ScopedModelDescendant<CartModel>(
-        builder: (BuildContext context, Widget child, CartModel model) {
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
       return Text(model.lineItems[index].variant.quantity.toString());
     });
   }
 
   Widget body() {
-    return ScopedModelDescendant<CartModel>(
-      builder: (BuildContext context, Widget child, CartModel model) {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
         return CustomScrollView(
           slivers: <Widget>[
             items(),
@@ -65,7 +64,7 @@ class _CartState extends State<Cart> {
     );
   }
 
-  Widget itemTotalContainer(CartModel model) {
+  Widget itemTotalContainer(MainModel model) {
     return SliverList(
       delegate: SliverChildListDelegate([
         Row(
@@ -110,8 +109,8 @@ class _CartState extends State<Cart> {
   }
 
   Widget items() {
-    return ScopedModelDescendant<CartModel>(
-      builder: (BuildContext context, Widget child, CartModel model) {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
         return SliverList(
           delegate:
               SliverChildBuilderDelegate((BuildContext context, int index) {
