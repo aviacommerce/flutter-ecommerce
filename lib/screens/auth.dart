@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/screens/home.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -80,45 +83,49 @@ class _AuthenticationState extends State<Authentication> with SingleTickerProvid
   }
 
   Widget _renderLogin(double targetWidth){
-    return SingleChildScrollView(
-        child: Container(
-          width: targetWidth,
-          child: Form(
-            key: _formKeyForLogin,
-            child: Column(
-              children: <Widget>[
-                SizedBox(
-                  height: 20.0,
-                ),
-                _buildEmailTextField(),
-                _buildPasswordTextField(),
-                SizedBox(
-                  height: 20.0,
-                ),
-                _isLoader ? CircularProgressIndicator(
-                  backgroundColor: Colors.green.shade300
-                  ) :
-                RaisedButton(
-                  textColor: Colors.white,
-                  color: Colors.green.shade300,
-                  child: Text('LOGIN'),
-                  onPressed: () =>
-                      _submitLogin(),
-                ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                Container(
-                  child: Text('FORGET YOUR PASSWORD?',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green.shade300),
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        return SingleChildScrollView(
+          child: Container(
+            width: targetWidth,
+            child: Form(
+              key: _formKeyForLogin,
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: 20.0,
                   ),
-                )
-              ],
+                  _buildEmailTextField(),
+                  _buildPasswordTextField(),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  _isLoader ? CircularProgressIndicator(
+                    backgroundColor: Colors.green.shade300
+                    ) :
+                  RaisedButton(
+                    textColor: Colors.white,
+                    color: Colors.green.shade300,
+                    child: Text('LOGIN'),
+                    onPressed: () =>
+                        _submitLogin(model),
+                  ),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  Container(
+                    child: Text('FORGET YOUR PASSWORD?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green.shade300),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
-        ),
-      );
+        );
+      }
+    );
   }
 
   Widget _renderSignup(double targetWidth){
@@ -206,7 +213,7 @@ class _AuthenticationState extends State<Authentication> with SingleTickerProvid
     );
   }
 
-  void _submitLogin() async {
+  void _submitLogin(MainModel model) async {
     setState(() {
       _isLoader = true;
     });
@@ -234,22 +241,24 @@ class _AuthenticationState extends State<Authentication> with SingleTickerProvid
     if (responseData.containsKey('id')) {
       message = 'Login successfuly.';
       hasError = false;
-      final SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setInt('id', responseData['id']);
-      prefs.setString('email', responseData['email']);
-      prefs.setString('spreeApiKey', responseData['spree_api_key']);
     }else if(responseData.containsKey('error')){
       message = responseData["error"];
     }
 
     final Map<String, dynamic> successInformation = {'success': !hasError, 'message': message};
     if (successInformation['success']) {
-      Navigator.of(context).pop();
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return _alertDialog('Success!', successInformation['message']);
-        });
+      // showDialog(
+      //   context: context,
+      //   builder: (BuildContext context) {
+      //     return _alertDialog('Success!', successInformation['message']);
+      // });
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setInt('id', responseData['id']);
+      prefs.setString('email', responseData['email']);
+      prefs.setString('spreeApiKey', responseData['spree_api_key']);
+      model.loggedInUser();
+      MaterialPageRoute route = MaterialPageRoute(builder: (context) => HomeScreen());
+              Navigator.push(context, route);
     } else {
       showDialog(
         context: context,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/screens/home.dart';
 
 class HomeDrawer extends StatelessWidget {
   Widget logOutButton() {
@@ -18,7 +18,9 @@ class HomeDrawer extends StatelessWidget {
               style: TextStyle(color: Colors.green),
             ),
             onTap: () {
-              print('LOGOUT TO BE IMPLEMENTED HERE');
+              model.logout();
+              MaterialPageRoute route = MaterialPageRoute(builder: (context) => HomeScreen());
+              Navigator.push(context, route);
             },
           );
         } else {

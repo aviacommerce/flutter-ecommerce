@@ -21,4 +21,13 @@ mixin UserModel on Model {
       notifyListeners();
     }
   }
+
+  logout() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('id');
+    prefs.remove('email');
+    prefs.remove('spreeApiKey');
+    _isAuthenticated = false;
+    notifyListeners();
+  }
 }
