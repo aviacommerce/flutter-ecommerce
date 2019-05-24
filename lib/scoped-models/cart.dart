@@ -4,12 +4,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
+import 'package:ofypets_mobile_app/models/order.dart';
 import 'package:ofypets_mobile_app/models/line_item.dart';
 import 'package:ofypets_mobile_app/models/variant.dart';
 
 class CartModel extends Model {
   List<LineItem> _lineItems = [];
+  Order order;
+  bool _isLoading = false;
 
   Map<dynamic, dynamic> lineItemObject = Map();
 
@@ -17,9 +19,24 @@ class CartModel extends Model {
     return List.from(_lineItems);
   }
 
+  bool get isLoading {
+    return _isLoading;
+  }
+
+  Map<String, String> headers = {
+    'Content-Type': 'application/json',
+    'token-type': 'Bearer',
+    'ng-api': 'true'
+  };
+
   void addProduct({int variantId, int quantity}) async {
-    print('ADD TO CART');
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    _lineItems.clear();
+    _isLoading = true;
+    prefs.setString('numberOfItems', _lineItems.length.toString());
+    notifyListeners();
+    print('ADD TO CART');
     final String orderToken = prefs.getString('orderToken');
 
     if (orderToken != null) {
@@ -30,6 +47,20 @@ class CartModel extends Model {
       createNewOrder(variantId, quantity);
     }
     notifyListeners();
+  }
+
+  void removeProduct(int lineItemId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    _isLoading = true;
+    _lineItems.clear();
+    prefs.setString('numberOfItems', _lineItems.length.toString());
+    notifyListeners();
+    http
+        .delete(Settings.SERVER_URL +
+            'api/v1/orders/${prefs.getString('orderNumber')}/line_items/$lineItemId?order_token=${prefs.getString('orderToken')}')
+        .then((response) {
+      fetchCurrentOrder();
+    });
   }
 
   void createNewOrder(int variantId, int quantity) async {
@@ -46,8 +77,10 @@ class CartModel extends Model {
     };
     http
         .post(Settings.SERVER_URL + 'api/v1/orders',
-            body: json.encode(orderParams))
+            headers: headers, body: json.encode(orderParams))
         .then((response) {
+      fetchCurrentOrder();
+
       responseBody = json.decode(response.body);
       prefs.setString('orderToken', responseBody['token']);
       prefs.setString('orderNumber', responseBody['number']);
@@ -55,7 +88,6 @@ class CartModel extends Model {
   }
 
   void createNewLineItem(int variantId, int quantity) async {
-    Map<String, String> headers = {'Content-Type': 'application/json'};
     Map<dynamic, dynamic> responseBody;
     Variant variant;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -71,23 +103,63 @@ class CartModel extends Model {
             headers: headers,
             body: json.encode(lineItemObject))
         .then((response) {
-      responseBody = json.decode(response.body);
-      print(responseBody);
-      variant = Variant(
-          image: responseBody['variant']['images'][0]['product_url'],
-          displayPrice: responseBody['variant']['display_price'],
-          name: responseBody['variant']['name'],
-          quantity: responseBody['quantity']);
-      lineItem = LineItem(
-          id: responseBody['id'],
-          displayAmount: responseBody['display_amount'],
-          quantity: responseBody['quantity'],
-          total: responseBody['total'],
-          variant: variant,
-          variantId: responseBody['variant_id']);
-      _lineItems.add(lineItem);
-      prefs.setString('numberOfItems', _lineItems.length.toString());
-      notifyListeners();
+      fetchCurrentOrder();
+
+      // responseBody = json.decode(response.body);
+      // print(responseBody);
+      // variant = Variant(
+      //     image: responseBody['variant']['images'][0]['product_url'],
+      //     displayPrice: responseBody['variant']['display_price'],
+      //     name: responseBody['variant']['name'],
+      //     quantity: responseBody['quantity']);
+      // lineItem = LineItem(
+      //     id: responseBody['id'],
+      //     displayAmount: responseBody['display_amount'],
+      //     quantity: responseBody['quantity'],
+      //     total: responseBody['total'],
+      //     variant: variant,
+      //     variantId: responseBody['variant_id']);
     });
+  }
+
+  fetchCurrentOrder() async {
+    Map<dynamic, dynamic> responseBody;
+    LineItem lineItem;
+    Variant variant;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String orderToken = prefs.getString('orderToken');
+
+    if (orderToken != null) {
+      http
+          .get(Settings.SERVER_URL +
+              'api/v1/orders/${prefs.getString('orderNumber')}?order_token=${prefs.getString('orderToken')}')
+          .then((response) {
+        responseBody = json.decode(response.body);
+        responseBody['line_items'].forEach((lineItem) {
+          variant = Variant(
+              image: lineItem['variant']['images'][0]['product_url'],
+              displayPrice: lineItem['variant']['display_price'],
+              name: lineItem['variant']['name'],
+              quantity: lineItem['quantity']);
+
+          lineItem = LineItem(
+              id: lineItem['id'],
+              displayAmount: lineItem['display_amount'],
+              quantity: lineItem['quantity'],
+              total: lineItem['total'],
+              variant: variant,
+              variantId: lineItem['variant_id']);
+          _lineItems.add(lineItem);
+        });
+        order = Order(
+            id: responseBody['id'],
+            itemTotal: responseBody['item_total'],
+            displayTotal: responseBody['display_item_total'],
+            lineItems: _lineItems);
+        _isLoading = false;
+        prefs.setString('numberOfItems', _lineItems.length.toString());
+        notifyListeners();
+      });
+    }
   }
 }

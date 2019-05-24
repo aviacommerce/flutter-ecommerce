@@ -6,12 +6,28 @@ import 'package:ofypets_mobile_app/scoped-models/cart.dart';
 
 void main() => runApp(MyApp());
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   // This widget is the root of your application.
+
+  @override
+  State<StatefulWidget> createState() {
+    return _MyAppState();
+  }
+}
+
+class _MyAppState extends State<MyApp> {
+  final CartModel _model = CartModel();
+
+  @override
+  void initState() {
+    _model.fetchCurrentOrder();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScopedModel<CartModel>(
-      model: CartModel(),
+      model: _model,
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
