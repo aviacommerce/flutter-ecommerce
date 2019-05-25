@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ofypets_mobile_app/screens/home.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';

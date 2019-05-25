@@ -16,11 +16,9 @@ class Authentication extends StatefulWidget {
   }
 }
 
-class _AuthenticationState extends State<Authentication> with SingleTickerProviderStateMixin{
-  final Map<String, dynamic> _formData = {
-    'email': null,
-    'password': null
-  };
+class _AuthenticationState extends State<Authentication>
+    with SingleTickerProviderStateMixin {
+  final Map<String, dynamic> _formData = {'email': null, 'password': null};
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _formKeyForLogin = GlobalKey<FormState>();
   final TextEditingController _passwordTextController = TextEditingController();
@@ -30,8 +28,8 @@ class _AuthenticationState extends State<Authentication> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(
-        initialIndex: widget.index, vsync: this, length: 2);
+    _tabController =
+        TabController(initialIndex: widget.index, vsync: this, length: 2);
   }
 
   @override
@@ -82,58 +80,14 @@ class _AuthenticationState extends State<Authentication> with SingleTickerProvid
     );
   }
 
-  Widget _renderLogin(double targetWidth){
+  Widget _renderLogin(double targetWidth) {
     return ScopedModelDescendant<MainModel>(
-      builder: (BuildContext context, Widget child, MainModel model) {
-        return SingleChildScrollView(
-          child: Container(
-            width: targetWidth,
-            child: Form(
-              key: _formKeyForLogin,
-              child: Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  _buildEmailTextField(),
-                  _buildPasswordTextField(),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  _isLoader ? CircularProgressIndicator(
-                    backgroundColor: Colors.green.shade300
-                    ) :
-                  RaisedButton(
-                    textColor: Colors.white,
-                    color: Colors.green.shade300,
-                    child: Text('LOGIN'),
-                    onPressed: () =>
-                        _submitLogin(model),
-                  ),
-                  SizedBox(
-                    height: 20.0,
-                  ),
-                  Container(
-                    child: Text('FORGET YOUR PASSWORD?',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green.shade300),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-        );
-      }
-    );
-  }
-
-  Widget _renderSignup(double targetWidth){
-    return SingleChildScrollView(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return SingleChildScrollView(
         child: Container(
           width: targetWidth,
           child: Form(
-            key: _formKey,
+            key: _formKeyForLogin,
             child: Column(
               children: <Widget>[
                 SizedBox(
@@ -141,28 +95,72 @@ class _AuthenticationState extends State<Authentication> with SingleTickerProvid
                 ),
                 _buildEmailTextField(),
                 _buildPasswordTextField(),
-                _buildPasswordConfirmTextField(),
                 SizedBox(
                   height: 20.0,
                 ),
-                _isLoader ? CircularProgressIndicator(
-                  backgroundColor: Colors.green.shade300
-                  ) :
-                RaisedButton(
-                  textColor: Colors.white,
-                  color: Colors.green.shade300,
-                  child: Text('SIGNUP'),
-                  onPressed: () =>
-                      _submitForm(),
-                ),
+                _isLoader
+                    ? CircularProgressIndicator(
+                        backgroundColor: Colors.green.shade300)
+                    : RaisedButton(
+                        textColor: Colors.white,
+                        color: Colors.green.shade300,
+                        child: Text('LOGIN'),
+                        onPressed: () => _submitLogin(model),
+                      ),
                 SizedBox(
                   height: 20.0,
                 ),
+                Container(
+                  child: Text(
+                    'FORGET YOUR PASSWORD?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green.shade300),
+                  ),
+                )
               ],
             ),
           ),
         ),
       );
+    });
+  }
+
+  Widget _renderSignup(double targetWidth) {
+    return SingleChildScrollView(
+      child: Container(
+        width: targetWidth,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                height: 20.0,
+              ),
+              _buildEmailTextField(),
+              _buildPasswordTextField(),
+              _buildPasswordConfirmTextField(),
+              SizedBox(
+                height: 20.0,
+              ),
+              _isLoader
+                  ? CircularProgressIndicator(
+                      backgroundColor: Colors.green.shade300)
+                  : RaisedButton(
+                      textColor: Colors.white,
+                      color: Colors.green.shade300,
+                      child: Text('SIGNUP'),
+                      onPressed: () => _submitForm(),
+                    ),
+              SizedBox(
+                height: 20.0,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildEmailTextField() {
@@ -224,10 +222,12 @@ class _AuthenticationState extends State<Authentication> with SingleTickerProvid
       return;
     }
     _formKeyForLogin.currentState.save();
-    final Map<String, dynamic> authData = { "spree_user":{
-      'email': _formData['email'],
-      'password': _formData['password'],
-    }};
+    final Map<String, dynamic> authData = {
+      "spree_user": {
+        'email': _formData['email'],
+        'password': _formData['password'],
+      }
+    };
 
     final http.Response response = await http.post(
       Settings.SERVER_URL + 'login.json',
@@ -241,30 +241,31 @@ class _AuthenticationState extends State<Authentication> with SingleTickerProvid
     if (responseData.containsKey('id')) {
       message = 'Login successfuly.';
       hasError = false;
-    }else if(responseData.containsKey('error')){
+    } else if (responseData.containsKey('error')) {
       message = responseData["error"];
     }
 
-    final Map<String, dynamic> successInformation = {'success': !hasError, 'message': message};
+    final Map<String, dynamic> successInformation = {
+      'success': !hasError,
+      'message': message
+    };
     if (successInformation['success']) {
-      // showDialog(
-      //   context: context,
-      //   builder: (BuildContext context) {
-      //     return _alertDialog('Success!', successInformation['message']);
-      // });
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setInt('id', responseData['id']);
       prefs.setString('email', responseData['email']);
       prefs.setString('spreeApiKey', responseData['spree_api_key']);
+      model.fetchCurrentOrder();
       model.loggedInUser();
-      MaterialPageRoute route = MaterialPageRoute(builder: (context) => HomeScreen());
-              Navigator.push(context, route);
+      MaterialPageRoute route =
+          MaterialPageRoute(builder: (context) => HomeScreen());
+      Navigator.pushReplacement(context, route);
     } else {
       showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return _alertDialog('An Error Occurred!', successInformation['message']);
-        });
+          context: context,
+          builder: (BuildContext context) {
+            return _alertDialog(
+                'An Error Occurred!', successInformation['message']);
+          });
     }
     setState(() {
       _isLoader = false;
@@ -282,10 +283,12 @@ class _AuthenticationState extends State<Authentication> with SingleTickerProvid
       return;
     }
     _formKey.currentState.save();
-    final Map<String, dynamic> authData = { "spree_user":{
-      'email': _formData['email'],
-      'password': _formData['password'],
-    }};
+    final Map<String, dynamic> authData = {
+      "spree_user": {
+        'email': _formData['email'],
+        'password': _formData['password'],
+      }
+    };
 
     final http.Response response = await http.post(
       Settings.SERVER_URL + 'auth/accounts',
@@ -301,39 +304,43 @@ class _AuthenticationState extends State<Authentication> with SingleTickerProvid
       print('success');
       message = 'Register successfuly.';
       hasError = false;
-    }else if(responseData.containsKey('errors')){
+    } else if (responseData.containsKey('errors')) {
       message = "Email " + responseData["errors"]["email"][0];
     }
 
-    final Map<String, dynamic> successInformation = {'success': !hasError, 'message': message};
+    final Map<String, dynamic> successInformation = {
+      'success': !hasError,
+      'message': message
+    };
     if (successInformation['success']) {
       Navigator.of(context).pop();
       showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return _alertDialog('Success!', successInformation['message']);
-        });
+          context: context,
+          builder: (BuildContext context) {
+            return _alertDialog('Success!', successInformation['message']);
+          });
     } else {
       showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return _alertDialog('An Error Occurred!', successInformation['message']);
-        });
+          context: context,
+          builder: (BuildContext context) {
+            return _alertDialog(
+                'An Error Occurred!', successInformation['message']);
+          });
     }
     setState(() {
       _isLoader = false;
     });
   }
 
-  Widget _alertDialog(String boxTitle, String message){
+  Widget _alertDialog(String boxTitle, String message) {
     return AlertDialog(
       title: Text(boxTitle),
       content: Text(message),
       actions: <Widget>[
         FlatButton(
           child: Text('Okay',
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green.shade300)
-          ),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, color: Colors.green.shade300)),
           onPressed: () {
             Navigator.of(context).pop();
           },

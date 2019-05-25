@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/screens/address.dart';
+import 'package:ofypets_mobile_app/screens/auth.dart';
 
 class Cart extends StatefulWidget {
   @override
@@ -90,22 +92,33 @@ class _CartState extends State<Cart> {
   }
 
   Widget proceedToCheckoutButton() {
-    return SliverList(
-        delegate: SliverChildListDelegate([
-      Container(
-        padding: EdgeInsets.all(20),
-        child: FlatButton(
-          color: Colors.green,
-          child: Text(
-            'PROCEED TO CHECKOUT',
-            style: TextStyle(fontSize: 20, color: Colors.white),
+    MaterialPageRoute addressRoute =
+        MaterialPageRoute(builder: (context) => AddressPage());
+
+    MaterialPageRoute authRoute =
+        MaterialPageRoute(builder: (context) => Authentication(0));
+
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return SliverList(
+          delegate: SliverChildListDelegate([
+        Container(
+          padding: EdgeInsets.all(20),
+          child: FlatButton(
+            color: Colors.green,
+            child: Text(
+              'PROCEED TO CHECKOUT',
+              style: TextStyle(fontSize: 20, color: Colors.white),
+            ),
+            onPressed: () {
+              model.isAuthenticated
+                  ? Navigator.push(context, addressRoute)
+                  : Navigator.push(context, authRoute);
+            },
           ),
-          onPressed: () {
-            
-          },
-        ),
-      )
-    ]));
+        )
+      ]));
+    });
   }
 
   Widget items() {
