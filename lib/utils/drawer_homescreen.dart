@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/home.dart';
+import 'package:http/http.dart' as http;
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeDrawer extends StatelessWidget {
+
   Widget logOutButton() {
     return ScopedModelDescendant(
       builder: (BuildContext context, Widget child, MainModel model) {
@@ -18,9 +20,7 @@ class HomeDrawer extends StatelessWidget {
               style: TextStyle(color: Colors.green),
             ),
             onTap: () {
-              model.logout();
-              MaterialPageRoute route = MaterialPageRoute(builder: (context) => HomeScreen());
-              Navigator.push(context, route);
+              logoutUser(model);
             },
           );
         } else {
@@ -30,6 +30,25 @@ class HomeDrawer extends StatelessWidget {
     );
   }
 
+  logoutUser(MainModel model) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String user_id = prefs.getInt('id').toString();
+    String api_key = prefs.getString('spreeApiKey');
+    Map<String, String> headers = {
+    'Content-Type': 'application/json',
+    'token-type': 'Bearer',
+    'ng-api': 'true',
+    'Auth-Token': api_key,
+    'uid': user_id
+  };
+    http
+    .get(Settings.SERVER_URL + 'logout.json', headers: headers)
+    .then((response){
+      prefs.clear();
+      model.loggedInUser();
+      print(response);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Drawer(
