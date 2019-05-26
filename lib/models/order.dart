@@ -5,6 +5,14 @@ class Order {
   final String itemTotal;
   final String displayTotal;
   final List<LineItem> lineItems;
+  int totalQuantity;
+  String shipTotal;
 
-  Order({this.id, this.displayTotal, this.itemTotal, this.lineItems});
+  Order(
+      {this.id,
+      this.displayTotal,
+      this.itemTotal,
+      this.lineItems,
+      this.shipTotal,
+      this.totalQuantity});
 }

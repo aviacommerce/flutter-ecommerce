@@ -73,12 +73,14 @@ class _CartState extends State<Cart> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             Text(
-              'SubTotal',
+              model.order == null ? '' : 'SubTotal',
               style: TextStyle(fontSize: 20, color: Colors.green),
             ),
             Container(
               child: Text(
-                model.order.displayTotal,
+                model.order == null
+                    ? 'No Items in Cart'
+                    : model.order.displayTotal,
                 style: TextStyle(
                     fontSize: 20,
                     color: Colors.red,
@@ -107,13 +109,18 @@ class _CartState extends State<Cart> {
           child: FlatButton(
             color: Colors.green,
             child: Text(
-              'PROCEED TO CHECKOUT',
+              model.order == null ? 'BROWSE ITEMS' : 'PROCEED TO CHECKOUT',
               style: TextStyle(fontSize: 20, color: Colors.white),
             ),
             onPressed: () {
-              model.isAuthenticated
-                  ? Navigator.push(context, addressRoute)
-                  : Navigator.push(context, authRoute);
+              if (model.order != null) {
+                model.isAuthenticated
+                    ? Navigator.push(context, addressRoute)
+                    : Navigator.push(context, authRoute);
+              } else {
+                Navigator.popUntil(
+                    context, ModalRoute.withName(Navigator.defaultRouteName));
+              }
             },
           ),
         )

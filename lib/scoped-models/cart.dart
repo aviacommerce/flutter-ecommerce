@@ -13,6 +13,7 @@ mixin CartModel on Model {
   List<LineItem> _lineItems = [];
   Order order;
   bool _isLoading = false;
+  Map<String, dynamic> _shipAddress;
 
   Map<dynamic, dynamic> lineItemObject = Map();
 
@@ -22,6 +23,10 @@ mixin CartModel on Model {
 
   bool get isLoading {
     return _isLoading;
+  }
+
+  Map<String, dynamic> get shipAddress {
+    return _shipAddress;
   }
 
   Map<String, String> headers = {
@@ -125,7 +130,7 @@ mixin CartModel on Model {
 
   fetchCurrentOrder() async {
     Map<dynamic, dynamic> responseBody;
-    String url;
+    String url = '';
     Map<String, String> headers;
     LineItem lineItem;
     Variant variant;
@@ -141,7 +146,7 @@ mixin CartModel on Model {
         'token-type': 'Bearer',
         'ng-api': 'true'
       };
-    } else {
+    } else if (spreeApiKey != null) {
       url = 'api/v1/orders/current';
       headers = {
         'Content-Type': 'application/json',
@@ -153,35 +158,41 @@ mixin CartModel on Model {
     }
 
     print(url);
+    if (url != '') {
+      http.get(Settings.SERVER_URL + url, headers: headers).then((response) {
+        responseBody = json.decode(response.body);
+        print(responseBody);
+        responseBody['line_items'].forEach((lineItem) {
+          variant = Variant(
+              image: lineItem['variant']['images'][0]['product_url'],
+              displayPrice: lineItem['variant']['display_price'],
+              name: lineItem['variant']['name'],
+              quantity: lineItem['quantity']);
 
-    http.get(Settings.SERVER_URL + url, headers: headers).then((response) {
-      responseBody = json.decode(response.body);
-      print(responseBody);
-      responseBody['line_items'].forEach((lineItem) {
-        variant = Variant(
-            image: lineItem['variant']['images'][0]['product_url'],
-            displayPrice: lineItem['variant']['display_price'],
-            name: lineItem['variant']['name'],
-            quantity: lineItem['quantity']);
-
-        lineItem = LineItem(
-            id: lineItem['id'],
-            displayAmount: lineItem['display_amount'],
-            quantity: lineItem['quantity'],
-            total: lineItem['total'],
-            variant: variant,
-            variantId: lineItem['variant_id']);
-        _lineItems.add(lineItem);
+          lineItem = LineItem(
+              id: lineItem['id'],
+              displayAmount: lineItem['display_amount'],
+              quantity: lineItem['quantity'],
+              total: lineItem['total'],
+              variant: variant,
+              variantId: lineItem['variant_id']);
+          _lineItems.add(lineItem);
+        });
+        order = Order(
+            id: responseBody['id'],
+            itemTotal: responseBody['item_total'],
+            displayTotal: responseBody['display_item_total'],
+            lineItems: _lineItems,
+            shipTotal: responseBody['display_ship_total'],
+            totalQuantity: responseBody['total_quantity']);
+        _isLoading = false;
+        prefs.setString('numberOfItems', _lineItems.length.toString());
+        print(responseBody['ship_address']);
+        if (responseBody['ship_address'] != null) {
+          _shipAddress = responseBody['ship_address'];
+        }
+        notifyListeners();
       });
-      order = Order(
-          id: responseBody['id'],
-          itemTotal: responseBody['item_total'],
-          displayTotal: responseBody['display_item_total'],
-          lineItems: _lineItems);
-      _isLoading = false;
-      prefs.setString('numberOfItems', _lineItems.length.toString());
-      prefs.setString('shipAddress', responseBody['ship_address']);
-      notifyListeners();
-    });
+    }
   }
 }

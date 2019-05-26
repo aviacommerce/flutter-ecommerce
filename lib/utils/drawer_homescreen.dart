@@ -3,9 +3,9 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 
 class HomeDrawer extends StatelessWidget {
-
   Widget logOutButton() {
     return ScopedModelDescendant(
       builder: (BuildContext context, Widget child, MainModel model) {
@@ -35,20 +35,21 @@ class HomeDrawer extends StatelessWidget {
     String user_id = prefs.getInt('id').toString();
     String api_key = prefs.getString('spreeApiKey');
     Map<String, String> headers = {
-    'Content-Type': 'application/json',
-    'token-type': 'Bearer',
-    'ng-api': 'true',
-    'Auth-Token': api_key,
-    'uid': user_id
-  };
+      'Content-Type': 'application/json',
+      'token-type': 'Bearer',
+      'ng-api': 'true',
+      'Auth-Token': api_key,
+      'uid': user_id
+    };
     http
-    .get(Settings.SERVER_URL + 'logout.json', headers: headers)
-    .then((response){
+        .get(Settings.SERVER_URL + 'logout.json', headers: headers)
+        .then((response) {
       prefs.clear();
       model.loggedInUser();
-      print(response);
+      model.fetchCurrentOrder();
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
