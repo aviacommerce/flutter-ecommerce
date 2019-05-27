@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:intl/intl.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
 
 import 'package:ofypets_mobile_app/models/product.dart';
+import 'package:ofypets_mobile_app/models/review.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/cart.dart';
@@ -23,6 +29,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   int quantity = 1;
   Product selectedProduct;
   bool _hasVariants = false;
+  List<Review> reviews = [];
+  int total_reviews = 0;
+  double recommended_percent = 0;
+  double avg_rating = 0;
 
   @override
   void initState() {
@@ -33,7 +43,48 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     } else {
       selectedProduct = widget.product;
     }
+    get_reviews();
     super.initState();
+  }
+
+  get_reviews() {
+    Map<dynamic, dynamic> responseBody;
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'token-type': 'Bearer',
+      'ng-api': 'true',
+    };
+    reviews = [];
+    String url = Settings.SERVER_URL +
+        "products/${selectedProduct.review_product_id}/reviews";
+    http.get(url, headers: headers).then((response) {
+      responseBody = json.decode(response.body);
+      double total = 0;
+      double total_given_rating = 0;
+      responseBody['rating_summery'].forEach((rating) {
+        if (rating['percentage'] != null) {
+          total += rating["percentage"];
+        }
+        total_given_rating += rating['rating'] * rating['count'];
+      });
+      total_reviews = responseBody['total_ratings'];
+      if (total_reviews > 0) {
+        avg_rating = (total_given_rating / total_reviews);
+      }
+      recommended_percent = total;
+      responseBody['reviews'].forEach((review) {
+        reviews.add(Review(
+            id: review['id'],
+            name: review['name'],
+            title: review['title'],
+            review: review['review'],
+            rating: review['rating'].toDouble(),
+            approved: review['approved'],
+            created_at: review['created_at'],
+            updated_at: review['updated_at']));
+      });
+      setState(() {});
+    });
   }
 
   @override
@@ -64,9 +115,146 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         ),
         body: TabBarView(
           controller: _tabController,
-          children: <Widget>[highlightsTab(), Text('REVIEWS')],
+          children: <Widget>[highlightsTab(), reviewsTab()],
         ),
         floatingActionButton: addToCartFAB());
+  }
+
+  Widget reviewsTab() {
+    if (reviews.length == 0) {
+      return Container(child: Center(child: Text("No Reviews found")));
+    }
+    return ListView.builder(
+      itemCount: reviews.length + 1,
+      itemBuilder: (BuildContext context, int index) {
+        if (index == 0) {
+          return rating_summary(avg_rating, recommended_percent, total_reviews);
+        }
+        return review(reviews[index - 1]);
+      },
+    );
+  }
+
+  Widget rating_summary(rating, recommended_percent, total_reviews) {
+    return Card(
+      elevation: 2.5,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Expanded(
+                    flex: 1,
+                    child: Column(
+                      children: <Widget>[
+                        Container(
+                          padding: const EdgeInsets.all(10.0),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle, color: Colors.orange),
+                          child: Text(
+                            rating.toStringAsFixed(1),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17.0,
+                                fontWeight: FontWeight.w300),
+                          ),
+                        ),
+                        ratingBar(rating, 14)
+                      ],
+                    )),
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text("${total_reviews} Customer Reviews",
+                          style: TextStyle(
+                              fontSize: 12.0, fontWeight: FontWeight.w400)),
+                      Text(
+                          "Recommended by ${recommended_percent}% of reviewers",
+                          style: TextStyle(
+                              fontSize: 15.0, fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget review(Review review) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child: Column(
+              children: <Widget>[
+                Container(
+                  padding: const EdgeInsets.all(10.0),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle, color: Colors.orange),
+                  child: Text(
+                    review.rating.toString(),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w300),
+                  ),
+                ),
+                ratingBar(review.rating, 12)
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Container(
+              padding: EdgeInsets.only(bottom: 12.0),
+              decoration: BoxDecoration(
+                  border: Border(
+                      bottom:
+                          BorderSide(color: Color(0xFFDCDCDC), width: 0.7))),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 5.0),
+                    child: Text(review.title,
+                        style: TextStyle(
+                            fontSize: 15.0, fontWeight: FontWeight.bold)),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 5.0),
+                    child: Text(getReviewByText(review),
+                        style: TextStyle(
+                            fontSize: 13.0,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.grey)),
+                  ),
+                  Text(review.review,
+                      style: TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.w300))
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  String getReviewByText(Review review) {
+    RegExp exp = new RegExp(r"([^@]+)");
+    var now = DateTime.parse(review.created_at);
+    var formatter = new DateFormat('MMM d y');
+
+    return "By ${exp.firstMatch(review.name).group(0)} - ${formatter.format(now)}";
   }
 
   Widget highlightsTab() {

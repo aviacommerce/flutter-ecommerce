@@ -189,6 +189,7 @@ class _BrandListState extends State<BrandList> {
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['products'].forEach((product) {
+        int review_product_id = product["id"];
         variants = [];
         if (product['has_variants']) {
           product['variants'].forEach((variant) {
@@ -209,6 +210,7 @@ class _BrandListState extends State<BrandList> {
                 isOrderable: variant['is_orderable'],
                 avgRating: double.parse(product['avg_rating']),
                 reviewsCount: product['reviews_count'].toString(),
+                review_product_id: review_product_id
               ));
             });
           });
@@ -220,6 +222,7 @@ class _BrandListState extends State<BrandList> {
                 reviewsCount: product['reviews_count'].toString(),
                 image: product['master']['images'][0]['product_url'],
                 variants: variants,
+                review_product_id: review_product_id,
                 hasVariants: product['has_variants']));
           });
         } else {
@@ -233,6 +236,7 @@ class _BrandListState extends State<BrandList> {
               image: product['master']['images'][0]['product_url'],
               hasVariants: product['has_variants'],
               isOrderable: product['master']['is_orderable'],
+              review_product_id: review_product_id,
               description: product['description'],
             ));
           });

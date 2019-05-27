@@ -11,6 +11,7 @@ class Product {
   final List<Product> variants;
   final List<Map<dynamic, dynamic>> optionValues;
   String description;
+  final int review_product_id;
   
   Product({
     this.id,
@@ -25,6 +26,7 @@ class Product {
     this.hasVariants,
     this.description,
     this.optionValues,
+    this.review_product_id
   });
 
 }
