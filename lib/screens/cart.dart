@@ -72,13 +72,14 @@ class _CartState extends State<Cart> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
+            model.order.itemTotal == '0.0' ? Container():
             Text(
-              model.order == null ? '' : 'SubTotal',
+              'SubTotal',
               style: TextStyle(fontSize: 20, color: Colors.green),
             ),
             Container(
               child: Text(
-                model.order == null
+                model.order.itemTotal == '0.0'
                     ? 'No Items in Cart'
                     : model.order.displayTotal,
                 style: TextStyle(
@@ -102,6 +103,7 @@ class _CartState extends State<Cart> {
 
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
+          print(model.order.itemTotal);
       return SliverList(
           delegate: SliverChildListDelegate([
         Container(
@@ -109,14 +111,20 @@ class _CartState extends State<Cart> {
           child: FlatButton(
             color: Colors.green,
             child: Text(
-              model.order == null ? 'BROWSE ITEMS' : 'PROCEED TO CHECKOUT',
+              model.order.itemTotal == '0.0' ? 'BROWSE ITEMS' : 'PROCEED TO CHECKOUT',
               style: TextStyle(fontSize: 20, color: Colors.white),
             ),
             onPressed: () {
-              if (model.order != null) {
-                model.isAuthenticated
-                    ? Navigator.push(context, addressRoute)
-                    : Navigator.push(context, authRoute);
+              if (model.order.itemTotal != '0.0') {
+                if (model.isAuthenticated) {
+                  if (model.order.state == 'cart') {
+                    model.changeState();
+                  }
+
+                  Navigator.push(context, addressRoute);
+                } else {
+                  Navigator.push(context, authRoute);
+                }
               } else {
                 Navigator.popUntil(
                     context, ModalRoute.withName(Navigator.defaultRouteName));

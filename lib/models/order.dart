@@ -7,6 +7,7 @@ class Order {
   final List<LineItem> lineItems;
   int totalQuantity;
   String shipTotal;
+  String state;
 
   Order(
       {this.id,
@@ -14,5 +15,6 @@ class Order {
       this.itemTotal,
       this.lineItems,
       this.shipTotal,
-      this.totalQuantity});
+      this.totalQuantity,
+      this.state});
 }

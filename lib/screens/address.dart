@@ -82,21 +82,29 @@ class _AddressPageState extends State<AddressPage> {
   }
 
   Widget paymentButton(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      child: FlatButton(
-        color: Colors.green,
-        child: Text(
-          'CONTINUE TO PAYMENT',
-          style: TextStyle(fontSize: 20, color: Colors.white),
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return Container(
+        padding: EdgeInsets.all(20),
+        child: FlatButton(
+          color: Colors.green,
+          child: Text(
+            'CONTINUE TO PAYMENT',
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
+          onPressed: () {
+            if (model.order.state == 'delivery' ||
+                model.order.state == 'address') {
+                  model.changeState();
+                  //Success Page
+                }
+            MaterialPageRoute payment =
+                MaterialPageRoute(builder: (context) => PaymentScreen());
+            Navigator.push(context, payment);
+          },
         ),
-        onPressed: () {
-          MaterialPageRoute payment =
-              MaterialPageRoute(builder: (context) => PaymentScreen());
-          Navigator.push(context, payment);
-        },
-      ),
-    );
+      );
+    });
   }
 
   Widget textFieldContainer(String text) {
