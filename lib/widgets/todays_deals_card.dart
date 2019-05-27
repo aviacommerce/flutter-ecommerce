@@ -5,6 +5,7 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/screens/product_detail.dart';
 
 Widget addToCartButton(List<Product> todaysDealProducts, int index) {
   return ScopedModelDescendant<MainModel>(
@@ -12,7 +13,8 @@ Widget addToCartButton(List<Product> todaysDealProducts, int index) {
     return FlatButton(
       onPressed: () {
         if (todaysDealProducts[index].isOrderable) {
-          model.addProduct();
+          model.addProduct(
+              variantId: todaysDealProducts[index].id, quantity: 1);
         }
       },
       child: Text(
@@ -28,43 +30,52 @@ Widget addToCartButton(List<Product> todaysDealProducts, int index) {
   });
 }
 
-Widget todaysDealsCard(
-    int index, List<Product> todaysDealProducts, Size _deviceSize) {
-  return SizedBox(
-      width: _deviceSize.width * 0.4,
-      child: Card(
-        borderOnForeground: true,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: <Widget>[
-            FadeInImage(
-              image: NetworkImage(todaysDealProducts[index].image),
-              placeholder:
-                  AssetImage('images/placeholders/no-product-image.png'),
-              height: _deviceSize.height * 0.2,
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
-              child: Text(
-                todaysDealProducts[index].name,
-                maxLines: 3,
-              ),
-            ),
-            Text(
-              todaysDealProducts[index].displayPrice,
-              style: TextStyle(
-                  color: Colors.red, fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+Widget todaysDealsCard(int index, List<Product> todaysDealProducts,
+    Size _deviceSize, BuildContext context) {
+  return GestureDetector(
+      onTap: () {
+        MaterialPageRoute addressRoute = MaterialPageRoute(
+            builder: (context) =>
+                ProductDetailScreen(todaysDealProducts[index]));
+        Navigator.push(context, addressRoute);
+      },
+      child: SizedBox(
+          width: _deviceSize.width * 0.4,
+          child: Card(
+            borderOnForeground: true,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                ratingBar(todaysDealProducts[index].avgRating, 20),
-                Text(todaysDealProducts[index].reviewsCount),
+                FadeInImage(
+                  image: NetworkImage(todaysDealProducts[index].image),
+                  placeholder:
+                      AssetImage('images/placeholders/no-product-image.png'),
+                  height: _deviceSize.height * 0.2,
+                ),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+                  child: Text(
+                    todaysDealProducts[index].name,
+                    maxLines: 3,
+                  ),
+                ),
+                Text(
+                  todaysDealProducts[index].displayPrice,
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    ratingBar(todaysDealProducts[index].avgRating, 20),
+                    Text(todaysDealProducts[index].reviewsCount),
+                  ],
+                ),
+                Divider(),
+                addToCartButton(todaysDealProducts, index)
               ],
             ),
-            Divider(),
-            addToCartButton(todaysDealProducts, index)
-          ],
-        ),
-      ));
+          )));
 }

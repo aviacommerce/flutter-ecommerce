@@ -72,14 +72,15 @@ class _CartState extends State<Cart> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
-            model.order.itemTotal == '0.0' ? Container():
-            Text(
-              'SubTotal',
-              style: TextStyle(fontSize: 20, color: Colors.green),
-            ),
+            model.order == null
+                ? Container()
+                : Text(
+                    'SubTotal',
+                    style: TextStyle(fontSize: 20, color: Colors.green),
+                  ),
             Container(
               child: Text(
-                model.order.itemTotal == '0.0'
+                model.order == null
                     ? 'No Items in Cart'
                     : model.order.displayTotal,
                 style: TextStyle(
@@ -103,7 +104,6 @@ class _CartState extends State<Cart> {
 
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-          print(model.order.itemTotal);
       return SliverList(
           delegate: SliverChildListDelegate([
         Container(
@@ -111,19 +111,21 @@ class _CartState extends State<Cart> {
           child: FlatButton(
             color: Colors.green,
             child: Text(
-              model.order.itemTotal == '0.0' ? 'BROWSE ITEMS' : 'PROCEED TO CHECKOUT',
+              model.order == null ? 'BROWSE ITEMS' : 'PROCEED TO CHECKOUT',
               style: TextStyle(fontSize: 20, color: Colors.white),
             ),
             onPressed: () {
-              if (model.order.itemTotal != '0.0') {
-                if (model.isAuthenticated) {
-                  if (model.order.state == 'cart') {
-                    model.changeState();
-                  }
+              if (model.order != null) {
+                if (model.order.itemTotal != '0.0') {
+                  if (model.isAuthenticated) {
+                    if (model.order.state == 'cart') {
+                      model.changeState();
+                    }
 
-                  Navigator.push(context, addressRoute);
-                } else {
-                  Navigator.push(context, authRoute);
+                    Navigator.push(context, addressRoute);
+                  } else {
+                    Navigator.push(context, authRoute);
+                  }
                 }
               } else {
                 Navigator.popUntil(

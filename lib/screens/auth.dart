@@ -256,9 +256,7 @@ class _AuthenticationState extends State<Authentication>
       prefs.setString('spreeApiKey', responseData['spree_api_key']);
       model.fetchCurrentOrder();
       model.loggedInUser();
-      MaterialPageRoute route =
-          MaterialPageRoute(builder: (context) => HomeScreen());
-      Navigator.pushReplacement(context, route);
+      Navigator.of(context).pop();
     } else {
       showDialog(
           context: context,

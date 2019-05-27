@@ -169,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemCount: 10,
                       itemBuilder: (context, index) {
                         return todaysDealsCard(
-                            index, todaysDealProducts, _deviceSize);
+                            index, todaysDealProducts, _deviceSize, context);
                       },
                     ),
                   ),
@@ -309,6 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (product['has_variants']) {
           setState(() {
             todaysDealProducts.add(Product(
+                id: product['variants'][0]['id'],
                 name: product['variants'][0]['name'],
                 displayPrice: product['variants'][0]['display_price'],
                 avgRating: double.parse(product['avg_rating']),
@@ -319,6 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
         } else {
           setState(() {
             todaysDealProducts.add(Product(
+                id: product['id'],
                 name: product['name'],
                 displayPrice: product['display_price'],
                 avgRating: double.parse(product['avg_rating']),

@@ -35,6 +35,8 @@ mixin CartModel on Model {
   };
 
   void addProduct({int variantId, int quantity}) async {
+    print(quantity);
+    print(variantId);
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     _lineItems.clear();
@@ -84,16 +86,32 @@ mixin CartModel on Model {
         .post(Settings.SERVER_URL + 'api/v1/orders',
             headers: headers, body: json.encode(orderParams))
         .then((response) {
-      fetchCurrentOrder();
-
       responseBody = json.decode(response.body);
       prefs.setString('orderToken', responseBody['token']);
       prefs.setString('orderNumber', responseBody['number']);
+      fetchCurrentOrder();
     });
   }
 
   void createNewLineItem(int variantId, int quantity) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String spreeApiKey = prefs.getString('spreeApiKey');
+    if (spreeApiKey == null) {
+      headers = {
+        'Content-Type': 'application/json',
+        'token-type': 'Bearer',
+        'ng-api': 'true',
+        'Guest-Order-Token': prefs.getString('orderToken')
+      };
+    } else {
+      headers = {
+        'Content-Type': 'application/json',
+        'token-type': 'Bearer',
+        'ng-api': 'true',
+        'auth-token': prefs.getString('spreeApiKey'),
+        'Guest-Order-Token': prefs.getString('orderToken')
+      };
+    }
 
     lineItemObject = {
       "line_item": {"variant_id": variantId, "quantity": quantity}
@@ -144,6 +162,7 @@ mixin CartModel on Model {
     if (url != '') {
       http.get(Settings.SERVER_URL + url, headers: headers).then((response) {
         responseBody = json.decode(response.body);
+        print(responseBody['line_items']);
         responseBody['line_items'].forEach((lineItem) {
           variant = Variant(
               image: lineItem['variant']['images'][0]['product_url'],
@@ -173,12 +192,15 @@ mixin CartModel on Model {
         print(responseBody['token']);
         prefs.setString('numberOfItems', _lineItems.length.toString());
         prefs.setString('orderToken', responseBody['token']);
+        prefs.setString('orderNumber', responseBody['number']);
         if (responseBody['ship_address'] != null) {
           _shipAddress = responseBody['ship_address'];
         }
 
         notifyListeners();
       });
+    } else {
+      _lineItems = [];
     }
   }
 
@@ -199,6 +221,7 @@ mixin CartModel on Model {
                 'api/v1/checkouts/${prefs.getString('orderNumber')}/next.json?order_token=${prefs.getString('orderToken')}',
             headers: headers)
         .then((response) {
+      responseBody = json.decode(response.body);
       order = Order(
           id: responseBody['id'],
           itemTotal: responseBody['item_total'],

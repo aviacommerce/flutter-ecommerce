@@ -37,9 +37,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
-    if (widget.product.hasVariants) {
-      _hasVariants = widget.product.hasVariants;
-      selectedProduct = widget.product.variants.first;
+
+    if (widget.product.hasVariants != null) {
+      if (widget.product.hasVariants) {
+        _hasVariants = widget.product.hasVariants;
+        selectedProduct = widget.product.variants.first;
+      }
     } else {
       selectedProduct = widget.product;
     }
