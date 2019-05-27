@@ -12,7 +12,7 @@ import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/cart.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart'
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
