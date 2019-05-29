@@ -4,6 +4,7 @@ class Order {
   final int id;
   final String itemTotal;
   final String displayTotal;
+  final String displaySubTotal;
   final List<LineItem> lineItems;
   int totalQuantity;
   String shipTotal;
@@ -11,6 +12,7 @@ class Order {
 
   Order(
       {this.id,
+      this.displaySubTotal,
       this.displayTotal,
       this.itemTotal,
       this.lineItems,

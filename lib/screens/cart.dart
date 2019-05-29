@@ -15,28 +15,32 @@ class Cart extends StatefulWidget {
 
 class _CartState extends State<Cart> {
   List<int> quantities = [];
+  bool stateChanged = true;
+
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
+          print('order');
+          print(model.order);
       return Scaffold(
-        appBar: AppBar(
-            leading: IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            title: Text('Shopping Cart'),
-            bottom: model.isLoading
-                ? PreferredSize(
-                    child: LinearProgressIndicator(),
-                    preferredSize: Size.fromHeight(10),
-                  )
-                : PreferredSize(
-                    child: Container(),
-                    preferredSize: Size.fromHeight(10),
-                  )),
-        body: body(),
-      );
+          appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              title: Text('Shopping Cart'),
+              bottom: model.isLoading
+                  ? PreferredSize(
+                      child: LinearProgressIndicator(),
+                      preferredSize: Size.fromHeight(10),
+                    )
+                  : PreferredSize(
+                      child: Container(),
+                      preferredSize: Size.fromHeight(10),
+                    )),
+          body: body(),
+          bottomNavigationBar: proceedToCheckoutButton());
     });
   }
 
@@ -59,7 +63,6 @@ class _CartState extends State<Cart> {
           slivers: <Widget>[
             items(),
             itemTotalContainer(model),
-            proceedToCheckoutButton()
           ],
         );
       },
@@ -70,19 +73,23 @@ class _CartState extends State<Cart> {
     return SliverList(
       delegate: SliverChildListDelegate([
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             model.order == null
                 ? Container()
-                : Text(
-                    'SubTotal',
-                    style: TextStyle(fontSize: 20, color: Colors.green),
-                  ),
+                : model.order.itemTotal != '0.0'
+                    ? Text(
+                        'SubTotal: ',
+                        style: TextStyle(fontSize: 20, color: Colors.green),
+                      )
+                    : Container(),
             Container(
               child: Text(
                 model.order == null
                     ? 'No Items in Cart'
-                    : model.order.displayTotal,
+                    : model.order.itemTotal != '0.0'
+                        ? model.order.displaySubTotal
+                        : 'No Items in Cart',
                 style: TextStyle(
                     fontSize: 20,
                     color: Colors.red,
@@ -104,37 +111,49 @@ class _CartState extends State<Cart> {
 
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-      return SliverList(
-          delegate: SliverChildListDelegate([
-        Container(
-          padding: EdgeInsets.all(20),
-          child: FlatButton(
-            color: Colors.green,
-            child: Text(
-              model.order == null ? 'BROWSE ITEMS' : 'PROCEED TO CHECKOUT',
-              style: TextStyle(fontSize: 20, color: Colors.white),
-            ),
-            onPressed: () {
-              if (model.order != null) {
-                if (model.order.itemTotal != '0.0') {
-                  if (model.isAuthenticated) {
-                    if (model.order.state == 'cart') {
-                      model.changeState();
-                    }
+      return Container(
+        padding: EdgeInsets.all(20),
+        child: FlatButton(
+          color: Colors.green,
+          child: Text(
+            model.order == null
+                ? 'BROWSE ITEMS'
+                : model.order.itemTotal == '0.0'
+                    ? 'BROWSE ITEMS'
+                    : 'PROCEED TO CHECKOUT',
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
+          onPressed: () async {
+            if (model.order != null) {
+              if (model.order.itemTotal != '0.0') {
+                if (model.isAuthenticated) {
+                  if (model.order.state == 'cart') {
+                    print('STATE IS CART, CHANGE');
+                   bool _stateischanged =  await model.changeState();
+                    setState(() {
+                      stateChanged = _stateischanged;
+                    });
+                  }
+                  if (stateChanged) {
+                    print('STATE IS CHANGED, FETCH CURRENT ORDER');
+                    model.fetchCurrentOrder();
 
                     Navigator.push(context, addressRoute);
-                  } else {
-                    Navigator.push(context, authRoute);
                   }
+                } else {
+                  Navigator.push(context, authRoute);
                 }
               } else {
                 Navigator.popUntil(
                     context, ModalRoute.withName(Navigator.defaultRouteName));
               }
-            },
-          ),
-        )
-      ]));
+            } else {
+              Navigator.popUntil(
+                  context, ModalRoute.withName(Navigator.defaultRouteName));
+            }
+          },
+        ),
+      );
     });
   }
 
@@ -145,104 +164,117 @@ class _CartState extends State<Cart> {
           delegate:
               SliverChildBuilderDelegate((BuildContext context, int index) {
             return GestureDetector(
-              onTap: () {},
-              child: Container(
-                color: Colors.white,
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Row(
-                    children: <Widget>[
-                      Stack(
+                onTap: () {},
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  elevation: 3,
+                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                  child: Container(
+                    color: Colors.white,
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: Row(
                         children: <Widget>[
-                          Container(
-                            height: 150,
-                            width: 150,
-                            color: Colors.white,
-                            child: FadeInImage(
-                              image: NetworkImage(
-                                  model.lineItems[index].variant.image),
-                              placeholder: AssetImage(
-                                  'images/placeholders/no-product-image.png'),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                          child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                          Stack(
                             children: <Widget>[
                               Container(
-                                child: IconButton(
-                                  icon: Icon(Icons.close),
-                                  onPressed: () {
-                                    model.removeProduct(
-                                        model.lineItems[index].id);
-                                  },
+                                height: 150,
+                                width: 150,
+                                color: Colors.white,
+                                child: FadeInImage(
+                                  image: NetworkImage(
+                                      model.lineItems[index].variant.image),
+                                  placeholder: AssetImage(
+                                      'images/placeholders/no-product-image.png'),
                                 ),
                               ),
                             ],
                           ),
-                          Container(
-                            child: Text(
-                              model.lineItems[index].variant.name,
-                              textAlign: TextAlign.left,
-                              style: TextStyle(fontSize: 15),
-                            ),
+                          SizedBox(
+                            width: 10,
                           ),
-                          SizedBox(height: 10),
-                          Container(
-                            alignment: Alignment.topLeft,
-                            child: Text(
-                              model.lineItems[index].variant.displayPrice,
-                              textAlign: TextAlign.left,
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18),
-                            ),
-                          ),
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                  icon: Icon(Icons.remove),
-                                  onPressed: () {
-                                    if (model.lineItems[index].quantity >= 1) {
-                                      model.addProduct(
-                                        variantId:
-                                            model.lineItems[index].variantId,
-                                        quantity: -1,
-                                      );
-                                    }
-                                  },
+                          Expanded(
+                              child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  Container(
+                                    child: IconButton(
+                                      color: Colors.grey,
+                                      icon: Icon(Icons.delete),
+                                      onPressed: () {
+                                        model.removeProduct(
+                                            model.lineItems[index].id);
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Container(
+                                child: Text(
+                                  model.lineItems[index].variant.name,
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(fontSize: 15),
                                 ),
-                                Text(
-                                    model.lineItems[index].quantity.toString()),
-                                IconButton(
-                                  icon: Icon(Icons.add),
-                                  onPressed: () {
-                                    model.addProduct(
-                                      variantId:
-                                          model.lineItems[index].variantId,
-                                      quantity: 1,
-                                    );
-                                  },
+                              ),
+                              SizedBox(height: 10),
+                              Container(
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  model.lineItems[index].variant.displayPrice,
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
                                 ),
-                              ]),
+                              ),
+                              Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.remove,
+                                        color: Colors.orange,
+                                      ),
+                                      onPressed: () {
+                                        if (model.lineItems[index].quantity >=
+                                            1) {
+                                          model.addProduct(
+                                            variantId: model
+                                                .lineItems[index].variantId,
+                                            quantity: -1,
+                                          );
+                                        }
+                                      },
+                                    ),
+                                    Text(model.lineItems[index].quantity
+                                        .toString()),
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.add,
+                                        color: Colors.orange,
+                                      ),
+                                      onPressed: () {
+                                        model.addProduct(
+                                          variantId:
+                                              model.lineItems[index].variantId,
+                                          quantity: 1,
+                                        );
+                                      },
+                                    ),
+                                  ]),
+                            ],
+                          )),
                         ],
-                      )),
-                    ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            );
+                ));
           }, childCount: model.lineItems.length),
         );
       },

@@ -34,6 +34,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   int total_reviews = 0;
   double recommended_percent = 0;
   double avg_rating = 0;
+  String htmlDescription;
 
   @override
   void initState() {
@@ -43,9 +44,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       if (widget.product.hasVariants) {
         _hasVariants = widget.product.hasVariants;
         selectedProduct = widget.product.variants.first;
+        htmlDescription = widget.product.variants.first.description != null
+            ? widget.product.variants.first.description
+            : '';
       }
     } else {
       selectedProduct = widget.product;
+      htmlDescription =
+          widget.product.description != null ? widget.product.description : '';
     }
     get_reviews();
     super.initState();
@@ -363,10 +369,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           ),
           addToCartFlatButton(),
           Container(
-            padding: EdgeInsets.only(left: 8.0),
-            alignment: Alignment.centerLeft,
-            child: Text("Description", style: TextStyle(fontWeight: FontWeight.w700, fontSize: 15.0))),
-          HtmlWidget(selectedProduct.description)
+              padding: EdgeInsets.only(left: 8.0),
+              alignment: Alignment.centerLeft,
+              child: Text("Description",
+                  style:
+                      TextStyle(fontWeight: FontWeight.w700, fontSize: 15.0))),
+          HtmlWidget(htmlDescription)
         ],
       ),
     );

@@ -241,16 +241,16 @@ class _CategoryListingState extends State<CategoryListing> {
             });
             setState(() {
               variants.add(Product(
-                name: variant['name'],
-                description: variant['description'],
-                optionValues: optionValues,
-                displayPrice: variant['display_price'],
-                image: variant['images'][0]['product_url'],
-                isOrderable: variant['is_orderable'],
-                avgRating: double.parse(product['avg_rating']),
-                reviewsCount: product['reviews_count'].toString(),
-                review_product_id: review_product_id
-              ));
+                  id: variant['id'],
+                  name: variant['name'],
+                  description: variant['description'],
+                  optionValues: optionValues,
+                  displayPrice: variant['display_price'],
+                  image: variant['images'][0]['product_url'],
+                  isOrderable: variant['is_orderable'],
+                  avgRating: double.parse(product['avg_rating']),
+                  reviewsCount: product['reviews_count'].toString(),
+                  review_product_id: review_product_id));
             });
           });
           setState(() {
@@ -267,16 +267,16 @@ class _CategoryListingState extends State<CategoryListing> {
         } else {
           setState(() {
             productsByCategory.add(Product(
-              name: product['name'],
-              displayPrice: product['display_price'],
-              avgRating: double.parse(product['avg_rating']),
-              reviewsCount: product['reviews_count'].toString(),
-              image: product['master']['images'][0]['product_url'],
-              hasVariants: product['has_variants'],
-              isOrderable: product['master']['is_orderable'],
-              description: product['description'],
-              review_product_id: review_product_id
-            ));
+                id: product['id'],
+                name: product['name'],
+                displayPrice: product['display_price'],
+                avgRating: double.parse(product['avg_rating']),
+                reviewsCount: product['reviews_count'].toString(),
+                image: product['master']['images'][0]['product_url'],
+                hasVariants: product['has_variants'],
+                isOrderable: product['master']['is_orderable'],
+                description: product['description'],
+                review_product_id: review_product_id));
           });
         }
       });

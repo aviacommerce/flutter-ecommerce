@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class OrderResponse extends StatefulWidget {
   final String orderNumber;
@@ -19,156 +22,184 @@ class _OrderResponseState extends State<OrderResponse> {
   void initState() {
     super.initState();
     getOrderDetails();
+    // MainModel model = MainModel();
+    // model.clearData();
   }
 
   @override
   getOrderDetails() async {
-    await http.get(Settings.SERVER_URL + '/api/v1/orders/${widget.orderNumber}', headers: {
-      "content-type": "application/json",
-      "ng-api": "true",
-      "auth-token": "e4700279785ec123930be85dfecf7d7dca30fd718d5f8bfb"
-    }).then((response) {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    // MainModel model = MainModel();
+    // await model.clearData();
+
+    // print('AFTER CLEARING STATUS');
+    // print(model.order);
+    // print(model.lineItems.length);
+
+    await http.get(Settings.SERVER_URL + '/api/v1/orders/${widget.orderNumber}',
+        headers: {
+          "content-type": "application/json",
+          "ng-api": "true",
+          "auth-token": prefs.getString('spreeApiKey')
+        }).then((response) {
       setState(() {
         responseBody = json.decode(response.body);
+        print(widget.orderNumber);
+        print('RESPONSE BODY --------------->');
+        print(responseBody);
       });
     });
   }
 
   Widget build(BuildContext context) {
     _deviceSize = MediaQuery.of(context).size;
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Order Status'),
-      ),
-      body: responseBody != null
-          ? new SingleChildScrollView(
-              padding: EdgeInsets.only(left: 10, right: 10, top: 10),
-              // child: Text('hghsg $responseBody')
-              child: new Column(
-                children: <Widget>[
-                  new Card(
-                    child: new Container(
-                      width: _deviceSize.width,
-                      margin: EdgeInsets.all(10),
-                      child: new Column(
-                        children: <Widget>[
-                          new Text(
-                            'Your order successfully placed!',
-                            style: new TextStyle(
-                                fontSize: 18.0, fontWeight: FontWeight.w500),
-                          )
-                        ],
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return new Scaffold(
+        appBar: new AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.close),
+            onPressed: () async {
+              await model.clearData();
+              Navigator.popUntil(
+                  context, ModalRoute.withName(Navigator.defaultRouteName));
+            },
+          ),
+          title: new Text('Order Status'),
+        ),
+        body: responseBody != null
+            ? new SingleChildScrollView(
+                padding: EdgeInsets.only(left: 10, right: 10, top: 10),
+                // child: Text('hghsg $responseBody')
+                child: new Column(
+                  children: <Widget>[
+                    new Card(
+                      child: new Container(
+                        width: _deviceSize.width,
+                        margin: EdgeInsets.all(10),
+                        child: new Column(
+                          children: <Widget>[
+                            new Text(
+                              'Your order successfully placed!',
+                              style: new TextStyle(
+                                  fontSize: 18.0, fontWeight: FontWeight.w500),
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  new Card(
-                    child: new Container(
-                      width: _deviceSize.width,
-                      margin: EdgeInsets.all(10),
-                      child: new Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          new Text('ORDER DETAILS'),
-                          Divider(),
-                          SizedBox(height: 5),
-                          new Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Expanded(child: new Text('Order Number')),
-                              Expanded(
-                                  child: new Text(responseBody["number"] +
-                                      ' ( ${responseBody["total_quantity"]} items )'))
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          new Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Expanded(child: new Text('Order Date')),
-                              Expanded(
-                                  child:
-                                      new Text((responseBody["completed_at"])))
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          new Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Expanded(child: new Text('Payment Mode')),
-                              Expanded(
-                                  child: new Text(
-                                      (responseBody["payments"][0]
-                                          ["payment_method"]["name"]),
-                                      style: new TextStyle(
-                                          fontWeight: FontWeight.w800))),
-                            ],
-                          ),
-                          Divider(),
-                          new Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Expanded(child: new Text('Order Total')),
-                              Expanded(
-                                  child: new Text(
-                                      (responseBody["display_total"]),
-                                      style: new TextStyle(
-                                          fontWeight: FontWeight.w800))),
-                            ],
-                          ),
-                          SizedBox(height: 5),
-                        ],
+                    new Card(
+                      child: new Container(
+                        width: _deviceSize.width,
+                        margin: EdgeInsets.all(10),
+                        child: new Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            new Text('ORDER DETAILS'),
+                            Divider(),
+                            SizedBox(height: 5),
+                            new Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Expanded(child: new Text('Order Number')),
+                                Expanded(
+                                    child: new Text(responseBody["number"] +
+                                        ' ( ${responseBody["total_quantity"]} items )'))
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            new Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Expanded(child: new Text('Order Date')),
+                                Expanded(
+                                    child: new Text(
+                                        (responseBody["completed_at"])))
+                              ],
+                            ),
+                            SizedBox(height: 10),
+                            new Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Expanded(child: new Text('Payment Mode')),
+                                Expanded(
+                                    child: new Text(
+                                        (responseBody["payments"][0]
+                                            ["payment_method"]["name"]),
+                                        style: new TextStyle(
+                                            fontWeight: FontWeight.w800))),
+                              ],
+                            ),
+                            Divider(),
+                            new Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Expanded(child: new Text('Order Total')),
+                                Expanded(
+                                    child: new Text(
+                                        (responseBody["display_total"]),
+                                        style: new TextStyle(
+                                            fontWeight: FontWeight.w800))),
+                              ],
+                            ),
+                            SizedBox(height: 5),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  new Card(
-                    child: new Container(
-                      width: _deviceSize.width,
-                      margin: EdgeInsets.all(10),
-                      child: new Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          new Text('DELIVERY ADDRESS'),
-                          Divider(),
-                          new Text(
-                              responseBody["ship_address"]["full_name"] + ',',
-                              style:
-                                  new TextStyle(fontWeight: FontWeight.w800)),
-                          SizedBox(height: 5),
-                          new Text(
-                              responseBody["ship_address"]["address1"] + ','),
-                          SizedBox(height: 5),
-                          new Text(
-                              '${responseBody["ship_address"]["address2"]}, ${responseBody["ship_address"]["city"]}'),
-                          SizedBox(height: 5),
-                          new Text(
-                              '${responseBody["ship_address"]["city"]} - ${responseBody["ship_address"]["zipcode"]}, ${responseBody["ship_address"]["state"]["name"]}'),
-                          SizedBox(height: 5),
-                          new Text('${responseBody["ship_address"]["phone"]}',
-                              style:
-                                  new TextStyle(fontWeight: FontWeight.w800)),
-                          SizedBox(height: 5),
-                        ],
+                    SizedBox(height: 10),
+                    new Card(
+                      child: new Container(
+                        width: _deviceSize.width,
+                        margin: EdgeInsets.all(10),
+                        child: new Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            new Text('DELIVERY ADDRESS'),
+                            Divider(),
+                            new Text(
+                                responseBody["ship_address"]["full_name"] + ',',
+                                style:
+                                    new TextStyle(fontWeight: FontWeight.w800)),
+                            SizedBox(height: 5),
+                            new Text(
+                                responseBody["ship_address"]["address1"] + ','),
+                            SizedBox(height: 5),
+                            new Text(
+                                '${responseBody["ship_address"]["address2"]}, ${responseBody["ship_address"]["city"]}'),
+                            SizedBox(height: 5),
+                            new Text(
+                                '${responseBody["ship_address"]["city"]} - ${responseBody["ship_address"]["zipcode"]}, ${responseBody["ship_address"]["state"]["name"]}'),
+                            SizedBox(height: 5),
+                            new Text('${responseBody["ship_address"]["phone"]}',
+                                style:
+                                    new TextStyle(fontWeight: FontWeight.w800)),
+                            SizedBox(height: 5),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  new Card(
-                    child: new Container(
-                      width: _deviceSize.width,
-                      margin: EdgeInsets.all(10),
-                      child: new Column(
-                        children: lineitemsList(responseBody["line_items"]),
+                    SizedBox(height: 10),
+                    new Card(
+                      child: new Container(
+                        width: _deviceSize.width,
+                        margin: EdgeInsets.all(10),
+                        child: new Column(
+                          children: lineitemsList(responseBody["line_items"]),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            )
-          : Center(child: CircularProgressIndicator()),
-    );
+                  ],
+                ),
+              )
+            : Center(
+                child: CircularProgressIndicator(
+                backgroundColor: Colors.blue,
+              )),
+      );
+    });
   }
-  
+
   List<Widget> lineitemsList(items) {
     List<Widget> list = [];
     list.add(new Column(

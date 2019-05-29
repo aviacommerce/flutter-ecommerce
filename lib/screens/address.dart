@@ -11,6 +11,8 @@ class AddressPage extends StatefulWidget {
 }
 
 class _AddressPageState extends State<AddressPage> {
+
+  bool stateChanged = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,62 +23,33 @@ class _AddressPageState extends State<AddressPage> {
           child: Column(
         children: <Widget>[
           addressContainer(),
-          Divider(),
-          SizedBox(
-            height: 10,
-          ),
-          itemTotalContainer(),
-          paymentButton(context)
+          orderDetailColumn(),
         ],
       )),
+      bottomNavigationBar: paymentButton(context),
     );
   }
 
-  Widget itemTotalContainer() {
+  Widget orderDetailColumn() {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-      return Column(
-        children: <Widget>[
-          Container(
-            padding: EdgeInsets.only(left: 10),
-            child: Text(
-              model.order.totalQuantity.toString() + ' ITEMS',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-          ),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      return Card(
+        elevation: 3,
+        margin: EdgeInsets.all(15),
+        child: Column(
+          children: <Widget>[
             Container(
-              padding: EdgeInsets.all(10),
+              padding: EdgeInsets.only(left: 10),
               child: Text(
-                'Sub Total',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                model.order.totalQuantity.toString() + ' ITEMS',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
-            Container(
-              padding: EdgeInsets.all(10),
-              child: Text(
-                model.order.itemTotal,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            )
-          ]),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Container(
-              padding: EdgeInsets.all(10),
-              child: Text(
-                'Delivery',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(10),
-              child: Text(
-                model.order.shipTotal,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            )
-          ])
-        ],
+            amountRow('Sub Total', model.order.displaySubTotal, model),
+            amountRow('Delivery', model.order.shipTotal, model),
+            amountRow('Total', model.order.displayTotal, model)
+          ],
+        ),
       );
     });
   }
@@ -92,15 +65,27 @@ class _AddressPageState extends State<AddressPage> {
             'CONTINUE TO PAYMENT',
             style: TextStyle(fontSize: 20, color: Colors.white),
           ),
-          onPressed: () {
+          onPressed: () async {
             if (model.order.state == 'delivery' ||
                 model.order.state == 'address') {
-                  model.changeState();
-                  //Success Page
+              print('STATE IS DELIVERY/ADDRESS, CHANGE STATE');
+              bool _stateischanged = await model.changeState();
+              if(_stateischanged) {
+                if(model.order.state == 'delivery') {
+                  _stateischanged = await model.changeState();
                 }
-            MaterialPageRoute payment =
-                MaterialPageRoute(builder: (context) => PaymentScreen());
-            Navigator.push(context, payment);
+              }
+              setState(() {
+                stateChanged = _stateischanged;
+              });
+            }
+            if (stateChanged) {
+              print('STATE IS CHANGED, FETCH CURRENT ORDER');
+              model.fetchCurrentOrder();
+              MaterialPageRoute payment =
+                  MaterialPageRoute(builder: (context) => PaymentScreen());
+              Navigator.push(context, payment);
+            }
           },
         ),
       );
@@ -118,34 +103,57 @@ class _AddressPageState extends State<AddressPage> {
     );
   }
 
+  Widget amountRow(String title, String displayAmount, MainModel model) {
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Container(
+        padding: EdgeInsets.all(10),
+        child: Text(
+          title,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+      ),
+      Container(
+        padding: EdgeInsets.all(10),
+        child: Text(
+          displayAmount,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+      )
+    ]);
+  }
+
   Widget addressContainer() {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       if (model.shipAddress != null) {
-        return Container(
-            margin: EdgeInsets.only(left: 10),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              SizedBox(
-                height: 10,
-              ),
-              Text(
-                model.shipAddress['full_name'],
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.left,
-              ),
-              textFieldContainer(model.shipAddress['address1']),
-              textFieldContainer(model.shipAddress['address2']),
-              textFieldContainer(model.shipAddress['city'] +
-                  ' - ' +
-                  model.shipAddress['zipcode']),
-              textFieldContainer(model.shipAddress['state']['name']),
-              textFieldContainer(
-                  'Mobile: ' + ' - ' + model.shipAddress['phone']),
-            ]));
+        return Card(
+            elevation: 3,
+            margin: EdgeInsets.all(15),
+            child: Container(
+                margin: EdgeInsets.all(10),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                        model.shipAddress['full_name'],
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                      textFieldContainer(model.shipAddress['address1']),
+                      textFieldContainer(model.shipAddress['address2']),
+                      textFieldContainer(model.shipAddress['city'] +
+                          ' - ' +
+                          model.shipAddress['zipcode']),
+                      textFieldContainer(model.shipAddress['state']['name']),
+                      textFieldContainer(
+                          'Mobile: ' + ' - ' + model.shipAddress['phone']),
+                    ])));
       } else {
         return Container(child: Text('New Address Form'));
       }
