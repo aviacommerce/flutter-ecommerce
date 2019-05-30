@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/screens/auth.dart';
 
 class HomeDrawer extends StatelessWidget {
   Widget logOutButton() {
@@ -25,6 +27,59 @@ class HomeDrawer extends StatelessWidget {
           );
         } else {
           return Container();
+        }
+      },
+    );
+  }
+
+  Widget signInLineTile() {
+    return ScopedModelDescendant(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        if (!model.isAuthenticated) {
+          return Expanded(
+              child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              GestureDetector(
+                child: Text(
+                  'Sign in',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w300),
+                ),
+                onTap: () {
+                  MaterialPageRoute route = MaterialPageRoute(
+                      builder: (context) => Authentication(0));
+
+                  Navigator.push(context, route);
+                },
+              ),
+              Text('|',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w300)),
+              GestureDetector(
+                child: Text('Create Account',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w300)),
+                onTap: () {
+                  MaterialPageRoute route = MaterialPageRoute(
+                      builder: (context) => Authentication(1));
+
+                  Navigator.push(context, route);
+                },
+              )
+            ],
+          ));
+        } else {
+          return Expanded(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Text('Welcome Back!',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w300))
+              ],
+            ),
+          );
         }
       },
     );
@@ -68,33 +123,7 @@ class HomeDrawer extends StatelessWidget {
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.w300),
               ),
-              Expanded(
-                  child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  GestureDetector(
-                    child: Text(
-                      'Sign in',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.w300),
-                    ),
-                    onTap: () {
-                      print("Sign in");
-                    },
-                  ),
-                  Text('|',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.w300)),
-                  GestureDetector(
-                    child: Text('Create Account',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.w300)),
-                    onTap: () {
-                      print('Create Account');
-                    },
-                  )
-                ],
-              ))
+              signInLineTile()
             ]),
             decoration: BoxDecoration(color: Colors.green),
           ),
@@ -142,6 +171,7 @@ class HomeDrawer extends StatelessWidget {
               style: TextStyle(color: Colors.green),
             ),
           ),
+          logOutButton(),
           Divider(),
           ListTile(
             title: Text(
@@ -196,7 +226,6 @@ class HomeDrawer extends StatelessWidget {
               'Terms and Policies',
             ),
           ),
-          logOutButton()
         ],
       ),
     );

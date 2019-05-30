@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/payment.dart';
+// import 'package:ofypets_mobile_app/screens/update_address.dart';
 
 class AddressPage extends StatefulWidget {
   @override
@@ -11,23 +12,41 @@ class AddressPage extends StatefulWidget {
 }
 
 class _AddressPageState extends State<AddressPage> {
-
   bool stateChanged = true;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Delivery Address'),
-      ),
-      body: SingleChildScrollView(
-          child: Column(
-        children: <Widget>[
-          addressContainer(),
-          orderDetailColumn(),
-        ],
-      )),
-      bottomNavigationBar: paymentButton(context),
-    );
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return Scaffold(
+        appBar: AppBar(
+            title: Text('Delivery Address'),
+            bottom: model.isLoading
+                ? PreferredSize(
+                    child: LinearProgressIndicator(),
+                    preferredSize: Size.fromHeight(10),
+                  )
+                : PreferredSize(
+                    child: Container(),
+                    preferredSize: Size.fromHeight(10),
+                  )),
+        body: SingleChildScrollView(
+            child: Column(
+          children: <Widget>[
+            FlatButton(
+              child: Text('EDIT ADDRESS'),
+              onPressed: () {
+                // MaterialPageRoute payment =
+                //     MaterialPageRoute(builder: (context) => UpdateAddress());
+                // Navigator.push(context, payment);
+              },
+            ),
+            addressContainer(),
+            orderDetailColumn(),
+          ],
+        )),
+        bottomNavigationBar: paymentButton(context),
+      );
+    });
   }
 
   Widget orderDetailColumn() {
@@ -68,10 +87,10 @@ class _AddressPageState extends State<AddressPage> {
           onPressed: () async {
             if (model.order.state == 'delivery' ||
                 model.order.state == 'address') {
-              print('STATE IS DELIVERY/ADDRESS, CHANGE STATE');
+              // print('STATE IS DELIVERY/ADDRESS, CHANGE STATE');
               bool _stateischanged = await model.changeState();
-              if(_stateischanged) {
-                if(model.order.state == 'delivery') {
+              if (_stateischanged) {
+                if (model.order.state == 'delivery') {
                   _stateischanged = await model.changeState();
                 }
               }

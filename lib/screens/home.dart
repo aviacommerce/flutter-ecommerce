@@ -166,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: _deviceSize.height * 0.5,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      itemCount: 10,
+                      itemCount: todaysDealProducts.length,
                       itemBuilder: (context, index) {
                         return todaysDealsCard(
                             index, todaysDealProducts, _deviceSize, context);
@@ -302,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
     todaysDealsId = responseBody['taxonomies'][0]['id'].toString();
     http
         .get(Settings.SERVER_URL +
-            'api/v1/taxons/products?id=$todaysDealsId&per_page=10&data_set=small')
+            'api/v1/taxons/products?id=$todaysDealsId&per_page=20&data_set=small')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['products'].forEach((product) {

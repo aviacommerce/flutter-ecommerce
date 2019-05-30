@@ -19,8 +19,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
         builder: (BuildContext context, Widget child, MainModel model) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Payment Methods'),
-        ),
+            title: Text('Payment Methods'),
+            bottom: model.isLoading
+                ? PreferredSize(
+                    child: LinearProgressIndicator(),
+                    preferredSize: Size.fromHeight(10),
+                  )
+                : PreferredSize(
+                    child: Container(),
+                    preferredSize: Size.fromHeight(10),
+                  )),
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

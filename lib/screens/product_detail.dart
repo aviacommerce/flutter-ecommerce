@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
 
+import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/models/review.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/cart.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:ofypets_mobile_app/widgets/snackbar.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -389,9 +390,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           child: Text(
               selectedProduct.isOrderable ? 'ADD TO CART' : 'OUT OF STOCK'),
           onPressed: () {
+            Scaffold.of(context).showSnackBar(processSnackbar);
             if (selectedProduct.isOrderable) {
               model.addProduct(
                   variantId: selectedProduct.id, quantity: quantity);
+            }
+            if (!model.isLoading) {
+              Scaffold.of(context).showSnackBar(completeSnackbar);
             }
           },
         );
@@ -408,10 +413,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             color: Colors.white,
           ),
           onPressed: () {
+            Scaffold.of(context).showSnackBar(processSnackbar);
             selectedProduct.isOrderable
                 ? model.addProduct(
                     variantId: selectedProduct.id, quantity: quantity)
                 : null;
+            if (!model.isLoading) {
+              Scaffold.of(context).showSnackBar(completeSnackbar);
+            }
           },
           backgroundColor:
               selectedProduct.isOrderable ? Colors.orange : Colors.grey,

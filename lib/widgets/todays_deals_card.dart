@@ -6,26 +6,39 @@ import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/product_detail.dart';
+import 'package:ofypets_mobile_app/widgets/snackbar.dart';
 
 Widget addToCartButton(List<Product> todaysDealProducts, int index) {
   return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
     return FlatButton(
-      onPressed: () {
+      onPressed: () async {
         if (todaysDealProducts[index].isOrderable) {
+          Scaffold.of(context).showSnackBar(processSnackbar);
           model.addProduct(
               variantId: todaysDealProducts[index].id, quantity: 1);
+          if (!model.isLoading) {
+            Scaffold.of(context).showSnackBar(completeSnackbar);
+          }
         }
       },
-      child: Text(
-        todaysDealProducts[index].isOrderable ? 'ADD TO CART' : 'OUT OF STOCK',
-        style: TextStyle(
-            color: todaysDealProducts[index].isOrderable
-                ? Colors.green
-                : Colors.grey,
-            fontSize: 18,
-            fontWeight: FontWeight.bold),
-      ),
+      child: !model.isLoading
+          ? Text(
+              todaysDealProducts[index].isOrderable
+                  ? 'ADD TO CART'
+                  : 'OUT OF STOCK',
+              style: TextStyle(
+                  color: todaysDealProducts[index].isOrderable
+                      ? Colors.green
+                      : Colors.grey,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500),
+            )
+          : Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.green,
+              ),
+            ),
     );
   });
 }

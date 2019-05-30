@@ -147,30 +147,31 @@ mixin CartModel on Model {
         'Content-Type': 'application/json',
         'token-type': 'Bearer',
         'ng-api': 'true',
-        'auth-token': prefs.getString('spreeApiKey'),
+        'Auth-Token': prefs.getString('spreeApiKey'),
         'Guest-Order-Token': prefs.getString('orderToken')
       };
     }
-
+    print(headers);
     print(url);
     print(prefs.getString('spreeApiKey'));
     print(prefs.getString('orderToken'));
-    print('FETCH CURRENT ORDER');
+    // print('FETCH CURRENT ORDER');
 
     if (url != '') {
       _lineItems = [];
       http.get(Settings.SERVER_URL + url, headers: headers).then((response) {
-        print('RESPONSE');
-        print(response.body);
+        print(
+            '------------------------- RESPONSE ------------------------------');
+        // print(response.body);
         responseBody = json.decode(response.body);
         print(responseBody);
-        print(responseBody['display_item_total']);
-        print(responseBody['display_ship_total']);
-        print(responseBody['display_total']);
-        print(responseBody['state']);
+        // print(responseBody['display_item_total']);
+        // print(responseBody['display_ship_total']);
+        // print(responseBody['display_total']);
+        // print(responseBody['state']);
         responseBody['line_items'].forEach((lineItem) {
-          print('items returned');
-          print(lineItem['variant']['name']);
+          // print('items returned');
+          // print(lineItem['variant']['name']);
           variant = Variant(
               image: lineItem['variant']['images'][0]['product_url'],
               displayPrice: lineItem['variant']['display_price'],
@@ -224,6 +225,7 @@ mixin CartModel on Model {
     };
 
     _isLoading = true;
+    notifyListeners();
 
     http.Response response = await http.put(
         Settings.SERVER_URL +
@@ -231,7 +233,7 @@ mixin CartModel on Model {
         headers: headers);
 
     responseBody = json.decode(response.body);
-    print(responseBody);
+    // print(responseBody);
 
     order = Order(
         id: responseBody['id'],
@@ -243,15 +245,18 @@ mixin CartModel on Model {
         totalQuantity: responseBody['total_quantity'],
         state: responseBody['state']);
     prefs.setString('numberOfItems', _lineItems.length.toString());
-    print('STATE IS CHANGED');
-    print(order.state);
-    print('RETURN TRUE, CONTINUE');
+    // print('STATE IS CHANGED');
+    // print(order.state);
+    // print('RETURN TRUE, CONTINUE');
+    await fetchCurrentOrder();
     _isLoading = false;
     notifyListeners();
     return true;
   }
 
   Future<bool> completeOrder() async {
+    _isLoading = true;
+    notifyListeners();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     headers = {
@@ -269,20 +274,21 @@ mixin CartModel on Model {
             'api/v1/orders/${prefs.getString('orderNumber')}/payments?order_token=${prefs.getString('orderToken')}',
         body: json.encode(paymentPayload),
         headers: headers);
+    _isLoading = false;
+    notifyListeners();
     return true;
   }
 
   clearData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    print('CLEAR DATA');
+    // print('CLEAR DATA');
     prefs.setString('orderToken', null);
     prefs.setString('orderNumber', null);
     _lineItems.clear();
-    print(_lineItems.length);
-    print(prefs.getString('orderToken'));
-    print(prefs.getString('orderNumber'));
+    // print(_lineItems.length);
+    // print(prefs.getString('orderToken'));
+    // print(prefs.getString('orderNumber'));
     order = null;
     notifyListeners();
   }
-
 }

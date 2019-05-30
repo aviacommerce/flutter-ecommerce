@@ -7,8 +7,6 @@ import 'package:ofypets_mobile_app/screens/cart.dart';
 Widget shoppingCartIconButton() {
   return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
-        print('SHOPPING CART BUTTON LINE ITEMS LENGTH');
-        print(model.lineItems.length);
     return new Padding(
       padding: const EdgeInsets.all(10.0),
       child: new Container(

@@ -21,8 +21,6 @@ class _CartState extends State<Cart> {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-          print('order');
-          print(model.order);
       return Scaffold(
           appBar: AppBar(
               leading: IconButton(
@@ -129,14 +127,20 @@ class _CartState extends State<Cart> {
                 if (model.isAuthenticated) {
                   if (model.order.state == 'cart') {
                     print('STATE IS CART, CHANGE');
-                   bool _stateischanged =  await model.changeState();
+                    bool _stateischanged = await model.changeState();
+                    if (_stateischanged) {
+                      if (model.order.state == 'address') {
+                        print('DELIVERY');
+                        _stateischanged = await model.changeState();
+                      }
+                    }
                     setState(() {
                       stateChanged = _stateischanged;
                     });
                   }
                   if (stateChanged) {
-                    print('STATE IS CHANGED, FETCH CURRENT ORDER');
-                    model.fetchCurrentOrder();
+                    // print('STATE IS CHANGED, FETCH CURRENT ORDER');
+                    // model.fetchCurrentOrder();
 
                     Navigator.push(context, addressRoute);
                   }

@@ -23,22 +23,24 @@ Widget categoryBox(int index, BuildContext context, Size _deviceSize,
             ),
             child: Stack(children: [
               Container(
-                  padding: EdgeInsets.only(left: 10),
+                  alignment: Alignment.center,
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
                           'Shop By Brand',
                           style: TextStyle(
                               color: Colors.white,
-                              fontSize: 25,
-                              fontWeight: FontWeight.w700),
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600),
+                          textAlign: TextAlign.center,
                         ),
                         Text('A-Z',
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 50,
-                                fontWeight: FontWeight.w700)),
+                                fontSize: 30,
+                                fontWeight: FontWeight.w600)),
                       ])),
             ])));
   }
@@ -58,17 +60,19 @@ Widget categoryBox(int index, BuildContext context, Size _deviceSize,
           ),
           child: Stack(children: [
             Container(
-              alignment: Alignment.bottomRight,
-              child: Image.network(categories[index].image),
-            ),
+                alignment: Alignment.bottomRight,
+                child: ClipRRect(
+                  child: Image.network(categories[index].image),
+                  borderRadius: BorderRadius.circular(12),
+                )),
             Container(
               padding: EdgeInsets.only(left: 10, top: 10),
               child: Text(
                 categories[index].name,
                 style: TextStyle(
                     color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500),
               ),
             ),
           ])));

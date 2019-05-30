@@ -229,10 +229,15 @@ class _AuthenticationState extends State<Authentication>
       }
     };
 
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
     final http.Response response = await http.post(
       Settings.SERVER_URL + 'login.json',
       body: json.encode(authData),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'guest-order-token': prefs.getString('orderToken')
+      },
     );
 
     final Map<String, dynamic> responseData = json.decode(response.body);
