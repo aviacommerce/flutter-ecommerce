@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/home.dart';
+import 'package:ofypets_mobile_app/screens/forget_password.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -110,7 +111,17 @@ class _AuthenticationState extends State<Authentication>
                 SizedBox(
                   height: 20.0,
                 ),
-                Container(
+                GestureDetector(
+                  onTap:(){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context){
+                          return ForgetPassword();
+                          }
+                      )
+                    );
+                  },
                   child: Text(
                     'FORGET YOUR PASSWORD?',
                     textAlign: TextAlign.center,
