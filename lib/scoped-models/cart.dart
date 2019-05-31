@@ -20,6 +20,13 @@ mixin CartModel on Model {
     return List.from(_lineItems);
   }
 
+  set shipAddress(Map<String, dynamic> shipAddress) {
+    print('SETTER');
+    print(shipAddress);
+    _shipAddress = shipAddress;
+    notifyListeners();
+  }
+
   bool get isLoading {
     return _isLoading;
   }

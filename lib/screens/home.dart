@@ -87,7 +87,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-            )),
+            ),
+            ),
         drawer: HomeDrawer(),
         body: CustomScrollView(slivers: [
           SliverList(
@@ -177,23 +178,23 @@ class _HomeScreenState extends State<HomeScreen> {
           SliverToBoxAdapter(
             child: Divider(),
           ),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              Container(
-                width: _deviceSize.width,
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                color: Colors.white,
-                alignment: Alignment.centerRight,
-                child: Text(
-                  'SEE ALL',
-                  style: TextStyle(
-                      color: Colors.green,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold),
-                ),
-              )
-            ]),
-          ),
+          // SliverList(
+          //   delegate: SliverChildListDelegate([
+          //     Container(
+          //       width: _deviceSize.width,
+          //       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          //       color: Colors.white,
+          //       alignment: Alignment.centerRight,
+          //       child: Text(
+          //         'SEE ALL',
+          //         style: TextStyle(
+          //             color: Colors.green,
+          //             fontSize: 20,
+          //             fontWeight: FontWeight.bold),
+          //       ),
+          //     )
+          //   ]),
+          // ),
         ]),
         bottomNavigationBar:
             !model.isAuthenticated ? bottomNavigationBar() : null,

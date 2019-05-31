@@ -157,7 +157,7 @@ class HomeDrawer extends StatelessWidget {
               color: Colors.green,
             ),
             title: Text(
-              'Buy Again',
+              'Order History',
               style: TextStyle(color: Colors.green),
             ),
           ),
@@ -183,7 +183,7 @@ class HomeDrawer extends StatelessWidget {
               Icons.call,
             ),
             title: Text(
-              'Call: 1-111-111-1111',
+              'Call: 917-6031-568',
             ),
           ),
           ListTile(
@@ -191,7 +191,7 @@ class HomeDrawer extends StatelessWidget {
               Icons.mail,
             ),
             title: Text(
-              'Email: abc@ofypets.com',
+              'Email: support@ofypets.com',
             ),
           ),
           ListTile(

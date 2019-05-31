@@ -130,7 +130,7 @@ class _CartState extends State<Cart> {
                     bool _stateischanged = await model.changeState();
                     if (_stateischanged) {
                       if (model.order.state == 'address') {
-                        print('DELIVERY');
+                        print('DELIVERY, CHANGING STATE BEFORE GOING TO ADDRESS');
                         _stateischanged = await model.changeState();
                       }
                     }

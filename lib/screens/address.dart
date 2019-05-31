@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/payment.dart';
-// import 'package:ofypets_mobile_app/screens/update_address.dart';
+import 'package:ofypets_mobile_app/screens/update_address.dart';
 
 class AddressPage extends StatefulWidget {
   @override
@@ -35,9 +35,9 @@ class _AddressPageState extends State<AddressPage> {
             FlatButton(
               child: Text('EDIT ADDRESS'),
               onPressed: () {
-                // MaterialPageRoute payment =
-                //     MaterialPageRoute(builder: (context) => UpdateAddress());
-                // Navigator.push(context, payment);
+                MaterialPageRoute payment =
+                    MaterialPageRoute(builder: (context) => UpdateAddress(model.shipAddress));
+                Navigator.push(context, payment);
               },
             ),
             addressContainer(),
