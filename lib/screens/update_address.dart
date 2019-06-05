@@ -9,7 +9,7 @@ import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 
 class UpdateAddress extends StatefulWidget {
-  Map<String, dynamic> shipAddress;
+  final Map<String, dynamic> shipAddress;
   UpdateAddress(this.shipAddress);
   @override
   State<StatefulWidget> createState() {
@@ -19,8 +19,9 @@ class UpdateAddress extends StatefulWidget {
 
 class _UpdateAddressState extends State<UpdateAddress> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String _firstName;
-  String _lastName;
+
+  String _firstName = '';
+  String _lastName = '';
   String selectedState = '';
   String _address1 = '';
   String _address2 = '';
@@ -29,30 +30,35 @@ class _UpdateAddressState extends State<UpdateAddress> {
   String _pincode = '';
   int _stateId;
   Map<String, dynamic> data = Map();
+  Map<String, dynamic> address = Map();
   Map<String, String> headers = Map();
-
+  String url = '';
   static List<Map<String, dynamic>> states = [];
   @override
   void initState() {
+    print(widget.shipAddress);
     getStates();
     // getUserInfo();
     super.initState();
-    selectedState = widget.shipAddress['state']['name'];
-    _firstName = widget.shipAddress['firstname'];
-    _lastName = widget.shipAddress['lastname'];
-    _address2 = widget.shipAddress['address2'];
-    _city = widget.shipAddress['city'];
-    _address1 = widget.shipAddress['address1'];
-    _mobile = widget.shipAddress['phone'];
-    _pincode = widget.shipAddress['zipcode'];
-    _stateId = widget.shipAddress['state_id'];
+    if (widget.shipAddress != null) {
+      selectedState = widget.shipAddress['state']['name'];
+      _firstName = widget.shipAddress['firstname'];
+      _lastName = widget.shipAddress['lastname'];
+      _address2 = widget.shipAddress['address2'];
+      _city = widget.shipAddress['city'];
+      _address1 = widget.shipAddress['address1'];
+      _mobile = widget.shipAddress['phone'];
+      _pincode = widget.shipAddress['zipcode'];
+      _stateId = widget.shipAddress['state_id'];
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Update Address'),
+          title: Text(
+              widget.shipAddress != null ? 'Update Address' : 'Add Address'),
         ),
         body: Card(
           elevation: 5,
@@ -87,7 +93,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
           return 'First Name is required';
         }
       },
-      initialValue: widget.shipAddress['firstname'],
+      initialValue: _firstName,
       decoration: InputDecoration(
         labelText: label,
       ),
@@ -109,7 +115,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
       decoration: InputDecoration(
         labelText: label,
       ),
-      initialValue: widget.shipAddress['lastname'],
+      initialValue: _lastName,
       onSaved: (String value) {
         setState(() {
           _lastName = value;
@@ -121,7 +127,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
   Widget buildAddressField(String label) {
     return TextFormField(
       maxLines: 5,
-      initialValue: widget.shipAddress['address1'],
+      initialValue: _address1,
       validator: (String value) {
         if (value.isEmpty) {
           return 'Address is required';
@@ -140,7 +146,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
 
   Widget buildTownField(String label) {
     return TextFormField(
-      initialValue: widget.shipAddress['address2'],
+      initialValue: _address2,
       validator: (String value) {
         if (value.isEmpty) {
           return 'Locality/Town is required';
@@ -159,7 +165,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
 
   Widget buildCityField(String label) {
     return TextFormField(
-      initialValue: widget.shipAddress['city'],
+      initialValue: _city,
       validator: (String value) {
         if (value.isEmpty) {
           return 'City is required';
@@ -246,7 +252,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
 
   Widget buildMobileField(String label) {
     return TextFormField(
-      initialValue: widget.shipAddress['phone'],
+      initialValue: _mobile,
       validator: (String value) {
         if (value.isEmpty) {
           return 'Mobile No. is required!';
@@ -269,7 +275,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
 
   Widget buildPinCodeField(String label) {
     return TextFormField(
-      initialValue: widget.shipAddress['zipcode'],
+      initialValue: _pincode,
       validator: (String value) {
         if (value.isEmpty) {
           return 'Pincode is required!';
@@ -297,7 +303,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
     statesResponse['states'].forEach((state) {
       setState(() {
         states.add(state);
-        // selectedState = states.first['name'];
+        selectedState = states.first['name'];
       });
     });
   }
@@ -346,34 +352,39 @@ class _UpdateAddressState extends State<UpdateAddress> {
             'auth-token': prefs.getString('spreeApiKey'),
             'Guest-Order-Token': prefs.getString('orderToken')
           };
-          data = {
-            "address_params": {
-              "firstname": _firstName,
-              "lastname": _lastName,
-              "address2": _address2,
-              "city": _city,
-              "address1": _address1,
-              "phone": _mobile,
-              "zipcode": _pincode,
-              "state_name": selectedState,
-              "state_id": _stateId,
-              "country_id": '105'
-            }
+          address = {
+            "firstname": _firstName,
+            "lastname": _lastName,
+            "address2": _address2,
+            "city": _city,
+            "address1": _address1,
+            "phone": _mobile,
+            "zipcode": _pincode,
+            "state_name": selectedState,
+            "state_id": _stateId,
+            "country_id": '105'
           };
 
-          print('DATA-------------------------');
-          print(data);
+          if (widget.shipAddress != null) {
+            url =
+                'api/v1/orders/${prefs.getString('orderNumber')}/addresses/${widget.shipAddress['id']}';
+            data = {"address_params": address};
+          } else {
+            url =
+                'api/v1/checkouts/${prefs.getString('orderNumber')}.json?order_token=${prefs.getString('orderToken')}';
+            data = {
+              "order": {
+                "bill_address_attributes": address,
+                "ship_address_attributes": address
+              }
+            };
+          }
 
-          http.Response response = await http.put(
-              Settings.SERVER_URL +
-                  'api/v1/orders/${prefs.getString('orderNumber')}/addresses/${widget.shipAddress['id']}',
-              headers: headers,
-              body: json.encode(data));
+          http.Response response = await http.put(Settings.SERVER_URL + url,
+              headers: headers, body: json.encode(data));
           updateResponse = json.decode(response.body);
 
           if (updateResponse.containsKey('id')) {
-            print(updateResponse);
-            // model.shipAddress = data;
             await model.fetchCurrentOrder();
             Navigator.pop(context);
           }

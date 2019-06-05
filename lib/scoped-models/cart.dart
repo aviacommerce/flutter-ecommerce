@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/utils/headers.dart';
 import 'package:ofypets_mobile_app/models/order.dart';
 import 'package:ofypets_mobile_app/models/line_item.dart';
 import 'package:ofypets_mobile_app/models/variant.dart';
@@ -12,7 +13,6 @@ mixin CartModel on Model {
   List<LineItem> _lineItems = [];
   Order order;
   bool _isLoading = false;
-  Map<String, dynamic> _shipAddress;
 
   Map<dynamic, dynamic> lineItemObject = Map();
 
@@ -30,16 +30,6 @@ mixin CartModel on Model {
   bool get isLoading {
     return _isLoading;
   }
-
-  Map<String, dynamic> get shipAddress {
-    return _shipAddress;
-  }
-
-  Map<String, String> headers = {
-    'Content-Type': 'application/json',
-    'token-type': 'Bearer',
-    'ng-api': 'true'
-  };
 
   void addProduct({int variantId, int quantity}) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -74,6 +64,7 @@ mixin CartModel on Model {
   }
 
   void createNewOrder(int variantId, int quantity) async {
+    Map<String, String> headers = await getHeaders();
     Map<dynamic, dynamic> responseBody;
     Map<dynamic, dynamic> orderParams = Map();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -98,23 +89,7 @@ mixin CartModel on Model {
 
   void createNewLineItem(int variantId, int quantity) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String spreeApiKey = prefs.getString('spreeApiKey');
-    if (spreeApiKey == null) {
-      headers = {
-        'Content-Type': 'application/json',
-        'token-type': 'Bearer',
-        'ng-api': 'true',
-        'Guest-Order-Token': prefs.getString('orderToken')
-      };
-    } else {
-      headers = {
-        'Content-Type': 'application/json',
-        'token-type': 'Bearer',
-        'ng-api': 'true',
-        'auth-token': prefs.getString('spreeApiKey'),
-        'Guest-Order-Token': prefs.getString('orderToken')
-      };
-    }
+    Map<String, String> headers = await getHeaders();
 
     lineItemObject = {
       "line_item": {"variant_id": variantId, "quantity": quantity}
@@ -132,8 +107,8 @@ mixin CartModel on Model {
 
   fetchCurrentOrder() async {
     Map<dynamic, dynamic> responseBody;
+    Map<String, String> headers = await getHeaders();
     String url = '';
-    Map<String, String> headers;
     LineItem lineItem;
     Variant variant;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -143,42 +118,19 @@ mixin CartModel on Model {
     if (orderToken != null && spreeApiKey == null) {
       url =
           'api/v1/orders/${prefs.getString('orderNumber')}?order_token=${prefs.getString('orderToken')}';
-      headers = {
-        'Content-Type': 'application/json',
-        'token-type': 'Bearer',
-        'ng-api': 'true'
-      };
     } else if (spreeApiKey != null) {
       url = 'api/v1/orders/current';
-      headers = {
-        'Content-Type': 'application/json',
-        'token-type': 'Bearer',
-        'ng-api': 'true',
-        'Auth-Token': prefs.getString('spreeApiKey'),
-        'Guest-Order-Token': prefs.getString('orderToken')
-      };
     }
-    print(headers);
-    print(url);
-    print(prefs.getString('spreeApiKey'));
-    print(prefs.getString('orderToken'));
-    // print('FETCH CURRENT ORDER');
 
     if (url != '') {
       _lineItems = [];
-      http.get(Settings.SERVER_URL + url, headers: headers).then((response) {
+      http
+          .get(Settings.SERVER_URL + url, headers: headers)
+          .then((response) {
         print(
             '------------------------- RESPONSE ------------------------------');
-        // print(response.body);
         responseBody = json.decode(response.body);
-        print(responseBody);
-        // print(responseBody['display_item_total']);
-        // print(responseBody['display_ship_total']);
-        // print(responseBody['display_total']);
-        // print(responseBody['state']);
         responseBody['line_items'].forEach((lineItem) {
-          // print('items returned');
-          // print(lineItem['variant']['name']);
           variant = Variant(
               image: lineItem['variant']['images'][0]['product_url'],
               displayPrice: lineItem['variant']['display_price'],
@@ -203,16 +155,12 @@ mixin CartModel on Model {
             lineItems: _lineItems,
             shipTotal: responseBody['display_ship_total'],
             totalQuantity: responseBody['total_quantity'],
-            state: responseBody['state']);
+            state: responseBody['state'],
+            shipAddress: responseBody['ship_address']);
         _isLoading = false;
-        print(responseBody['token']);
         prefs.setString('numberOfItems', _lineItems.length.toString());
         prefs.setString('orderToken', responseBody['token']);
         prefs.setString('orderNumber', responseBody['number']);
-        if (responseBody['ship_address'] != null) {
-          _shipAddress = responseBody['ship_address'];
-        }
-
         notifyListeners();
       });
     } else {
@@ -222,14 +170,8 @@ mixin CartModel on Model {
 
   Future<bool> changeState() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, String> headers = await getHeaders();
     Map<dynamic, dynamic> responseBody;
-    headers = {
-      'Content-Type': 'application/json',
-      'token-type': 'Bearer',
-      'ng-api': 'true',
-      'auth-token': prefs.getString('spreeApiKey'),
-      'Guest-Order-Token': prefs.getString('orderToken')
-    };
 
     _isLoading = true;
     notifyListeners();
@@ -240,7 +182,6 @@ mixin CartModel on Model {
         headers: headers);
 
     responseBody = json.decode(response.body);
-    // print(responseBody);
 
     order = Order(
         id: responseBody['id'],
@@ -252,9 +193,6 @@ mixin CartModel on Model {
         totalQuantity: responseBody['total_quantity'],
         state: responseBody['state']);
     prefs.setString('numberOfItems', _lineItems.length.toString());
-    // print('STATE IS CHANGED');
-    // print(order.state);
-    // print('RETURN TRUE, CONTINUE');
     await fetchCurrentOrder();
     _isLoading = false;
     notifyListeners();
@@ -265,14 +203,8 @@ mixin CartModel on Model {
     _isLoading = true;
     notifyListeners();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, String> headers = await getHeaders();
 
-    headers = {
-      'Content-Type': 'application/json',
-      'token-type': 'Bearer',
-      'ng-api': 'true',
-      'auth-token': prefs.getString('spreeApiKey'),
-      'Guest-Order-Token': prefs.getString('orderToken')
-    };
     Map<String, dynamic> paymentPayload = {
       'payment': {'payment_method_id': 3, 'amount': order.itemTotal}
     };
@@ -288,13 +220,9 @@ mixin CartModel on Model {
 
   clearData() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    // print('CLEAR DATA');
     prefs.setString('orderToken', null);
     prefs.setString('orderNumber', null);
     _lineItems.clear();
-    // print(_lineItems.length);
-    // print(prefs.getString('orderToken'));
-    // print(prefs.getString('orderNumber'));
     order = null;
     notifyListeners();
   }

@@ -9,6 +9,7 @@ class Order {
   int totalQuantity;
   String shipTotal;
   String state;
+  Map<String, dynamic> shipAddress;
 
   Order(
       {this.id,
@@ -18,5 +19,6 @@ class Order {
       this.lineItems,
       this.shipTotal,
       this.totalQuantity,
-      this.state});
+      this.state,
+      this.shipAddress});
 }

@@ -33,10 +33,13 @@ class _AddressPageState extends State<AddressPage> {
             child: Column(
           children: <Widget>[
             FlatButton(
-              child: Text('EDIT ADDRESS'),
+              child: Text(model.order.shipAddress != null
+                  ? 'EDIT ADDRESS'
+                  : 'ADD ADDRESS'),
               onPressed: () {
-                MaterialPageRoute payment =
-                    MaterialPageRoute(builder: (context) => UpdateAddress(model.shipAddress));
+                MaterialPageRoute payment = MaterialPageRoute(
+                    builder: (context) =>
+                        UpdateAddress(model.order.shipAddress));
                 Navigator.push(context, payment);
               },
             ),
@@ -144,7 +147,7 @@ class _AddressPageState extends State<AddressPage> {
   Widget addressContainer() {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-      if (model.shipAddress != null) {
+      if (model.order.shipAddress != null) {
         return Card(
             elevation: 3,
             margin: EdgeInsets.all(15),
@@ -157,24 +160,24 @@ class _AddressPageState extends State<AddressPage> {
                         height: 10,
                       ),
                       Text(
-                        model.shipAddress['full_name'],
+                        model.order.shipAddress['full_name'],
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.left,
                       ),
-                      textFieldContainer(model.shipAddress['address1']),
-                      textFieldContainer(model.shipAddress['address2']),
-                      textFieldContainer(model.shipAddress['city'] +
+                      textFieldContainer(model.order.shipAddress['address1']),
+                      textFieldContainer(model.order.shipAddress['address2']),
+                      textFieldContainer(model.order.shipAddress['city'] +
                           ' - ' +
-                          model.shipAddress['zipcode']),
-                      textFieldContainer(model.shipAddress['state']['name']),
+                          model.order.shipAddress['zipcode']),
                       textFieldContainer(
-                          'Mobile: ' + ' - ' + model.shipAddress['phone']),
+                          model.order.shipAddress['state']['name']),
+                      textFieldContainer('Mobile: ' +
+                          ' - ' +
+                          model.order.shipAddress['phone']),
                     ])));
-      } else {
-        return Container(child: Text('New Address Form'));
       }
     });
   }
