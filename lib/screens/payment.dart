@@ -147,7 +147,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String orderNumber = prefs.getString('orderNumber');
     MaterialPageRoute payment =
-        MaterialPageRoute(builder: (context) => OrderResponse(orderNumber));
+        MaterialPageRoute(builder: (context) => OrderResponse(orderNumber: orderNumber));
     Navigator.pushAndRemoveUntil(
       context,
       payment,

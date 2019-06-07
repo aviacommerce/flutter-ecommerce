@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ofypets_mobile_app/screens/order_history.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -187,6 +188,11 @@ class _HomeDrawer extends State<HomeDrawer> {
               'Order History',
               style: TextStyle(color: Colors.green),
             ),
+            onTap: (){
+              MaterialPageRoute orderList =
+                  MaterialPageRoute(builder: (context) => OrderList());
+              Navigator.push(context, orderList);
+            },
           ),
           ListTile(
             leading: Icon(

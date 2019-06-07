@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/utils/headers.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
@@ -9,7 +10,8 @@ import 'package:intl/intl.dart';
 
 class OrderResponse extends StatefulWidget {
   final String orderNumber;
-  OrderResponse(this.orderNumber);
+  Map<dynamic, dynamic> detailOrder;
+  OrderResponse({this.orderNumber, this.detailOrder});
   @override
   State<StatefulWidget> createState() {
     return _OrderResponseState();
@@ -19,39 +21,32 @@ class OrderResponse extends StatefulWidget {
 class _OrderResponseState extends State<OrderResponse> {
   Size _deviceSize;
   Map<dynamic, dynamic> responseBody;
-  var formatter = new DateFormat('dd-MMM-yyyy');
+  var formatter = new DateFormat('dd-MMM-yyyy hh:mm a');
 
   @override
   void initState() {
     super.initState();
     getOrderDetails();
-    // MainModel model = MainModel();
-    // model.clearData();
   }
 
-  @override
   getOrderDetails() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    // MainModel model = MainModel();
-    // await model.clearData();
 
-    // print('AFTER CLEARING STATUS');
-    // print(model.order);
-    // print(model.lineItems.length);
-
-    await http.get(Settings.SERVER_URL + '/api/v1/orders/${widget.orderNumber}',
-        headers: {
-          "content-type": "application/json",
-          "ng-api": "true",
-          "auth-token": prefs.getString('spreeApiKey')
-        }).then((response) {
-      setState(() {
-        responseBody = json.decode(response.body);
-        print(widget.orderNumber);
-        print('RESPONSE BODY --------------->');
-        print(responseBody);
+    if (widget.orderNumber != null) {
+      Map<String, String> headers = await getHeaders();
+      await http
+          .get(Settings.SERVER_URL + '/api/v1/orders/${widget.orderNumber}',
+              headers: headers)
+          .then((response) {
+        setState(() {
+          responseBody = json.decode(response.body);
+        });
       });
-    });
+    } else {
+      setState(() {
+        responseBody = widget.detailOrder;
+      });
+    }
   }
 
   Widget build(BuildContext context) {
@@ -68,17 +63,20 @@ class _OrderResponseState extends State<OrderResponse> {
               leading: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () async {
-                  await model.clearData();
-                  Navigator.popUntil(
-                      context, ModalRoute.withName(Navigator.defaultRouteName));
+                  if (widget.orderNumber != null) {
+                    await model.clearData();
+                    Navigator.popUntil(context,
+                        ModalRoute.withName(Navigator.defaultRouteName));
+                  } else {
+                    Navigator.of(context).pop();
+                  }
                 },
               ),
-              title: new Text('Order Status'),
+              title: new Text('Order Deatils'),
             ),
             body: responseBody != null
                 ? new SingleChildScrollView(
                     padding: EdgeInsets.only(left: 10, right: 10, top: 10),
-                    // child: Text('hghsg $responseBody')
                     child: new Column(
                       children: <Widget>[
                         new Card(
@@ -87,12 +85,19 @@ class _OrderResponseState extends State<OrderResponse> {
                             margin: EdgeInsets.all(10),
                             child: new Column(
                               children: <Widget>[
-                                new Text(
-                                  'Your order successfully placed!',
-                                  style: new TextStyle(
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.w500),
-                                )
+                                widget.orderNumber != null
+                                    ? new Text(
+                                        'Your order successfully placed!',
+                                        style: new TextStyle(
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.w500),
+                                      )
+                                    : new Text(
+                                        'Your Order Details!',
+                                        style: new TextStyle(
+                                            fontSize: 18.0,
+                                            fontWeight: FontWeight.w500),
+                                      )
                               ],
                             ),
                           ),
@@ -124,9 +129,13 @@ class _OrderResponseState extends State<OrderResponse> {
                                   children: <Widget>[
                                     Expanded(child: new Text('Order Date')),
                                     Expanded(
-                                        child: new Text((formatter.format(
-                                            DateTime.parse(responseBody[
-                                                "completed_at"])))))
+                                        child: responseBody["completed_at"] !=
+                                                null
+                                            ? Text((formatter.format(
+                                                DateTime.parse(
+                                                    responseBody["completed_at"]
+                                                        .split('+5:30')[0]))))
+                                            : Text("Date Missing!"))
                                   ],
                                 ),
                                 SizedBox(height: 10),
@@ -261,7 +270,6 @@ class _OrderResponseState extends State<OrderResponse> {
             ),
           )
         });
-
     return list;
   }
 }
