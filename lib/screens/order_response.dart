@@ -72,7 +72,7 @@ class _OrderResponseState extends State<OrderResponse> {
                   }
                 },
               ),
-              title: new Text('Order Deatils'),
+              title: new Text('Order Details'),
             ),
             body: responseBody != null
                 ? new SingleChildScrollView(
