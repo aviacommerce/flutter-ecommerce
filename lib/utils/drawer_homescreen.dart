@@ -2,12 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
 
-class HomeDrawer extends StatelessWidget {
+class HomeDrawer extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _HomeDrawer();
+  }
+}
+
+class _HomeDrawer extends State<HomeDrawer> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  String userName = '';
   Widget logOutButton() {
     return ScopedModelDescendant(
       builder: (BuildContext context, Widget child, MainModel model) {
@@ -33,6 +45,7 @@ class HomeDrawer extends StatelessWidget {
   }
 
   Widget signInLineTile() {
+    getUserName();
     return ScopedModelDescendant(
       builder: (BuildContext context, Widget child, MainModel model) {
         if (!model.isAuthenticated) {
@@ -74,15 +87,29 @@ class HomeDrawer extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Text('Welcome Back!',
+                Text(
+                    'Hi, ${formatName()}!',
                     style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.w300))
+                        color: Colors.white, fontWeight: FontWeight.w500))
               ],
             ),
           );
         }
       },
     );
+  }
+
+  formatName() {
+    if (userName != null) {
+      return userName[0].toUpperCase() + userName.substring(1).split('@')[0];
+    }
+  }
+
+  getUserName() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userName = prefs.getString('email');
+    });
   }
 
   logoutUser(MainModel model) async {

@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:intl/intl.dart';
 
 class OrderResponse extends StatefulWidget {
   final String orderNumber;
@@ -18,6 +19,8 @@ class OrderResponse extends StatefulWidget {
 class _OrderResponseState extends State<OrderResponse> {
   Size _deviceSize;
   Map<dynamic, dynamic> responseBody;
+  var formatter = new DateFormat('dd-MMM-yyyy');
+
   @override
   void initState() {
     super.initState();
@@ -121,8 +124,9 @@ class _OrderResponseState extends State<OrderResponse> {
                                   children: <Widget>[
                                     Expanded(child: new Text('Order Date')),
                                     Expanded(
-                                        child: new Text(
-                                            (responseBody["completed_at"])))
+                                        child: new Text((formatter.format(
+                                            DateTime.parse(responseBody[
+                                                "completed_at"])))))
                                   ],
                                 ),
                                 SizedBox(height: 10),
