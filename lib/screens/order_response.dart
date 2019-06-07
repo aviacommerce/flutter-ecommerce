@@ -247,13 +247,15 @@ class _OrderResponseState extends State<OrderResponse> {
                             '${item["variant"]["images"][0]["product_url"]}'),
                         placeholder: AssetImage(
                             'images/placeholders/no-product-image.png'),
-                      ))
+                      )),
+                      Divider()
                 ]),
                 SizedBox(width: 30),
                 Expanded(
                   child: new Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
+                        SizedBox(height: 5),
                         new Text('${item["variant"]["name"]}'),
                         SizedBox(height: 5),
                         new Text('Qty : ${item["quantity"]}'),
@@ -263,7 +265,8 @@ class _OrderResponseState extends State<OrderResponse> {
                             : '',
                         SizedBox(height: 5),
                         new Text('${item["display_amount"]}',
-                            style: new TextStyle(fontWeight: FontWeight.w800))
+                            style: new TextStyle(fontWeight: FontWeight.w800)),
+                            Divider()
                       ]),
                 ),
               ],
