@@ -1,3 +1,6 @@
+import 'package:ofypets_mobile_app/models/option_type.dart';
+import 'package:ofypets_mobile_app/models/option_value.dart';
+
 class Product {
   final int id;
   final String title;
@@ -9,24 +12,24 @@ class Product {
   final bool isOrderable;
   final bool hasVariants;
   final List<Product> variants;
-  final List<Map<dynamic, dynamic>> optionValues;
+  final List<OptionValue> optionValues;
+  final List<OptionType> optionTypes;
   String description;
-  final int review_product_id;
-  
-  Product({
-    this.id,
-    this.title,
-    this.name,
-    this.displayPrice,
-    this.image,
-    this.avgRating,
-    this.reviewsCount,
-    this.isOrderable,
-    this.variants,
-    this.hasVariants,
-    this.description,
-    this.optionValues,
-    this.review_product_id
-  });
+  final int reviewProductId;
 
+  Product(
+      {this.id,
+      this.title,
+      this.name,
+      this.displayPrice,
+      this.image,
+      this.avgRating,
+      this.reviewsCount,
+      this.isOrderable,
+      this.variants,
+      this.hasVariants,
+      this.description,
+      this.optionValues,
+      this.reviewProductId,
+      this.optionTypes});
 }

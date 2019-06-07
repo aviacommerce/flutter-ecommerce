@@ -10,6 +10,8 @@ import 'package:ofypets_mobile_app/models/brand.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/widgets/product_container.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
+import 'package:ofypets_mobile_app/models/option_type.dart';
+import 'package:ofypets_mobile_app/models/option_value.dart';
 
 class BrandList extends StatefulWidget {
   @override
@@ -181,7 +183,8 @@ class _BrandListState extends State<BrandList> {
 
   getBrandProducts(int id) {
     List<Product> variants = [];
-    List<Map<dynamic, dynamic>> optionValues = [];
+    List<OptionValue> optionValues = [];
+    List<OptionType> optionTypes = [];
 
     http
         .get(Settings.SERVER_URL +
@@ -194,24 +197,39 @@ class _BrandListState extends State<BrandList> {
         if (product['has_variants']) {
           product['variants'].forEach((variant) {
             optionValues = [];
+            optionTypes = [];
             variant['option_values'].forEach((option) {
               setState(() {
-                optionValues.add(option);
+                optionValues.add(OptionValue(
+                  id: option['id'],
+                  name: option['name'],
+                  optionTypeId: option['option_type_id'],
+                  optionTypeName: option['option_type_name'],
+                  optionTypePresentation: option['option_type_presentation'],
+                ));
               });
             });
             setState(() {
               variants.add(Product(
-                id: variant['id'],
-                name: variant['name'],
-                description: variant['description'],
-                optionValues: optionValues,
-                displayPrice: variant['display_price'],
-                image: variant['images'][0]['product_url'],
-                isOrderable: variant['is_orderable'],
-                avgRating: double.parse(product['avg_rating']),
-                reviewsCount: product['reviews_count'].toString(),
-                review_product_id: review_product_id
-              ));
+                  id: variant['id'],
+                  name: variant['name'],
+                  description: variant['description'],
+                  optionValues: optionValues,
+                  displayPrice: variant['display_price'],
+                  image: variant['images'][0]['product_url'],
+                  isOrderable: variant['is_orderable'],
+                  avgRating: double.parse(product['avg_rating']),
+                  reviewsCount: product['reviews_count'].toString(),
+                  reviewProductId: review_product_id));
+            });
+          });
+          product['option_types'].forEach((optionType) {
+            setState(() {
+              optionTypes.add(OptionType(
+                  id: optionType['id'],
+                  name: optionType['name'],
+                  position: optionType['position'],
+                  presentation: optionType['presentation']));
             });
           });
           setState(() {
@@ -222,8 +240,9 @@ class _BrandListState extends State<BrandList> {
                 reviewsCount: product['reviews_count'].toString(),
                 image: product['master']['images'][0]['product_url'],
                 variants: variants,
-                review_product_id: review_product_id,
-                hasVariants: product['has_variants']));
+                reviewProductId: review_product_id,
+                hasVariants: product['has_variants'],
+                optionTypes: optionTypes));
           });
         } else {
           setState(() {
@@ -236,7 +255,7 @@ class _BrandListState extends State<BrandList> {
               image: product['master']['images'][0]['product_url'],
               hasVariants: product['has_variants'],
               isOrderable: product['master']['is_orderable'],
-              review_product_id: review_product_id,
+              reviewProductId: review_product_id,
               description: product['description'],
             ));
           });

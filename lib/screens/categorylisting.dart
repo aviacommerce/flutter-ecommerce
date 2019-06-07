@@ -11,6 +11,8 @@ import 'package:ofypets_mobile_app/models/category.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/widgets/product_container.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
+import 'package:ofypets_mobile_app/models/option_type.dart';
+import 'package:ofypets_mobile_app/models/option_value.dart';
 
 class CategoryListing extends StatefulWidget {
   final String categoryName;
@@ -218,7 +220,8 @@ class _CategoryListingState extends State<CategoryListing> {
 
   getProductsByCategory(int categoryId) {
     List<Product> variants = [];
-    List<Map<dynamic, dynamic>> optionValues = [];
+    List<OptionValue> optionValues = [];
+    List<OptionType> optionTypes = [];
     setState(() {
       _isLoading = true;
       productsByCategory = [];
@@ -236,7 +239,13 @@ class _CategoryListingState extends State<CategoryListing> {
             optionValues = [];
             variant['option_values'].forEach((option) {
               setState(() {
-                optionValues.add(option);
+                OptionValue(
+                  id: option['id'],
+                  name: option['name'],
+                  optionTypeId: option['option_type_id'],
+                  optionTypeName: option['option_type_name'],
+                  optionTypePresentation: option['option_type_presentation'],
+                );
               });
             });
             setState(() {
@@ -250,7 +259,16 @@ class _CategoryListingState extends State<CategoryListing> {
                   isOrderable: variant['is_orderable'],
                   avgRating: double.parse(product['avg_rating']),
                   reviewsCount: product['reviews_count'].toString(),
-                  review_product_id: review_product_id));
+                  reviewProductId: review_product_id));
+            });
+          });
+          product['option_types'].forEach((optionType) {
+            setState(() {
+              optionTypes.add(OptionType(
+                  id: optionType['id'],
+                  name: optionType['name'],
+                  position: optionType['position'],
+                  presentation: optionType['presentation']));
             });
           });
           setState(() {
@@ -261,8 +279,9 @@ class _CategoryListingState extends State<CategoryListing> {
                 reviewsCount: product['reviews_count'].toString(),
                 image: product['master']['images'][0]['product_url'],
                 variants: variants,
-                review_product_id: review_product_id,
-                hasVariants: product['has_variants']));
+                reviewProductId: review_product_id,
+                hasVariants: product['has_variants'],
+                optionTypes: optionTypes));
           });
         } else {
           setState(() {
@@ -276,7 +295,7 @@ class _CategoryListingState extends State<CategoryListing> {
                 hasVariants: product['has_variants'],
                 isOrderable: product['master']['is_orderable'],
                 description: product['description'],
-                review_product_id: review_product_id));
+                reviewProductId: review_product_id));
           });
         }
       });

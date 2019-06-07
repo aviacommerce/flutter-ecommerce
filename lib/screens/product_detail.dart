@@ -67,7 +67,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     };
     reviews = [];
     String url = Settings.SERVER_URL +
-        "products/${selectedProduct.review_product_id}/reviews";
+        "products/${selectedProduct.reviewProductId}/reviews";
     http.get(url, headers: headers).then((response) {
       responseBody = json.decode(response.body);
       double total = 0;
@@ -268,6 +268,71 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     return "By ${exp.firstMatch(review.name).group(0)} - ${formatter.format(now)}";
   }
 
+  Widget variantRow() {
+    if (widget.product.hasVariants) {
+      List<Widget> optionValueNames = [];
+      List<Widget> optionTypeNames = [];
+      widget.product.optionTypes.forEach((optionType) {
+        optionTypeNames.add(Container(
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.all(10),
+            child: Text(optionType.name)));
+      });
+      widget.product.variants.forEach((variant) {
+        variant.optionValues.forEach((optionValue) {
+          optionValueNames.add(GestureDetector(
+              onTap: () {
+                setState(() {
+                  widget.product.variants.forEach((variant) {
+                    if (variant.optionValues[0] == optionValue) {
+                      setState(() {
+                        selectedProduct = variant;
+                      });
+                    }
+                  });
+                });
+              },
+              child: Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                    color:
+                        selectedProduct.optionValues[0].name == optionValue.name
+                            ? Colors.red
+                            : Colors.black,
+                  )),
+                  alignment: Alignment.centerLeft,
+                  margin: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    optionValue.name,
+                    style: TextStyle(
+                        color: selectedProduct.optionValues[0].name ==
+                                optionValue.name
+                            ? Colors.red
+                            : Colors.black),
+                  ))));
+        });
+      });
+      return ListView.builder(
+        shrinkWrap: true,
+        itemCount: 1,
+        itemBuilder: (context, index) {
+          return Column(children: [
+            optionTypeNames[index],
+            ListView(
+              shrinkWrap: true,
+              children: <Widget>[
+                Row(children: optionValueNames),
+              ],
+            )
+          ]);
+        },
+      );
+    } else {
+      return Container();
+    }
+  }
+
   Widget highlightsTab() {
     return SingleChildScrollView(
       child: Column(
@@ -310,6 +375,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
+          variantRow(),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
             Expanded(
                 child: Container(
