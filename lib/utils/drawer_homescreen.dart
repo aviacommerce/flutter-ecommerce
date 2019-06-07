@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
+import 'package:ofypets_mobile_app/screens/favorites.dart';
 
 class HomeDrawer extends StatefulWidget {
   @override
@@ -43,6 +44,62 @@ class _HomeDrawer extends State<HomeDrawer> {
         }
       },
     );
+  }
+
+  Widget favoritesLineTile() {
+    return ScopedModelDescendant(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return ListTile(
+        leading: Icon(
+          Icons.favorite,
+          color: Colors.green,
+        ),
+        title: Text(
+          'Favorites',
+          style: TextStyle(color: Colors.green),
+        ),
+        onTap: () {
+          if (model.isAuthenticated) {
+            MaterialPageRoute orderList =
+                MaterialPageRoute(builder: (context) => FavoritesScreen());
+            Navigator.push(context, orderList);
+          } else {
+            MaterialPageRoute route =
+                MaterialPageRoute(builder: (context) => Authentication(0));
+
+            Navigator.push(context, route);
+          }
+        },
+      );
+    });
+  }
+
+  Widget orderHistoryLineTile() {
+    return ScopedModelDescendant(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return ListTile(
+        leading: Icon(
+          Icons.receipt,
+          color: Colors.green,
+        ),
+        title: Text(
+          'Order History',
+          style: TextStyle(color: Colors.green),
+        ),
+        onTap: () {
+          if (model.isAuthenticated) {
+            MaterialPageRoute orderList =
+                MaterialPageRoute(builder: (context) => OrderList());
+            Navigator.push(context, orderList);
+          } else {
+            MaterialPageRoute route =
+                MaterialPageRoute(builder: (context) => Authentication(0));
+
+            Navigator.push(context, route);
+          }
+        },
+      );
+    });
   }
 
   Widget signInLineTile() {
@@ -88,8 +145,7 @@ class _HomeDrawer extends State<HomeDrawer> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Text(
-                    'Hi, ${formatName()}!',
+                Text('Hi, ${formatName()}!',
                     style: TextStyle(
                         color: Colors.white, fontWeight: FontWeight.w500))
               ],
@@ -169,31 +225,8 @@ class _HomeDrawer extends State<HomeDrawer> {
               style: TextStyle(color: Colors.green),
             ),
           ),
-          ListTile(
-            leading: Icon(
-              Icons.favorite,
-              color: Colors.green,
-            ),
-            title: Text(
-              'Favorites',
-              style: TextStyle(color: Colors.green),
-            ),
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.receipt,
-              color: Colors.green,
-            ),
-            title: Text(
-              'Order History',
-              style: TextStyle(color: Colors.green),
-            ),
-            onTap: (){
-              MaterialPageRoute orderList =
-                  MaterialPageRoute(builder: (context) => OrderList());
-              Navigator.push(context, orderList);
-            },
-          ),
+          favoritesLineTile(),
+          orderHistoryLineTile(),
           ListTile(
             leading: Icon(
               Icons.person,

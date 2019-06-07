@@ -269,65 +269,69 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   }
 
   Widget variantRow() {
-    if (widget.product.hasVariants) {
-      List<Widget> optionValueNames = [];
-      List<Widget> optionTypeNames = [];
-      widget.product.optionTypes.forEach((optionType) {
-        optionTypeNames.add(Container(
-            alignment: Alignment.centerLeft,
-            padding: EdgeInsets.all(10),
-            child: Text(optionType.name)));
-      });
-      widget.product.variants.forEach((variant) {
-        variant.optionValues.forEach((optionValue) {
-          optionValueNames.add(GestureDetector(
-              onTap: () {
-                setState(() {
-                  widget.product.variants.forEach((variant) {
-                    if (variant.optionValues[0] == optionValue) {
-                      setState(() {
-                        selectedProduct = variant;
-                      });
-                    }
-                  });
-                });
-              },
-              child: Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                    color:
-                        selectedProduct.optionValues[0].name == optionValue.name
-                            ? Colors.red
-                            : Colors.black,
-                  )),
-                  alignment: Alignment.centerLeft,
-                  margin: EdgeInsets.all(10),
-                  padding: EdgeInsets.all(10),
-                  child: Text(
-                    optionValue.name,
-                    style: TextStyle(
-                        color: selectedProduct.optionValues[0].name ==
-                                optionValue.name
-                            ? Colors.red
-                            : Colors.black),
-                  ))));
+    if (widget.product.hasVariants != null) {
+      if (widget.product.hasVariants) {
+        List<Widget> optionValueNames = [];
+        List<Widget> optionTypeNames = [];
+        widget.product.optionTypes.forEach((optionType) {
+          optionTypeNames.add(Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(10),
+              child: Text(optionType.name)));
         });
-      });
-      return ListView.builder(
-        shrinkWrap: true,
-        itemCount: 1,
-        itemBuilder: (context, index) {
-          return Column(children: [
-            optionTypeNames[index],
-            ListView(
-              shrinkWrap: true,
-              children: <Widget>[
-                Row(children: optionValueNames),
-              ],
-            )
-          ]);
-        },
-      );
+        widget.product.variants.forEach((variant) {
+          variant.optionValues.forEach((optionValue) {
+            optionValueNames.add(GestureDetector(
+                onTap: () {
+                  setState(() {
+                    widget.product.variants.forEach((variant) {
+                      if (variant.optionValues[0] == optionValue) {
+                        setState(() {
+                          selectedProduct = variant;
+                        });
+                      }
+                    });
+                  });
+                },
+                child: Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                      color: selectedProduct.optionValues[0].name ==
+                              optionValue.name
+                          ? Colors.red
+                          : Colors.black,
+                    )),
+                    alignment: Alignment.centerLeft,
+                    margin: EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10),
+                    child: Text(
+                      optionValue.name,
+                      style: TextStyle(
+                          color: selectedProduct.optionValues[0].name ==
+                                  optionValue.name
+                              ? Colors.red
+                              : Colors.black),
+                    ))));
+          });
+        });
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: 1,
+          itemBuilder: (context, index) {
+            return Column(children: [
+              optionTypeNames[index],
+              ListView(
+                shrinkWrap: true,
+                children: <Widget>[
+                  Row(children: optionValueNames),
+                ],
+              )
+            ]);
+          },
+        );
+      } else {
+        return Container();
+      }
     } else {
       return Container();
     }
