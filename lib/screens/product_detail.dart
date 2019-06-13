@@ -40,13 +40,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
-
+    print(widget.product.hasVariants);
     if (widget.product.hasVariants != null) {
       if (widget.product.hasVariants) {
         _hasVariants = widget.product.hasVariants;
         selectedProduct = widget.product.variants.first;
         htmlDescription = widget.product.variants.first.description != null
             ? widget.product.variants.first.description
+            : '';
+      } else {
+        selectedProduct = widget.product;
+        htmlDescription = widget.product.description != null
+            ? widget.product.description
             : '';
       }
     } else {
@@ -59,6 +64,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   }
 
   get_reviews() {
+    print('selectedProductId');
+    print(selectedProduct);
     print('reviewproductid');
     print(selectedProduct.reviewProductId);
     Map<dynamic, dynamic> responseBody;
