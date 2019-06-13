@@ -22,6 +22,7 @@ Widget shoppingCartIconButton() {
           child: new Stack(
             children: <Widget>[
               new IconButton(
+                iconSize: 30,
                 icon: new Icon(
                   Icons.shopping_cart,
                   color: Colors.white,

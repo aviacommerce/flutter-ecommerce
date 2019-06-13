@@ -17,6 +17,8 @@ import 'package:ofypets_mobile_app/widgets/category_box.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/models/option_type.dart';
+import 'package:ofypets_mobile_app/models/option_value.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -63,32 +65,38 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (BuildContext context, Widget child, MainModel model) {
       return Scaffold(
         appBar: AppBar(
-            title: Text(
-              'ofypets',
-              style: TextStyle(fontFamily: 'HolyFat', fontSize: 50),
-            ),
-            actions: <Widget>[
-              Padding(
-                  padding: EdgeInsets.only(right: _deviceSize.width * 0.01),
-                  child: shoppingCartIconButton()),
-            ],
-            bottom: PreferredSize(
-              preferredSize: Size(_deviceSize.width, 50),
-              child: Container(
-                width: _deviceSize.width,
-                height: 50,
-                margin: EdgeInsets.all(10),
-                color: Colors.white,
-                child: ListTile(
-                  leading: Icon(Icons.search),
-                  title: Text(
-                    'Find the best for your pet...',
-                    style: TextStyle(fontWeight: FontWeight.w300),
-                  ),
+          centerTitle: true,
+          title: Container(
+              padding: EdgeInsets.all(10),
+              child: Text(
+                'ofypets',
+                style: TextStyle(fontFamily: 'HolyFat', fontSize: 50),
+              )),
+          actions: <Widget>[
+            Padding(
+                padding: EdgeInsets.only(right: _deviceSize.width * 0.01),
+                child: shoppingCartIconButton()),
+          ],
+          bottom: PreferredSize(
+            preferredSize: Size(_deviceSize.width, 70),
+            child: Container(
+              decoration: BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(5)),
+              width: _deviceSize.width,
+              height: 50,
+              margin: EdgeInsets.all(010),
+              child: ListTile(
+                leading: Icon(Icons.search),
+                title: Text(
+                  'Find the best for your pet...',
+                  style: TextStyle(fontWeight: FontWeight.w300),
                 ),
               ),
             ),
-            ),
+          ),
+        ),
         drawer: HomeDrawer(),
         body: CustomScrollView(slivers: [
           SliverList(
@@ -178,23 +186,6 @@ class _HomeScreenState extends State<HomeScreen> {
           SliverToBoxAdapter(
             child: Divider(),
           ),
-          // SliverList(
-          //   delegate: SliverChildListDelegate([
-          //     Container(
-          //       width: _deviceSize.width,
-          //       padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          //       color: Colors.white,
-          //       alignment: Alignment.centerRight,
-          //       child: Text(
-          //         'SEE ALL',
-          //         style: TextStyle(
-          //             color: Colors.green,
-          //             fontSize: 20,
-          //             fontWeight: FontWeight.bold),
-          //       ),
-          //     )
-          //   ]),
-          // ),
         ]),
         bottomNavigationBar:
             !model.isAuthenticated ? bottomNavigationBar() : null,
@@ -296,38 +287,93 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   getTodaysDeals() async {
-    String todaysDealsId;
+        String todaysDealsId;
     http.Response response = await http.get(
         Settings.SERVER_URL + 'api/v1/taxonomies?q[name_cont]=Today\'s Deals');
     responseBody = json.decode(response.body);
     todaysDealsId = responseBody['taxonomies'][0]['id'].toString();
+    List<Product> variants = [];
+    List<OptionValue> optionValues = [];
+    List<OptionType> optionTypes = [];
+    setState(() {
+      _isDealsLoading = true;
+      todaysDealProducts = [];
+    });
     http
         .get(Settings.SERVER_URL +
             'api/v1/taxons/products?id=$todaysDealsId&per_page=20&data_set=small')
         .then((response) {
       responseBody = json.decode(response.body);
+      print('RESPONSE');
+      print(responseBody);
       responseBody['products'].forEach((product) {
+        int review_product_id = product["id"];
+        print('reviewProductId');print(review_product_id);
+        variants = [];
         if (product['has_variants']) {
-          setState(() {
-            todaysDealProducts.add(Product(
-                id: product['variants'][0]['id'],
-                name: product['variants'][0]['name'],
-                displayPrice: product['variants'][0]['display_price'],
-                avgRating: double.parse(product['avg_rating']),
-                reviewsCount: product['reviews_count'].toString(),
-                image: product['variants'][0]['images'][0]['product_url'],
-                isOrderable: product['variants'][0]['is_orderable']));
+          product['variants'].forEach((variant) {
+            optionValues = [];
+            optionTypes = [];
+            variant['option_values'].forEach((option) {
+              setState(() {
+                optionValues.add(OptionValue(
+                  id: option['id'],
+                  name: option['name'],
+                  optionTypeId: option['option_type_id'],
+                  optionTypeName: option['option_type_name'],
+                  optionTypePresentation: option['option_type_presentation'],
+                ));
+              });
+            });
+            setState(() {
+              variants.add(Product(
+                  id: variant['id'],
+                  name: variant['name'],
+                  description: variant['description'],
+                  optionValues: optionValues,
+                  displayPrice: variant['display_price'],
+                  image: variant['images'][0]['product_url'],
+                  isOrderable: variant['is_orderable'],
+                  avgRating: double.parse(product['avg_rating']),
+                  reviewsCount: product['reviews_count'].toString(),
+                  reviewProductId: review_product_id));
+            });
           });
-        } else {
+          product['option_types'].forEach((optionType) {
+            setState(() {
+              optionTypes.add(OptionType(
+                  id: optionType['id'],
+                  name: optionType['name'],
+                  position: optionType['position'],
+                  presentation: optionType['presentation']));
+            });
+          });
           setState(() {
             todaysDealProducts.add(Product(
-                id: product['id'],
                 name: product['name'],
                 displayPrice: product['display_price'],
                 avgRating: double.parse(product['avg_rating']),
                 reviewsCount: product['reviews_count'].toString(),
                 image: product['master']['images'][0]['product_url'],
-                isOrderable: product['master']['is_orderable']));
+                variants: variants,
+                reviewProductId: review_product_id,
+                hasVariants: product['has_variants'],
+                optionTypes: optionTypes));
+          });
+        } else {
+          setState(() {
+            todaysDealProducts.add(Product(
+              id: product['id'],
+              name: product['name'],
+              displayPrice: product['display_price'],
+              avgRating: double.parse(product['avg_rating']),
+              reviewsCount: product['reviews_count'].toString(),
+              image: product['master']['images'][0]['product_url'],
+              hasVariants: product['has_variants'],
+              isOrderable: product['master']['is_orderable'],
+              reviewProductId: review_product_id,
+              description: product['description'],
+            ));
           });
         }
       });
@@ -336,6 +382,48 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     });
   }
+
+  // getTodaysDeals() async {
+    // String todaysDealsId;
+    // http.Response response = await http.get(
+    //     Settings.SERVER_URL + 'api/v1/taxonomies?q[name_cont]=Today\'s Deals');
+    // responseBody = json.decode(response.body);
+    // todaysDealsId = responseBody['taxonomies'][0]['id'].toString();
+  //   http
+  //       .get(Settings.SERVER_URL +
+  //           'api/v1/taxons/products?id=$todaysDealsId&per_page=20&data_set=small')
+  //       .then((response) {
+  //     responseBody = json.decode(response.body);
+  //     responseBody['products'].forEach((product) {
+  //       if (product['has_variants']) {
+  //         setState(() {
+  //           todaysDealProducts.add(Product(
+  //               id: product['variants'][0]['id'],
+  //               name: product['variants'][0]['name'],
+  //               displayPrice: product['variants'][0]['display_price'],
+  //               avgRating: double.parse(product['avg_rating']),
+  //               reviewsCount: product['reviews_count'].toString(),
+  //               image: product['variants'][0]['images'][0]['product_url'],
+  //               isOrderable: product['variants'][0]['is_orderable']));
+  //         });
+  //       } else {
+  //         setState(() {
+  //           todaysDealProducts.add(Product(
+  //               id: product['id'],
+  //               name: product['name'],
+  //               displayPrice: product['display_price'],
+  //               avgRating: double.parse(product['avg_rating']),
+  //               reviewsCount: product['reviews_count'].toString(),
+  //               image: product['master']['images'][0]['product_url'],
+  //               isOrderable: product['master']['is_orderable']));
+  //         });
+  //       }
+  //     });
+  //     setState(() {
+  //       _isDealsLoading = false;
+  //     });
+  //   });
+  // }
 
   getBanners() async {
     http

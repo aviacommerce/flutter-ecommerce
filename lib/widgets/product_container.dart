@@ -5,19 +5,18 @@ import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/screens/product_detail.dart';
 
 Widget productContainer(Product product, BuildContext context) {
-  return Container(
-      color: Colors.white,
-      child: GestureDetector(
+  return GestureDetector(
           onTap: () {
             MaterialPageRoute route = MaterialPageRoute(
                 builder: (context) => ProductDetailScreen(product));
             Navigator.push(context, route);
           },
-          child: Container(
+          child: Card(
+            margin: EdgeInsets.all(10),
               color: Colors.white,
               child: Row(
                 children: <Widget>[
-                  Stack(
+                  Column(
                     children: <Widget>[
                       Container(
                         height: 150,
@@ -30,15 +29,13 @@ Widget productContainer(Product product, BuildContext context) {
                         ),
                       ),
                       Container(
-                        height: 150,
+                        padding: EdgeInsets.all(10),
                         width: 150,
-                        alignment: Alignment.topRight,
-                        child: IconButton(
-                          alignment: Alignment.topRight,
-                          icon: Icon(Icons.favorite_border),
-                          color: Colors.orange,
-                          onPressed: () {},
-                        ),
+                        alignment: Alignment.center,
+                        child: Text('MORE OPTIONS AVAILABLE', style: TextStyle(
+                          fontWeight: FontWeight.w300,
+                          fontSize: 12
+                        ),textAlign: TextAlign.center,)
                       )
                     ],
                   ),
@@ -58,16 +55,28 @@ Widget productContainer(Product product, BuildContext context) {
                         ),
                       ),
                       SizedBox(height: 10),
-                      Container(
-                        alignment: Alignment.topLeft,
-                        child: Text(
-                          product.displayPrice,
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18),
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Container(
+                            alignment: Alignment.topLeft,
+                            child: Text(
+                              product.displayPrice,
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18),
+                            ),
+                          ),
+                          IconButton(
+                            padding: EdgeInsets.all(10),
+                            alignment: Alignment.topRight,
+                            icon: Icon(Icons.favorite),
+                            color: Colors.orange,
+                            onPressed: () {},
+                          ),
+                        ],
                       ),
                       SizedBox(height: 10),
                       Row(
@@ -80,5 +89,5 @@ Widget productContainer(Product product, BuildContext context) {
                     ],
                   )),
                 ],
-              ))));
+              )));
 }

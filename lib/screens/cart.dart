@@ -38,7 +38,13 @@ class _CartState extends State<Cart> {
                       preferredSize: Size.fromHeight(10),
                     )),
           body: body(),
-          bottomNavigationBar: proceedToCheckoutButton());
+          bottomNavigationBar: BottomAppBar(
+              child: Container(
+                  height: 136,
+                  child: Column(children: [
+                    proceedToCheckoutButton(),
+                    itemTotalContainer(model)
+                  ]))));
     });
   }
 
@@ -60,7 +66,6 @@ class _CartState extends State<Cart> {
         return CustomScrollView(
           slivers: <Widget>[
             items(),
-            itemTotalContainer(model),
           ],
         );
       },
@@ -68,35 +73,29 @@ class _CartState extends State<Cart> {
   }
 
   Widget itemTotalContainer(MainModel model) {
-    return SliverList(
-      delegate: SliverChildListDelegate([
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        model.order == null
+            ? Container()
+            : model.order.itemTotal != '0.0'
+                ? Text(
+                    'SubTotal: ',
+                    style: TextStyle(fontSize: 20, color: Colors.green),
+                  )
+                : Container(),
+        Container(
+          child: Text(
             model.order == null
-                ? Container()
+                ? 'No Items in Cart'
                 : model.order.itemTotal != '0.0'
-                    ? Text(
-                        'SubTotal: ',
-                        style: TextStyle(fontSize: 20, color: Colors.green),
-                      )
-                    : Container(),
-            Container(
-              child: Text(
-                model.order == null
-                    ? 'No Items in Cart'
-                    : model.order.itemTotal != '0.0'
-                        ? model.order.displaySubTotal
-                        : 'No Items in Cart',
-                style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.red,
-                    fontWeight: FontWeight.bold),
-              ),
-            )
-          ],
+                    ? model.order.displaySubTotal
+                    : 'No Items in Cart',
+            style: TextStyle(
+                fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),
+          ),
         )
-      ]),
+      ],
     );
   }
 
@@ -112,6 +111,8 @@ class _CartState extends State<Cart> {
       return Container(
         padding: EdgeInsets.all(20),
         child: FlatButton(
+          shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
           color: Colors.green,
           child: Text(
             model.order == null
@@ -119,7 +120,7 @@ class _CartState extends State<Cart> {
                 : model.order.itemTotal == '0.0'
                     ? 'BROWSE ITEMS'
                     : 'PROCEED TO CHECKOUT',
-            style: TextStyle(fontSize: 20, color: Colors.white),
+            style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.w300),
           ),
           onPressed: () async {
             if (model.order != null) {
@@ -130,7 +131,8 @@ class _CartState extends State<Cart> {
                     bool _stateischanged = await model.changeState();
                     if (_stateischanged) {
                       if (model.order.state == 'address') {
-                        print('DELIVERY, CHANGING STATE BEFORE GOING TO ADDRESS');
+                        print(
+                            'DELIVERY, CHANGING STATE BEFORE GOING TO ADDRESS');
                         _stateischanged = await model.changeState();
                       }
                     }
@@ -183,6 +185,7 @@ class _CartState extends State<Cart> {
                           Stack(
                             children: <Widget>[
                               Container(
+                                padding: EdgeInsets.all(10),
                                 height: 150,
                                 width: 150,
                                 color: Colors.white,

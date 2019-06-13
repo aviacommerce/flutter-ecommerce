@@ -218,7 +218,7 @@ class _CategoryListingState extends State<CategoryListing> {
     });
   }
 
-  getProductsByCategory(int categoryId) {
+  getProductsByCategory(int id) {
     List<Product> variants = [];
     List<OptionValue> optionValues = [];
     List<OptionType> optionTypes = [];
@@ -228,7 +228,7 @@ class _CategoryListingState extends State<CategoryListing> {
     });
     http
         .get(Settings.SERVER_URL +
-            'api/v1/taxons/products?id=$categoryId&per_page=10&data_set=small')
+            'api/v1/taxons/products?id=$id&per_page=20&data_set=small')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['products'].forEach((product) {
@@ -237,15 +237,16 @@ class _CategoryListingState extends State<CategoryListing> {
         if (product['has_variants']) {
           product['variants'].forEach((variant) {
             optionValues = [];
+            optionTypes = [];
             variant['option_values'].forEach((option) {
               setState(() {
-                OptionValue(
+                optionValues.add(OptionValue(
                   id: option['id'],
                   name: option['name'],
                   optionTypeId: option['option_type_id'],
                   optionTypeName: option['option_type_name'],
                   optionTypePresentation: option['option_type_presentation'],
-                );
+                ));
               });
             });
             setState(() {
@@ -286,16 +287,17 @@ class _CategoryListingState extends State<CategoryListing> {
         } else {
           setState(() {
             productsByCategory.add(Product(
-                id: product['id'],
-                name: product['name'],
-                displayPrice: product['display_price'],
-                avgRating: double.parse(product['avg_rating']),
-                reviewsCount: product['reviews_count'].toString(),
-                image: product['master']['images'][0]['product_url'],
-                hasVariants: product['has_variants'],
-                isOrderable: product['master']['is_orderable'],
-                description: product['description'],
-                reviewProductId: review_product_id));
+              id: product['id'],
+              name: product['name'],
+              displayPrice: product['display_price'],
+              avgRating: double.parse(product['avg_rating']),
+              reviewsCount: product['reviews_count'].toString(),
+              image: product['master']['images'][0]['product_url'],
+              hasVariants: product['has_variants'],
+              isOrderable: product['master']['is_orderable'],
+              reviewProductId: review_product_id,
+              description: product['description'],
+            ));
           });
         }
       });

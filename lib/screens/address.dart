@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
+
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/payment.dart';
 import 'package:ofypets_mobile_app/screens/update_address.dart';
+import 'package:ofypets_mobile_app/widgets/order_details_card.dart';
 
 class AddressPage extends StatefulWidget {
   @override
@@ -44,34 +46,11 @@ class _AddressPageState extends State<AddressPage> {
               },
             ),
             addressContainer(),
-            orderDetailColumn(),
+            Divider(),
+            orderDetailCard(),
           ],
         )),
         bottomNavigationBar: paymentButton(context),
-      );
-    });
-  }
-
-  Widget orderDetailColumn() {
-    return ScopedModelDescendant<MainModel>(
-        builder: (BuildContext context, Widget child, MainModel model) {
-      return Card(
-        elevation: 3,
-        margin: EdgeInsets.all(15),
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(left: 10),
-              child: Text(
-                model.order.totalQuantity.toString() + ' ITEMS',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            amountRow('Sub Total', model.order.displaySubTotal, model),
-            amountRow('Delivery', model.order.shipTotal, model),
-            amountRow('Total', model.order.displayTotal, model)
-          ],
-        ),
       );
     });
   }
@@ -125,59 +104,44 @@ class _AddressPageState extends State<AddressPage> {
     );
   }
 
-  Widget amountRow(String title, String displayAmount, MainModel model) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Container(
-        padding: EdgeInsets.all(10),
-        child: Text(
-          title,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-      Container(
-        padding: EdgeInsets.all(10),
-        child: Text(
-          displayAmount,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      )
-    ]);
-  }
-
   Widget addressContainer() {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       if (model.order.shipAddress != null) {
-        return Card(
+        return Container(
+          width: MediaQuery.of(context).size.width,
+          child: Card(
             elevation: 3,
             margin: EdgeInsets.all(15),
             child: Container(
-                margin: EdgeInsets.all(10),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text(
-                        model.order.shipAddress['full_name'],
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.left,
-                      ),
-                      textFieldContainer(model.order.shipAddress['address1']),
-                      textFieldContainer(model.order.shipAddress['address2']),
-                      textFieldContainer(model.order.shipAddress['city'] +
-                          ' - ' +
-                          model.order.shipAddress['zipcode']),
-                      textFieldContainer(
-                          model.order.shipAddress['state']['name']),
-                      textFieldContainer('Mobile: ' +
-                          ' - ' +
-                          model.order.shipAddress['phone']),
-                    ])));
+              margin: EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Text(
+                    model.order.shipAddress['full_name'],
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.left,
+                  ),
+                  textFieldContainer(model.order.shipAddress['address1']),
+                  textFieldContainer(model.order.shipAddress['address2']),
+                  textFieldContainer(model.order.shipAddress['city'] +
+                      ' - ' +
+                      model.order.shipAddress['zipcode']),
+                  textFieldContainer(model.order.shipAddress['state']['name']),
+                  textFieldContainer(
+                      'Mobile: ' + ' - ' + model.order.shipAddress['phone']),
+                ],
+              ),
+            ),
+          ),
+        );
       }
     });
   }

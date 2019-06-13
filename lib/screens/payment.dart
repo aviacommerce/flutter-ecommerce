@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/order_response.dart';
+import 'package:ofypets_mobile_app/widgets/order_details_card.dart';
 
 class PaymentScreen extends StatefulWidget {
   @override
@@ -34,7 +35,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              orderDetailColumn(),
+              orderDetailCard(),
               Card(
                 elevation: 3,
                 margin: EdgeInsets.all(15),
@@ -46,6 +47,33 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         margin: EdgeInsets.all(10),
                         child: Text(
                           'CASH ON DELIVERY(COD)',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                    Container(
+                        margin: EdgeInsets.all(10),
+                        child: Text(
+                          'Pay with Cash or Card when your order is delivered.',
+                        )),
+                    Container(
+                        margin: EdgeInsets.all(10),
+                        child: Text(
+                          'Note: All authorised notes are accepted. Credit/Debit cards are also accepted.',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        )),
+                  ],
+                ),
+              ),
+                            Card(
+                elevation: 3,
+                margin: EdgeInsets.all(15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                        margin: EdgeInsets.all(10),
+                        child: Text(
+                          'Pay U Biz',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         )),
                     Container(
@@ -99,50 +127,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       );
     });
   }
-
-  Widget orderDetailColumn() {
-    return ScopedModelDescendant<MainModel>(
-        builder: (BuildContext context, Widget child, MainModel model) {
-      return Card(
-        elevation: 3,
-        margin: EdgeInsets.all(15),
-        child: Column(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(left: 10),
-              child: Text(
-                model.order.totalQuantity.toString() + ' ITEMS',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            amountRow('Sub Total', model.order.displaySubTotal, model),
-            amountRow('Delivery', model.order.shipTotal, model),
-            amountRow('Total', model.order.displayTotal, model)
-          ],
-        ),
-      );
-    });
-  }
-
-  Widget amountRow(String title, String displayAmount, MainModel model) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Container(
-        padding: EdgeInsets.all(10),
-        child: Text(
-          title,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-      Container(
-        padding: EdgeInsets.all(10),
-        child: Text(
-          displayAmount,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      )
-    ]);
-  }
-
+  
   pushSuccessPage() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String orderNumber = prefs.getString('orderNumber');

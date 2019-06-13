@@ -59,6 +59,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   }
 
   get_reviews() {
+    print('reviewproductid');
+    print(selectedProduct.reviewProductId);
     Map<dynamic, dynamic> responseBody;
     Map<String, String> headers = {
       'Content-Type': 'application/json',
