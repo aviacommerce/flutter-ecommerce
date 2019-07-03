@@ -6,6 +6,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
+import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ofypets_mobile_app/screens/auth.dart';
+
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/models/review.dart';
@@ -107,10 +111,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     });
   }
 
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     _deviceSize = MediaQuery.of(context).size;
     return Scaffold(
+        key: _scaffoldKey,
         backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text('Item Details'),
@@ -374,6 +381,59 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
+                Expanded(
+                  child: IconButton(
+                    padding: EdgeInsets.all(10),
+                    alignment: Alignment.topRight,
+                    icon: Icon(Icons.favorite),
+                    color: Colors.orange,
+                    onPressed: () async {
+                      final SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      String authToken = prefs.getString('spreeApiKey');
+
+                      if (authToken == null) {
+                        _scaffoldKey.currentState.showSnackBar(SnackBar(
+                          content: Text(
+                            'Please Login to add to Favorites',
+                          ),
+                          action: SnackBarAction(
+                            label: 'LOGIN',
+                            onPressed: () {
+                              MaterialPageRoute route = MaterialPageRoute(
+                                  builder: (context) => Authentication(0));
+                              Navigator.push(context, route);
+                            },
+                          ),
+                        ));
+                      } else {
+                        _scaffoldKey.currentState.showSnackBar(SnackBar(
+                          content: Text(
+                            'Adding to Favorites, please wait.',
+                          ),
+                          duration: Duration(seconds: 1),
+                        ));
+                        Map<String, String> headers = await getHeaders();
+                        http
+                            .post(Settings.SERVER_URL + 'favorite_products',
+                                body: json.encode({
+                                  'id':
+                                      widget.product.reviewProductId.toString()
+                                }),
+                                headers: headers)
+                            .then((response) {
+                          Map<dynamic, dynamic> responseBody =
+                              json.decode(response.body);
+
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                            content: Text(responseBody['message']),
+                            duration: Duration(seconds: 1),
+                          ));
+                        });
+                      }
+                    },
+                  ),
+                ),
                 ratingBar(selectedProduct.avgRating, 20),
                 Container(
                     margin: EdgeInsets.only(right: 10),

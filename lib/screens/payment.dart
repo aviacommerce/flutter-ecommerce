@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/order_response.dart';
-import 'package:ofypets_mobile_app/widgets/order_details_card.dart';
+import 'package:ofypets_mobile_app/utils/params.dart';
 
 class PaymentScreen extends StatefulWidget {
   @override
@@ -13,7 +13,11 @@ class PaymentScreen extends StatefulWidget {
   }
 }
 
+enum SingingCharacter { cod, payubiz }
+
 class _PaymentScreenState extends State<PaymentScreen> {
+// In the State of a stateful widget:
+  SingingCharacter _character = SingingCharacter.cod;
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
@@ -32,63 +36,28 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   )),
         body: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              orderDetailCard(),
-              Card(
-                elevation: 3,
-                margin: EdgeInsets.all(15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                        margin: EdgeInsets.all(10),
-                        child: Text(
-                          'CASH ON DELIVERY(COD)',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                    Container(
-                        margin: EdgeInsets.all(10),
-                        child: Text(
-                          'Pay with Cash or Card when your order is delivered.',
-                        )),
-                    Container(
-                        margin: EdgeInsets.all(10),
-                        child: Text(
-                          'Note: All authorised notes are accepted. Credit/Debit cards are also accepted.',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                  ],
-                ),
+              RadioListTile<SingingCharacter>(
+                title: const Text('Cash on Delivery'),
+                value: SingingCharacter.cod,
+                groupValue: _character,
+                onChanged: (SingingCharacter value) {
+                  setState(() {
+                    _character = value;
+                  });
+                },
+                activeColor: Colors.green,
               ),
-                            Card(
-                elevation: 3,
-                margin: EdgeInsets.all(15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                        margin: EdgeInsets.all(10),
-                        child: Text(
-                          'Pay U Biz',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                    Container(
-                        margin: EdgeInsets.all(10),
-                        child: Text(
-                          'Pay with Cash or Card when your order is delivered.',
-                        )),
-                    Container(
-                        margin: EdgeInsets.all(10),
-                        child: Text(
-                          'Note: All authorised notes are accepted. Credit/Debit cards are also accepted.',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        )),
-                  ],
-                ),
+              RadioListTile<SingingCharacter>(
+                title: const Text('PayuBiz'),
+                value: SingingCharacter.payubiz,
+                groupValue: _character,
+                onChanged: (SingingCharacter value) {
+                  setState(() {
+                    _character = value;
+                  });
+                },
+                activeColor: Colors.green,
               ),
             ],
           ),
@@ -104,35 +73,45 @@ class _PaymentScreenState extends State<PaymentScreen> {
       return Container(
         padding: EdgeInsets.all(20),
         child: FlatButton(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           color: Colors.green,
           child: Text(
-            'PAY ON DELIVERY',
-            style: TextStyle(fontSize: 20, color: Colors.white),
+            _character == SingingCharacter.cod
+                ? 'PAY ON DELIVERY'
+                : 'CONTINUE TO PAYUBIZ',
+            style: TextStyle(
+                fontSize: 20, color: Colors.white, fontWeight: FontWeight.w300),
           ),
           onPressed: () async {
-            bool isComplete = false;
-            isComplete = await model.completeOrder();
-            if (isComplete) {
-              bool isChanged = false;
+            if (_character == SingingCharacter.cod) {
+              bool isComplete = false;
+              isComplete = await model.completeOrder(3);
+              if (isComplete) {
+                bool isChanged = false;
 
-              if (model.order.state == 'payment') {
-                isChanged = await model.changeState();
+                if (model.order.state == 'payment') {
+                  isChanged = await model.changeState();
+                }
+                if (isChanged) {
+                  pushSuccessPage();
+                }
               }
-              if (isChanged) {
-                pushSuccessPage();
-              }
+            } else {
+              print('PAYUBIZ');
+              getParams(
+                  model.order.itemTotal, model.order.shipAddress['firstname']);
             }
           },
         ),
       );
     });
   }
-  
+
   pushSuccessPage() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String orderNumber = prefs.getString('orderNumber');
-    MaterialPageRoute payment =
-        MaterialPageRoute(builder: (context) => OrderResponse(orderNumber: orderNumber));
+    MaterialPageRoute payment = MaterialPageRoute(
+        builder: (context) => OrderResponse(orderNumber: orderNumber));
     Navigator.pushAndRemoveUntil(
       context,
       payment,

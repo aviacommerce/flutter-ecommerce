@@ -157,9 +157,9 @@ class _HomeDrawer extends State<HomeDrawer> {
   }
 
   formatName() {
-    if (userName != null) {
-      return userName[0].toUpperCase() + userName.substring(1).split('@')[0];
-    }
+    // if (userName != null) {
+    //   return userName[0].toUpperCase() + userName.substring(1).split('@')[0];
+    // }
   }
 
   getUserName() async {

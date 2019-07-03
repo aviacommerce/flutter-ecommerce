@@ -61,10 +61,12 @@ class _AddressPageState extends State<AddressPage> {
       return Container(
         padding: EdgeInsets.all(20),
         child: FlatButton(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           color: Colors.green,
           child: Text(
             'CONTINUE TO PAYMENT',
-            style: TextStyle(fontSize: 20, color: Colors.white),
+            style: TextStyle(
+                fontSize: 20, color: Colors.white, fontWeight: FontWeight.w300),
           ),
           onPressed: () async {
             if (model.order.state == 'delivery' ||

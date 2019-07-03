@@ -192,7 +192,7 @@ mixin CartModel on Model {
     return true;
   }
 
-  Future<bool> completeOrder() async {
+  Future<bool> completeOrder(int paymentMethodId) async {
     _isLoading = true;
     notifyListeners();
     final SharedPreferences prefs = await SharedPreferences.getInstance();

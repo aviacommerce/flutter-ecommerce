@@ -5,8 +5,7 @@ import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/models/favorites.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 
-// import 'package:ofypets_mobile_app/models/option_type.dart';
-// import 'package:ofypets_mobile_app/models/option_value.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -30,9 +29,11 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     super.initState();
   }
 
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
           title: Text('Favorites'),
           bottom: _isLoading
@@ -64,18 +65,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             margin: EdgeInsets.all(10),
             child: Column(
               children: <Widget>[
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.end,
-                //   children: <Widget>[
-                //     Container(
-                //       child: IconButton(
-                //         color: Colors.grey,
-                //         icon: Icon(Icons.delete),
-                //         onPressed: () {},
-                //       ),
-                //     ),
-                //   ],
-                // ),
                 Row(children: [
                   Container(
                     padding: EdgeInsets.all(10),
@@ -112,7 +101,45 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         ),
                       ],
                     ),
-                  )
+                  ),
+                  Container(
+                    child: IconButton(
+                      color: Colors.grey,
+                      icon: Icon(Icons.delete),
+                      onPressed: () async {
+                        Map<String, String> headers = await getHeaders();
+                        _scaffoldKey.currentState.showSnackBar(SnackBar(
+                          content: Text(
+                            'Removing from Favorites, please wait.',
+                          ),
+                          duration: Duration(seconds: 1),
+                        ));
+                        http
+                            .delete(
+                                Settings.SERVER_URL +
+                                    'favorite_products/${favoriteProducts[index].id}',
+                                headers: headers)
+                            .then((response) {
+                          Map<dynamic, dynamic> responseBody =
+                              json.decode(response.body);
+                          if (responseBody['message'] != null) {
+                            setState(() {
+                              favoriteProducts.removeAt(index);
+                            });
+                            _scaffoldKey.currentState.showSnackBar(SnackBar(
+                              content: Text(responseBody['message']),
+                              duration: Duration(seconds: 1),
+                            ));
+                          } else {
+                            _scaffoldKey.currentState.showSnackBar(SnackBar(
+                              content: Text('Oops! Something went wrong'),
+                              duration: Duration(seconds: 1),
+                            ));
+                          }
+                        });
+                      },
+                    ),
+                  ),
                 ])
               ],
             )));
@@ -233,6 +260,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
       setState(() {
         favoriteProducts.add(Favorite(
+            id: favoriteObj['id'],
             name: favoriteObj['attributes']['name'],
             image: favoriteObj['attributes']['product_url'],
             price: favoriteObj['attributes']['price'],
