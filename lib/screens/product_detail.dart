@@ -115,6 +115,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
 
   @override
   Widget build(BuildContext context) {
+    print('IMAGE URL');
+    print(selectedProduct.image);
     _deviceSize = MediaQuery.of(context).size;
     return Scaffold(
         key: _scaffoldKey,

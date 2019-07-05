@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
+import 'package:ofypets_mobile_app/screens/search.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -79,22 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
           bottom: PreferredSize(
             preferredSize: Size(_deviceSize.width, 70),
-            child: Container(
-              decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(5)),
-              width: _deviceSize.width,
-              height: 50,
-              margin: EdgeInsets.all(010),
-              child: ListTile(
-                leading: Icon(Icons.search),
-                title: Text(
-                  'Find the best for your pet...',
-                  style: TextStyle(fontWeight: FontWeight.w300),
-                ),
-              ),
-            ),
+            child: searchBar(),
           ),
         ),
         drawer: HomeDrawer(),
@@ -287,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   getTodaysDeals() async {
-        String todaysDealsId;
+    String todaysDealsId;
     http.Response response = await http.get(
         Settings.SERVER_URL + 'api/v1/taxonomies?q[name_cont]=Today\'s Deals');
     responseBody = json.decode(response.body);
@@ -308,7 +294,8 @@ class _HomeScreenState extends State<HomeScreen> {
       print(responseBody);
       responseBody['products'].forEach((product) {
         int review_product_id = product["id"];
-        print('reviewProductId');print(review_product_id);
+        print('reviewProductId');
+        print(review_product_id);
         variants = [];
         if (product['has_variants']) {
           product['variants'].forEach((variant) {
@@ -383,47 +370,31 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // getTodaysDeals() async {
-    // String todaysDealsId;
-    // http.Response response = await http.get(
-    //     Settings.SERVER_URL + 'api/v1/taxonomies?q[name_cont]=Today\'s Deals');
-    // responseBody = json.decode(response.body);
-    // todaysDealsId = responseBody['taxonomies'][0]['id'].toString();
-  //   http
-  //       .get(Settings.SERVER_URL +
-  //           'api/v1/taxons/products?id=$todaysDealsId&per_page=20&data_set=small')
-  //       .then((response) {
-  //     responseBody = json.decode(response.body);
-  //     responseBody['products'].forEach((product) {
-  //       if (product['has_variants']) {
-  //         setState(() {
-  //           todaysDealProducts.add(Product(
-  //               id: product['variants'][0]['id'],
-  //               name: product['variants'][0]['name'],
-  //               displayPrice: product['variants'][0]['display_price'],
-  //               avgRating: double.parse(product['avg_rating']),
-  //               reviewsCount: product['reviews_count'].toString(),
-  //               image: product['variants'][0]['images'][0]['product_url'],
-  //               isOrderable: product['variants'][0]['is_orderable']));
-  //         });
-  //       } else {
-  //         setState(() {
-  //           todaysDealProducts.add(Product(
-  //               id: product['id'],
-  //               name: product['name'],
-  //               displayPrice: product['display_price'],
-  //               avgRating: double.parse(product['avg_rating']),
-  //               reviewsCount: product['reviews_count'].toString(),
-  //               image: product['master']['images'][0]['product_url'],
-  //               isOrderable: product['master']['is_orderable']));
-  //         });
-  //       }
-  //     });
-  //     setState(() {
-  //       _isDealsLoading = false;
-  //     });
-  //   });
-  // }
+  Widget searchBar() {
+    return GestureDetector(
+      onTap: () {
+        MaterialPageRoute route =
+            MaterialPageRoute(builder: (context) => ProductSearch());
+        Navigator.of(context).push(route);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5)),
+        width: _deviceSize.width,
+        height: 50,
+        margin: EdgeInsets.all(010),
+        child: ListTile(
+          leading: Icon(Icons.search),
+          title: Text(
+            'Find the best for your pet...',
+            style: TextStyle(fontWeight: FontWeight.w300),
+          ),
+        ),
+      ),
+    );
+  }
 
   getBanners() async {
     http
