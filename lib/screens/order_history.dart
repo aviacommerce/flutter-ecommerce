@@ -25,8 +25,10 @@ class _OrderList extends State<OrderList> {
   Size _deviceSize;
 
   getOrdersLists() async {
-    Map<String, String> headers = await getHeaders(); 
-    await http.get(Settings.SERVER_URL + '/api/v1/orders/mine', headers: headers).then((response) {
+    Map<String, String> headers = await getHeaders();
+    await http
+        .get(Settings.SERVER_URL + '/api/v1/orders/mine', headers: headers)
+        .then((response) {
       setState(() {
         orderListResponse = json.decode(response.body);
       });
@@ -44,7 +46,8 @@ class _OrderList extends State<OrderList> {
                 return orderItem(index);
               },
             )
-          : Center(child: CircularProgressIndicator(backgroundColor: Colors.blue)),
+          : Center(
+              child: CircularProgressIndicator(backgroundColor: Colors.blue)),
     );
   }
 
@@ -86,8 +89,9 @@ class _OrderList extends State<OrderList> {
   }
 
   goToDetailsPage(detailOrder) {
-    MaterialPageRoute orderResponse =
-        MaterialPageRoute(builder: (context) => OrderResponse(orderNumber: null, detailOrder: detailOrder));
+    MaterialPageRoute orderResponse = MaterialPageRoute(
+        builder: (context) =>
+            OrderResponse(orderNumber: null, detailOrder: detailOrder));
     Navigator.push(context, orderResponse);
   }
 }

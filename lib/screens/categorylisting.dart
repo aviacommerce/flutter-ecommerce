@@ -274,6 +274,8 @@ class _CategoryListingState extends State<CategoryListing> {
           });
           setState(() {
             productsByCategory.add(Product(
+                taxonId: product['taxon_ids'].first,
+                id: product['id'],
                 name: product['name'],
                 displayPrice: product['display_price'],
                 avgRating: double.parse(product['avg_rating']),
@@ -287,6 +289,7 @@ class _CategoryListingState extends State<CategoryListing> {
         } else {
           setState(() {
             productsByCategory.add(Product(
+              taxonId: product['taxon_ids'].first,
               id: product['id'],
               name: product['name'],
               displayPrice: product['display_price'],

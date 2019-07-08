@@ -294,8 +294,6 @@ class _HomeScreenState extends State<HomeScreen> {
       print(responseBody);
       responseBody['products'].forEach((product) {
         int review_product_id = product["id"];
-        print('reviewProductId');
-        print(review_product_id);
         variants = [];
         if (product['has_variants']) {
           product['variants'].forEach((variant) {
@@ -337,6 +335,8 @@ class _HomeScreenState extends State<HomeScreen> {
           });
           setState(() {
             todaysDealProducts.add(Product(
+                taxonId: product['taxon_ids'].first,
+                id: product['id'],
                 name: product['name'],
                 displayPrice: product['display_price'],
                 avgRating: double.parse(product['avg_rating']),
@@ -350,6 +350,7 @@ class _HomeScreenState extends State<HomeScreen> {
         } else {
           setState(() {
             todaysDealProducts.add(Product(
+              taxonId: product['taxon_ids'].first,
               id: product['id'],
               name: product['name'],
               displayPrice: product['display_price'],

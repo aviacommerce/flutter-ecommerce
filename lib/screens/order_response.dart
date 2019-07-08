@@ -133,8 +133,9 @@ class _OrderResponseState extends State<OrderResponse> {
                                                 null
                                             ? Text((formatter.format(
                                                 DateTime.parse(
-                                                    responseBody["completed_at"]
-                                                        .split('+5:30')[0]))))
+                                                    (responseBody
+                                                            ["completed_at"]
+                                                        .split('+05:30')[0])))))
                                             : Text("Date Missing!"))
                                   ],
                                 ),
@@ -248,7 +249,7 @@ class _OrderResponseState extends State<OrderResponse> {
                         placeholder: AssetImage(
                             'images/placeholders/no-product-image.png'),
                       )),
-                      Divider()
+                  Divider()
                 ]),
                 SizedBox(width: 30),
                 Expanded(
@@ -266,7 +267,7 @@ class _OrderResponseState extends State<OrderResponse> {
                         SizedBox(height: 5),
                         new Text('${item["display_amount"]}',
                             style: new TextStyle(fontWeight: FontWeight.w800)),
-                            Divider()
+                        Divider()
                       ]),
                 ),
               ],
