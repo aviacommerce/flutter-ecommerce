@@ -192,6 +192,8 @@ class _BrandListState extends State<BrandList> {
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['products'].forEach((product) {
+        print('---------TAXON ID---------');
+        print(product['taxon_ids'].first);
         int review_product_id = product["id"];
         variants = [];
         if (product['has_variants']) {
@@ -234,6 +236,8 @@ class _BrandListState extends State<BrandList> {
           });
           setState(() {
             productsByBrand.add(Product(
+                taxonId: product['taxon_ids'].first,
+                id: product['id'],
                 name: product['name'],
                 displayPrice: product['display_price'],
                 avgRating: double.parse(product['avg_rating']),
@@ -247,6 +251,7 @@ class _BrandListState extends State<BrandList> {
         } else {
           setState(() {
             productsByBrand.add(Product(
+              taxonId: product['taxon_ids'].first,
               id: product['id'],
               name: product['name'],
               displayPrice: product['display_price'],
