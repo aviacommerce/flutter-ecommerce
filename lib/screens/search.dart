@@ -161,7 +161,10 @@ class _ProductSearchState extends State<ProductSearch> {
     });
     http.Response response = await http.get(
         Settings.SERVER_URL +
-            'api/v1/products/${searchProducts[index].slug}?data_set=large',
+            'api/v1/products/7?data_set=large',
+            // 'api/v1/products/${searchProducts[index].slug}?data_set=large',
+
+
         headers: headers);
 
     responseBody = json.decode(response.body);
@@ -268,7 +271,7 @@ class _ProductSearchState extends State<ProductSearch> {
     searchProducts = [];
     http.Response response = await http.get(
         Settings.SERVER_URL +
-            'api/v1/products?q%5Bname_cont_all%5D%5B%5D=$slug&&per_page=20&data_set=small',
+            'api/v1/products?q[name_cont_all]=$slug&per_page=20&data_set=small',
         headers: headers);
 
     responseBody = json.decode(response.body);

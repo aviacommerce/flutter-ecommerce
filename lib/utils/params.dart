@@ -1,19 +1,33 @@
+import 'dart:convert';
+
+import 'package:ofypets_mobile_app/utils/headers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:ofypets_mobile_app/utils/config.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:http/http.dart' as http;
 
-getParams(String paymentAmount, String firstName) async {
+import 'dart:io';
+
+getParams() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  String surl = '${Settings.SERVER_URL}payment/handle_payubiz';
+  String furl = '${Settings.SERVER_URL}payment/handle_payubiz';
 
-  Map<String, String> hashParams = {
-    'key': DefaultConfig.PAYUBZ_KEY,
-    'txnid': prefs.getString('orderNumber'),
-    'amount': paymentAmount,
-    'productinfo': DefaultConfig.APP_NAME + '-Product',
-    'firstname': firstName,
-    'email': prefs.getString('email'),
-    'udf1': prefs.getString('orderNumber')
+  Map<String, String> headers = await getHeaders();
+
+  Map<String, dynamic> params = {
+    'params': {
+      'surl': surl,
+      'furl': furl,
+      'order_number': prefs.getString('orderNumber')
+    }
   };
-  String paramsList = "${hashParams['key']}|${hashParams['txnid']}|";
-  print(paramsList);
+  http.Response response = await http.post(
+      Settings.SERVER_URL + 'payment/post_request_payubiz',
+      body: json.encode(params),
+      headers: headers);
+  print("PAYUBIZ RESPONSE URL");
+  print(json.decode(response.body));
+  
 }

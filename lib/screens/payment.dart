@@ -98,8 +98,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
               }
             } else {
               print('PAYUBIZ');
-              getParams(
-                  model.order.itemTotal, model.order.shipAddress['firstname']);
+              bool isComplete = false;
+              isComplete = await model.completeOrder(2);
+              if (isComplete) {
+                bool isChanged = false;
+
+                if (model.order.state == 'payment') {
+                  isChanged = await model.changeState();
+                }
+                if (isChanged) {
+                  // pushSuccessPage();
+                  getParams();
+                }
+              }
             }
           },
         ),
@@ -117,6 +128,5 @@ class _PaymentScreenState extends State<PaymentScreen> {
       payment,
       ModalRoute.withName('/'),
     );
-    // Navigator.push(context, payment);
   }
 }

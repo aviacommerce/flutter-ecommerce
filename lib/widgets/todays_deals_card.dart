@@ -85,7 +85,8 @@ Widget todaysDealsCard(int index, List<Product> todaysDealProducts,
                   image: NetworkImage(displayProduct.image),
                   placeholder:
                       AssetImage('images/placeholders/no-product-image.png'),
-                  height: _deviceSize.height * 0.2,
+                  // height: _deviceSize.height * 0.2,
+                  height: 100,
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),

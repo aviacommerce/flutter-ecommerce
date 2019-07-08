@@ -3,6 +3,7 @@ import 'package:ofypets_mobile_app/models/option_value.dart';
 
 class Product {
   final int id;
+  final int taxonId;
   final String title;
   final String name;
   final String displayPrice;
@@ -18,7 +19,8 @@ class Product {
   final int reviewProductId;
 
   Product(
-      {this.id,
+      {this.taxonId,
+      this.id,
       this.title,
       this.name,
       this.displayPrice,

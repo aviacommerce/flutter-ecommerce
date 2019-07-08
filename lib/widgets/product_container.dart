@@ -74,7 +74,7 @@ Widget productContainer(Product product, BuildContext context) {
                           style: TextStyle(
                               color: Colors.red,
                               fontWeight: FontWeight.bold,
-                              fontSize: 18),
+                              fontSize: 16),
                         ),
                       ),
                       IconButton(
