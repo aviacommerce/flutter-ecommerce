@@ -1,23 +1,23 @@
-import 'package:flutter/material.dart';
-
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:http/http.dart' as http;
-
-import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/color_list.dart';
 import 'package:ofypets_mobile_app/models/category.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/widgets/product_container.dart';
-import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
+import 'package:ofypets_mobile_app/models/product.dart';
+import 'package:ofypets_mobile_app/utils/color_list.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
+import 'package:ofypets_mobile_app/widgets/product_container_for_pagination.dart';
+import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 
 class CategoryListing extends StatefulWidget {
   final String categoryName;
   final int categoryId;
   final int parentId;
+
   CategoryListing(this.categoryName, this.categoryId, this.parentId);
   @override
   State<StatefulWidget> createState() {
@@ -29,10 +29,14 @@ class _CategoryListingState extends State<CategoryListing> {
   Size _deviceSize;
   bool _isLoading = true;
   int level = 0;
+  static const int PAGE_SIZE = 20;
   List<Category> categoryList = [];
   List<Category> subCategoryList = [];
   List<Product> productsByCategory = [];
   List<Widget> header = [];
+  final int perPage = TWENTY;
+  int currentPage = ONE;
+  int subCatId = ZERO;
   Map<dynamic, dynamic> responseBody;
   @override
   void initState() {
@@ -101,13 +105,13 @@ class _CategoryListingState extends State<CategoryListing> {
         );
         break;
       case 2:
-        return ListView.builder(
-          itemCount: productsByCategory.length,
-          itemBuilder: (BuildContext context, int index) {
-            return GestureDetector(
-                onTap: () {},
-                child: productContainer(productsByCategory[index], context));
-          },
+        return Theme(
+          data: ThemeData(primarySwatch: Colors.blue),
+          child: PagewiseListView(
+            pageSize: PAGE_SIZE,
+            itemBuilder: productContainer,
+            pageFuture: (pageIndex) => getProductsByCategory(0),
+          ),
         );
         break;
       default:
@@ -150,7 +154,8 @@ class _CategoryListingState extends State<CategoryListing> {
                   ' > ' + categoryList[index].name, FontWeight.bold, 1));
             });
           } else {
-            getProductsByCategory(subCategoryList[index].id);
+            subCatId = subCategoryList[index].id;
+            loadProductsByCategory();
             setState(() {
               header.add(textField(
                   ' > ' + subCategoryList[index].name, FontWeight.bold, 2));
@@ -218,96 +223,94 @@ class _CategoryListingState extends State<CategoryListing> {
     });
   }
 
-  getProductsByCategory(int id) {
+  Future<List<Product>> getProductsByCategory(int id) async {
+    print(subCatId);
     List<Product> variants = [];
     List<OptionValue> optionValues = [];
     List<OptionType> optionTypes = [];
-    setState(() {
-      _isLoading = true;
-      productsByCategory = [];
-    });
-    http
-        .get(Settings.SERVER_URL +
-            'api/v1/taxons/products?id=$id&per_page=20&data_set=small')
-        .then((response) {
-      responseBody = json.decode(response.body);
-      responseBody['products'].forEach((product) {
-        int review_product_id = product["id"];
-        variants = [];
-        if (product['has_variants']) {
-          product['variants'].forEach((variant) {
-            optionValues = [];
-            optionTypes = [];
-            variant['option_values'].forEach((option) {
-              setState(() {
-                optionValues.add(OptionValue(
-                  id: option['id'],
-                  name: option['name'],
-                  optionTypeId: option['option_type_id'],
-                  optionTypeName: option['option_type_name'],
-                  optionTypePresentation: option['option_type_presentation'],
-                ));
-              });
-            });
+    productsByCategory = [];
+    final response = (await http.get(Settings.SERVER_URL +
+            'api/v1/taxons/products?id=$subCatId&page=$currentPage&per_page=$perPage&data_set=small'))
+        .body;
+    currentPage++;
+    responseBody = json.decode(response);
+    responseBody['products'].forEach((product) {
+      int review_product_id = product["id"];
+      variants = [];
+      if (product['has_variants']) {
+        product['variants'].forEach((variant) {
+          optionValues = [];
+          optionTypes = [];
+          variant['option_values'].forEach((option) {
             setState(() {
-              variants.add(Product(
-                  id: variant['id'],
-                  name: variant['name'],
-                  description: variant['description'],
-                  optionValues: optionValues,
-                  displayPrice: variant['display_price'],
-                  image: variant['images'][0]['product_url'],
-                  isOrderable: variant['is_orderable'],
-                  avgRating: double.parse(product['avg_rating']),
-                  reviewsCount: product['reviews_count'].toString(),
-                  reviewProductId: review_product_id));
-            });
-          });
-          product['option_types'].forEach((optionType) {
-            setState(() {
-              optionTypes.add(OptionType(
-                  id: optionType['id'],
-                  name: optionType['name'],
-                  position: optionType['position'],
-                  presentation: optionType['presentation']));
+              optionValues.add(OptionValue(
+                id: option['id'],
+                name: option['name'],
+                optionTypeId: option['option_type_id'],
+                optionTypeName: option['option_type_name'],
+                optionTypePresentation: option['option_type_presentation'],
+              ));
             });
           });
           setState(() {
-            productsByCategory.add(Product(
-                taxonId: product['taxon_ids'].first,
-                id: product['id'],
-                name: product['name'],
-                displayPrice: product['display_price'],
+            variants.add(Product(
+                id: variant['id'],
+                name: variant['name'],
+                description: variant['description'],
+                optionValues: optionValues,
+                displayPrice: variant['display_price'],
+                image: variant['images'][0]['product_url'],
+                isOrderable: variant['is_orderable'],
                 avgRating: double.parse(product['avg_rating']),
                 reviewsCount: product['reviews_count'].toString(),
-                image: product['master']['images'][0]['product_url'],
-                variants: variants,
-                reviewProductId: review_product_id,
-                hasVariants: product['has_variants'],
-                optionTypes: optionTypes));
+                reviewProductId: review_product_id));
           });
-        } else {
+        });
+        product['option_types'].forEach((optionType) {
           setState(() {
-            productsByCategory.add(Product(
-              taxonId: product['taxon_ids'].first,
-              id: product['id'],
+            optionTypes.add(OptionType(
+                id: optionType['id'],
+                name: optionType['name'],
+                position: optionType['position'],
+                presentation: optionType['presentation']));
+          });
+        });
+        setState(() {
+          productsByCategory.add(Product(
               name: product['name'],
               displayPrice: product['display_price'],
               avgRating: double.parse(product['avg_rating']),
               reviewsCount: product['reviews_count'].toString(),
               image: product['master']['images'][0]['product_url'],
-              hasVariants: product['has_variants'],
-              isOrderable: product['master']['is_orderable'],
+              variants: variants,
               reviewProductId: review_product_id,
-              description: product['description'],
-            ));
-          });
-        }
-      });
-      setState(() {
-        level = 2;
-        _isLoading = false;
-      });
+              hasVariants: product['has_variants'],
+              optionTypes: optionTypes));
+        });
+      } else {
+        setState(() {
+          productsByCategory.add(Product(
+            id: product['id'],
+            name: product['name'],
+            displayPrice: product['display_price'],
+            avgRating: double.parse(product['avg_rating']),
+            reviewsCount: product['reviews_count'].toString(),
+            image: product['master']['images'][0]['product_url'],
+            hasVariants: product['has_variants'],
+            isOrderable: product['master']['is_orderable'],
+            reviewProductId: review_product_id,
+            description: product['description'],
+          ));
+        });
+      }
+    });
+    return productsByCategory;
+  }
+
+  void loadProductsByCategory() {
+    setState(() {
+      level = 2;
+      _isLoading = false;
     });
   }
 
