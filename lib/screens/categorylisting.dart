@@ -106,7 +106,7 @@ class _CategoryListingState extends State<CategoryListing> {
         break;
       case 2:
         return Theme(
-          data: ThemeData(primarySwatch: Colors.blue),
+          data: ThemeData(primarySwatch: Colors.green),
           child: PagewiseListView(
             pageSize: PAGE_SIZE,
             itemBuilder: productContainer,

@@ -1,14 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:ofypets_mobile_app/utils/headers.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/models/favorites.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
+import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/screens/product_detail.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/utils/headers.dart';
 
 class FavoritesScreen extends StatefulWidget {
   @override
@@ -19,12 +20,17 @@ class FavoritesScreen extends StatefulWidget {
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
   List<Favorite> favoriteProducts = [];
-  bool _isLoading = true;
+  List<Favorite> deletedProducts = [];
+  Future<List<Favorite>> futureFavoriteProducts;
+  bool _isLoading = false;
   Product tappedProduct;
-
+  final int perPage = TWENTY;
+  int currentPage = ONE;
+  int subCatId = ZERO;
+  static const int PAGE_SIZE = 20;
   @override
   void initState() {
-    getFavorites();
+    // getFavorites();
     super.initState();
   }
 
@@ -32,119 +38,140 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          title: Text('Favorites'),
-          bottom: _isLoading
-              ? PreferredSize(
-                  child: LinearProgressIndicator(),
-                  preferredSize: Size.fromHeight(10),
-                )
-              : PreferredSize(
-                  child: Container(),
-                  preferredSize: Size.fromHeight(10),
-                ),
+      key: _scaffoldKey,
+      appBar: AppBar(
+        title: Text('Favorites'),
+        bottom: _isLoading
+            ? PreferredSize(
+                child: LinearProgressIndicator(),
+                preferredSize: Size.fromHeight(10),
+              )
+            : PreferredSize(
+                child: Container(),
+                preferredSize: Size.fromHeight(10),
+              ),
+      ),
+      body: Theme(
+        data: ThemeData(primarySwatch: Colors.green),
+        child: PagewiseListView(
+          pageSize: PAGE_SIZE,
+          itemBuilder: favoriteCardPaginated,
+          pageFuture: (pageIndex) {
+            return getPaginatedFavorites();
+          },
         ),
-        body: ListView.builder(
-            itemCount: favoriteProducts.length,
-            itemBuilder: (context, index) {
-              return favoriteCard(index);
-            }));
+      ),
+    );
   }
 
-  Widget favoriteCard(int index) {
-    return GestureDetector(
+  Widget favoriteCardPaginated(
+      BuildContext context, Favorite favorite, int index) {
+    bool isDeleted = false;
+    deletedProducts.forEach((deletedItem) {
+      if (deletedItem.id == favorite.id) {
+        isDeleted = true;
+      }
+    });
+    if (isDeleted) {
+      return Container();
+    } else {
+      return GestureDetector(
         onTap: () {
-          getProductDetail(index);
+          getProductDetail(favorite.slug);
         },
         child: Card(
-            elevation: 2,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-            margin: EdgeInsets.all(10),
-            child: Column(
-              children: <Widget>[
-                Row(children: [
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    height: 150,
-                    width: 150,
-                    color: Colors.white,
-                    child: FadeInImage(
-                      image: NetworkImage(favoriteProducts[index].image),
-                      placeholder: AssetImage(
-                          'images/placeholders/no-product-image.png'),
-                    ),
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+          margin: EdgeInsets.all(10),
+          child: Column(
+            children: <Widget>[
+              Row(children: [
+                Container(
+                  padding: EdgeInsets.all(10),
+                  height: 150,
+                  width: 150,
+                  color: Colors.white,
+                  child: FadeInImage(
+                    image: NetworkImage(favorite.image),
+                    placeholder:
+                        AssetImage('images/placeholders/no-product-image.png'),
                   ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                          child: Text(
-                            favoriteProducts[index].name,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(fontSize: 15),
-                          ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        child: Text(
+                          favorite.name,
+                          textAlign: TextAlign.left,
+                          style: TextStyle(fontSize: 15),
                         ),
-                        SizedBox(
-                          height: 10,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        child: Text(
+                          favorite.currencySymbol + favorite.price,
+                          textAlign: TextAlign.left,
+                          style: TextStyle(fontSize: 15, color: Colors.red),
                         ),
-                        Container(
-                          child: Text(
-                            favoriteProducts[index].currencySymbol +
-                                favoriteProducts[index].price,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(fontSize: 15, color: Colors.red),
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  Container(
-                    child: IconButton(
-                      color: Colors.grey,
-                      icon: Icon(Icons.delete),
-                      onPressed: () async {
-                        Map<String, String> headers = await getHeaders();
-                        _scaffoldKey.currentState.showSnackBar(SnackBar(
-                          content: Text(
-                            'Removing from Favorites, please wait.',
-                          ),
-                          duration: Duration(seconds: 1),
-                        ));
-                        http
-                            .delete(
-                                Settings.SERVER_URL +
-                                    'favorite_products/${favoriteProducts[index].id}',
-                                headers: headers)
-                            .then((response) {
-                          Map<dynamic, dynamic> responseBody =
-                              json.decode(response.body);
-                          if (responseBody['message'] != null) {
-                            setState(() {
-                              favoriteProducts.removeAt(index);
-                            });
-                            _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              content: Text(responseBody['message']),
-                              duration: Duration(seconds: 1),
-                            ));
-                          } else {
-                            _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              content: Text('Oops! Something went wrong'),
-                              duration: Duration(seconds: 1),
-                            ));
-                          }
-                        });
-                      },
-                    ),
+                ),
+                Container(
+                  child: IconButton(
+                    color: Colors.grey,
+                    icon: Icon(Icons.delete),
+                    onPressed: () async {
+                      Map<String, String> headers = await getHeaders();
+                      _scaffoldKey.currentState.showSnackBar(SnackBar(
+                        content: Text(
+                          'Removing from Favorites, please wait.',
+                        ),
+                        duration: Duration(seconds: 1),
+                      ));
+                      http
+                          .delete(
+                              Settings.SERVER_URL +
+                                  'favorite_products/${favorite.id}',
+                              headers: headers)
+                          .then((response) {
+                        Map<dynamic, dynamic> responseBody =
+                            json.decode(response.body);
+                        if (responseBody['message'] != null) {
+                          setState(() {
+                            addItemtoDeleteList(favorite);
+                          });
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                            content: Text(responseBody['message']),
+                            duration: Duration(seconds: 1),
+                          ));
+                        } else {
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                            content: Text('Oops! Something went wrong'),
+                            duration: Duration(seconds: 1),
+                          ));
+                        }
+                      });
+                    },
                   ),
-                ])
-              ],
-            )));
+                ),
+              ])
+            ],
+          ),
+        ),
+      );
+    }
   }
 
-  getProductDetail(int index) async {
+  void addItemtoDeleteList(Favorite favorite) {
+    deletedProducts.add(favorite);
+  }
+
+  getProductDetail(String slug) async {
     setState(() {
       _isLoading = true;
     });
@@ -152,8 +179,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     Map<String, dynamic> responseBody = Map();
 
     http.Response response = await http.get(
-        Settings.SERVER_URL +
-            'api/v1/products/${favoriteProducts[index].slug}?data_set=large',
+        Settings.SERVER_URL + 'api/v1/products/$slug?data_set=large',
         headers: headers);
     responseBody = json.decode(response.body);
     List<Product> variants = [];
@@ -250,18 +276,16 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     Navigator.push(context, route);
   }
 
-  getFavorites() async {
+  Future<List<Favorite>> getPaginatedFavorites() async {
     Map<String, String> headers = await getHeaders();
     Map<String, dynamic> responseBody = Map();
-
     http.Response response = await http.get(
         Settings.SERVER_URL +
-            'spree/user_favorite_products.json?data_set=small',
+            'spree/user_favorite_products.json?page=$currentPage&per_page=$perPage&data_set=small',
         headers: headers);
-
+    currentPage++;
     responseBody = json.decode(response.body);
     responseBody['data'].forEach((favoriteObj) {
-
       setState(() {
         favoriteProducts.add(Favorite(
             id: favoriteObj['id'],
@@ -272,8 +296,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             slug: favoriteObj['attributes']['slug']));
       });
     });
-    setState(() {
-      _isLoading = false;
-    });
+    return favoriteProducts;
   }
 }
