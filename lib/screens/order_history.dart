@@ -1,10 +1,13 @@
-import 'package:http/http.dart' as http;
-import 'package:flutter/material.dart';
-import 'package:ofypets_mobile_app/screens/order_response.dart';
 import 'dart:convert';
-import 'package:ofypets_mobile_app/utils/headers.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:ofypets_mobile_app/models/order.dart';
+import 'package:ofypets_mobile_app/screens/order_response.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/utils/headers.dart';
 
 class OrderList extends StatefulWidget {
   @override
@@ -16,68 +19,85 @@ class OrderList extends StatefulWidget {
 class _OrderList extends State<OrderList> {
   Map<dynamic, dynamic> orderListResponse;
   var formatter = new DateFormat('dd-MMM-yyyy hh:mm a');
-
+  final int perPage = TWENTY;
+  int currentPage = ONE;
+  int subCatId = ZERO;
+  static const int PAGE_SIZE = 20;
+  List<Order> ordersList = [];
+  Map<dynamic, dynamic> responseBody;
   void initState() {
     super.initState();
-    getOrdersLists();
   }
 
   Size _deviceSize;
 
-  getOrdersLists() async {
+  Future<List<Order>> getOrdersLists() async {
+    ordersList = [];
     Map<String, String> headers = await getHeaders();
-    await http
-        .get(Settings.SERVER_URL + '/api/v1/orders/mine', headers: headers)
-        .then((response) {
-      setState(() {
-        orderListResponse = json.decode(response.body);
-      });
+    final response = (await http.get(
+            Settings.SERVER_URL +
+                '/api/v1/orders/mine?desc&page=$currentPage&per_page=$perPage',
+            headers: headers))
+        .body;
+
+    currentPage++;
+    responseBody = json.decode(response);
+    orderListResponse = json.decode(response);
+    responseBody['orders'].forEach((order) {
+      if (order["completed_at"] != null) {
+        setState(() {
+          ordersList.add(Order(
+              completedAt: order["completed_at"],
+              imageUrl: order["line_items"][0]["variant"]["images"][0]
+                  ["small_url"],
+              displayTotal: order["display_total"],
+              number: order["number"]));
+        });
+      }
     });
+    return ordersList;
   }
 
   Widget build(BuildContext context) {
     _deviceSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(title: Text('Order History')),
-      body: orderListResponse != null
-          ? ListView.builder(
-              itemCount: orderListResponse["orders"].length,
-              itemBuilder: (BuildContext context, int index) {
-                return orderItem(index);
-              },
-            )
-          : Center(
-              child: CircularProgressIndicator(backgroundColor: Colors.blue)),
+      body: Theme(
+        data: ThemeData(primarySwatch: Colors.blue),
+        child: PagewiseListView(
+          pageSize: PAGE_SIZE,
+          itemBuilder: orderItem,
+          pageFuture: (pageIndex) => getOrdersLists(),
+        ),
+      ),
     );
   }
 
-  Widget orderItem(int index) {
-    if (orderListResponse["orders"][index]["completed_at"] != null) {
+  Widget orderItem(BuildContext context, Order order, int index) {
+    print(order.completedAt);
+    if (order.completedAt != null) {
       return GestureDetector(
-          onTap: () {
-            goToDetailsPage(orderListResponse["orders"][index]);
-          },
-          child: Card(
-              child: new Container(
-                  width: _deviceSize.width,
-                  margin: EdgeInsets.all(5),
-                  child: new Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        ListTile(
-                          leading: orderVariantImage(orderListResponse["orders"]
-                                  [index]["line_items"][0]["variant"]["images"]
-                              [0]["small_url"]),
-                          title: Text(
-                              '${orderListResponse["orders"][index]["number"]}'),
-                          subtitle: Text((formatter.format(DateTime.parse(
-                              (orderListResponse["orders"][index]
-                                      ["completed_at"]
-                                  .split('+05:30')[0]))))),
-                          trailing: Text(
-                              '${orderListResponse["orders"][index]["display_total"]}'),
-                        ),
-                      ]))));
+        onTap: () {
+          goToDetailsPage(orderListResponse["orders"][index]);
+        },
+        child: Card(
+          child: new Container(
+            width: _deviceSize.width,
+            margin: EdgeInsets.all(5),
+            child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  ListTile(
+                    leading: orderVariantImage(order.imageUrl),
+                    title: Text('${order.number}'),
+                    subtitle: Text((formatter.format(DateTime.parse(
+                        (order.completedAt.split('+05:30')[0]))))),
+                    trailing: Text('${order.displayTotal}'),
+                  ),
+                ]),
+          ),
+        ),
+      );
     }
   }
 

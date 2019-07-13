@@ -9,12 +9,16 @@ class Order {
   int totalQuantity;
   String shipTotal;
   String state;
+  String completedAt, imageUrl, number;
   Map<String, dynamic> shipAddress;
 
   Order(
       {this.id,
-      this.displaySubTotal,
+      this.completedAt,
+      this.imageUrl,
+      this.number,
       this.displayTotal,
+      this.displaySubTotal,
       this.itemTotal,
       this.lineItems,
       this.shipTotal,
