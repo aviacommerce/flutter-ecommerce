@@ -63,7 +63,7 @@ class _OrderList extends State<OrderList> {
     return Scaffold(
       appBar: AppBar(title: Text('Order History')),
       body: Theme(
-        data: ThemeData(primarySwatch: Colors.blue),
+        data: ThemeData(primarySwatch: Colors.green),
         child: PagewiseListView(
           pageSize: PAGE_SIZE,
           itemBuilder: orderItem,

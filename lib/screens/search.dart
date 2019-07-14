@@ -1,14 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:http/http.dart' as http;
+import 'package:ofypets_mobile_app/models/option_type.dart';
+import 'package:ofypets_mobile_app/models/option_value.dart';
+import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/models/searchProduct.dart';
+import 'package:ofypets_mobile_app/screens/product_detail.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
-import 'package:ofypets_mobile_app/models/option_value.dart';
-import 'package:ofypets_mobile_app/models/option_type.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/screens/product_detail.dart';
 
 class ProductSearch extends StatefulWidget {
   @override
@@ -21,83 +22,96 @@ class _ProductSearchState extends State<ProductSearch> {
   String slug = '';
   TextEditingController _controller;
   List<SearchProduct> searchProducts = [];
-  bool _isLoading = true;
+  bool _isLoading = false;
   Product tappedProduct = Product();
+  final int perPage = TWENTY;
+  int currentPage = ONE;
+  int subCatId = ZERO;
+  bool isSearched = false;
+  static const int PAGE_SIZE = 20;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          bottom: PreferredSize(
-            child: Stack(
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 70,
-                  decoration: BoxDecoration(
+      appBar: AppBar(
+        bottom: PreferredSize(
+          child: Stack(
+            children: [
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: 70,
+                decoration: BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  color: Colors.green,
+                ),
+                // margin: EdgeInsets.all(10),
+              ),
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: 50,
+                decoration: BoxDecoration(
                     shape: BoxShape.rectangle,
-                    color: Colors.green,
-                  ),
-                  // margin: EdgeInsets.all(10),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5)),
+                margin: EdgeInsets.all(10),
+              ),
+              Container(
+                padding: EdgeInsets.only(left: 15),
+                child: TextField(
+                  controller: _controller,
+                  onChanged: (value) {
+                    setState(() {
+                      slug = value;
+                    });
+                  },
+                  autofocus: true,
+                  decoration: InputDecoration(
+                      labelText: 'Find the best for your pet...',
+                      border: InputBorder.none,
+                      labelStyle:
+                          TextStyle(fontWeight: FontWeight.w300, fontSize: 18)),
                 ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 50,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5)),
-                  margin: EdgeInsets.all(10),
+              ),
+              Container(
+                height: 50,
+                margin: EdgeInsets.all(10),
+                width: MediaQuery.of(context).size.width,
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () {
+                    FocusScope.of(context).requestFocus(new FocusNode());
+                    print('SEARCH');
+                    print(slug);
+                    setState(() {
+                      isSearched = true;
+                    });
+                    // searchProduct();
+                  },
                 ),
-                Container(
-                  padding: EdgeInsets.only(left: 15),
-                  child: TextField(
-                    controller: _controller,
-                    onChanged: (value) {
-                      setState(() {
-                        slug = value;
-                      });
-                    },
-                    autofocus: true,
-                    decoration: InputDecoration(
-                        labelText: 'Find the best for your pet...',
-                        border: InputBorder.none,
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.w300, fontSize: 18)),
-                  ),
-                ),
-                Container(
-                  height: 50,
-                  margin: EdgeInsets.all(10),
-                  width: MediaQuery.of(context).size.width,
-                  alignment: Alignment.centerRight,
-                  child: IconButton(
-                    icon: Icon(Icons.search),
-                    onPressed: () {
-                      FocusScope.of(context).requestFocus(new FocusNode());
-                      print('SEARCH');
-                      print(slug);
-                      searchProduct();
-                    },
-                  ),
-                )
-              ],
-            ),
-            preferredSize: Size.fromHeight(20),
-          ),
-        ),
-        body: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(backgroundColor: Colors.green,),
               )
-            : ListView.builder(
-                itemCount: searchProducts.length,
-                itemBuilder: (context, index) {
-                  return favoriteCard(index);
-                }));
+            ],
+          ),
+          preferredSize: Size.fromHeight(20),
+        ),
+      ),
+      body: isSearched
+          ? Theme(
+              data: ThemeData(primarySwatch: Colors.green),
+              child: PagewiseListView(
+                pageSize: PAGE_SIZE,
+                itemBuilder: favoriteCard,
+                pageFuture: (pageIndex) => searchProduct(),
+              ))
+          : Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.green,
+              ),
+            ),
+    );
   }
 
-  Widget favoriteCard(int index) {
+  Widget favoriteCard(BuildContext context, SearchProduct product, int index) {
     return GestureDetector(
         onTap: () {
           getProductDetail(index);
@@ -115,11 +129,14 @@ class _ProductSearchState extends State<ProductSearch> {
                     height: 150,
                     width: 150,
                     color: Colors.white,
-                    child: FadeInImage(
-                      image: NetworkImage(searchProducts[index].image),
-                      placeholder: AssetImage(
-                          'images/placeholders/no-product-image.png'),
-                    ),
+                    child: product.image != null
+                        ? FadeInImage(
+                            image: NetworkImage(product.image),
+                            placeholder: AssetImage(
+                                'images/placeholders/no-product-image.png'),
+                          )
+                        : Image.asset(
+                            'images/placeholders/no-product-image.png'),
                   ),
                   Expanded(
                     child: Column(
@@ -127,7 +144,7 @@ class _ProductSearchState extends State<ProductSearch> {
                       children: <Widget>[
                         Container(
                           child: Text(
-                            searchProducts[index].name,
+                            product.name,
                             textAlign: TextAlign.left,
                             style: TextStyle(fontSize: 15),
                           ),
@@ -137,8 +154,7 @@ class _ProductSearchState extends State<ProductSearch> {
                         ),
                         Container(
                           child: Text(
-                            searchProducts[index].currencySymbol +
-                                searchProducts[index].price,
+                            product.currencySymbol + product.price,
                             textAlign: TextAlign.left,
                             style: TextStyle(fontSize: 15, color: Colors.red),
                           ),
@@ -159,13 +175,11 @@ class _ProductSearchState extends State<ProductSearch> {
       _isLoading = true;
       searchProducts.clear();
     });
-    http.Response response = await http.get(
-        Settings.SERVER_URL +
-            'api/v1/products/7?data_set=large',
+    http.Response response =
+        await http.get(Settings.SERVER_URL + 'api/v1/products/7?data_set=large',
             // 'api/v1/products/${searchProducts[index].slug}?data_set=large',
 
-
-        headers: headers);
+            headers: headers);
 
     responseBody = json.decode(response.body);
     print('------------IMAGE URL RECEIVED----------');
@@ -264,16 +278,16 @@ class _ProductSearchState extends State<ProductSearch> {
     Navigator.push(context, route);
   }
 
-  searchProduct() async {
+  Future<List<SearchProduct>> searchProduct() async {
     Map<String, String> headers = await getHeaders();
     Map<String, dynamic> responseBody = Map();
     print('SENDING REQUEST');
     searchProducts = [];
     http.Response response = await http.get(
         Settings.SERVER_URL +
-            'api/v1/products?q[name_cont_all]=$slug&per_page=20&data_set=small',
+            'api/v1/products?q[name_cont_all]=$slug&page=$currentPage&per_page=$perPage&data_set=small',
         headers: headers);
-
+    currentPage++;
     responseBody = json.decode(response.body);
     print('------------SEARCH RESPONSE----------');
     print(responseBody);
@@ -289,8 +303,6 @@ class _ProductSearchState extends State<ProductSearch> {
             slug: favoriteObj['attributes']['slug']));
       });
     });
-    setState(() {
-      _isLoading = false;
-    });
+    return searchProducts;
   }
 }
