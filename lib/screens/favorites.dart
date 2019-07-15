@@ -1,8 +1,8 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
-import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/models/favorites.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
@@ -286,6 +286,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     currentPage++;
     responseBody = json.decode(response.body);
     responseBody['data'].forEach((favoriteObj) {
+
       setState(() {
         favoriteProducts.add(Favorite(
             id: favoriteObj['id'],

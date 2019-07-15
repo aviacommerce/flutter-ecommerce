@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:ofypets_mobile_app/screens/review_detail.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -13,9 +12,11 @@ import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/models/review.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/cart.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 import 'package:ofypets_mobile_app/widgets/snackbar.dart';
+import 'package:ofypets_mobile_app/models/option_type.dart';
+import 'package:ofypets_mobile_app/models/option_value.dart';
+import 'package:ofypets_mobile_app/widgets/similar_products_card.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -28,6 +29,7 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen>
     with SingleTickerProviderStateMixin {
+  bool _isLoading = true;
   TabController _tabController;
   Size _deviceSize;
   int quantity = 1;
@@ -39,6 +41,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   double recommended_percent = 0;
   double avg_rating = 0;
   String htmlDescription;
+  List<Product> similarProducts = List();
 
   @override
   void initState() {
@@ -63,6 +66,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           widget.product.description != null ? widget.product.description : '';
     }
     get_reviews();
+    getSimilarProducts();
     super.initState();
   }
 
@@ -528,7 +532,41 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               child: Text("Description",
                   style:
                       TextStyle(fontWeight: FontWeight.w700, fontSize: 15.0))),
-          HtmlWidget(htmlDescription)
+          HtmlWidget(htmlDescription),
+          Container(
+              width: _deviceSize.width,
+              color: Colors.white,
+              child: ListTile(
+                dense: true,
+                leading: Icon(
+                  Icons.shop,
+                  color: Colors.green,
+                ),
+                title: Text('Similar Products',
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.green)),
+              )),
+          _isLoading
+              ? Container(
+                  height: _deviceSize.height * 0.5,
+                  alignment: Alignment.center,
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.blue,
+                  ),
+                )
+              : Container(
+                  height: _deviceSize.height * 0.5,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: similarProducts.length,
+                    itemBuilder: (context, index) {
+                      return similarProductCard(
+                          index, similarProducts, _deviceSize, context);
+                    },
+                  ),
+                ),
         ],
       ),
     );
@@ -597,28 +635,117 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       },
     );
   }
-}
-/* return ScopedModelDescendant<MainModel>(
-      builder: (BuildContext context, Widget child, MainModel model) {
-        return FloatingActionButton(
-          child: Icon(
-            Icons.shopping_cart,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            Scaffold.of(context).showSnackBar(processSnackbar);
-            selectedProduct.isOrderable
-                ? model.addProduct(
-                variantId: selectedProduct.id, quantity: quantity)
-                : null;
-            if (!model.isLoading) {
-              Scaffold.of(context).showSnackBar(completeSnackbar);
-            }
-          },
-          backgroundColor:
-          selectedProduct.isOrderable ? Colors.orange : Colors.grey,
-        );
-      },
-    );
+
+//  return ScopedModelDescendant<MainModel>(
+//       builder: (BuildContext context, Widget child, MainModel model) {
+//         return FloatingActionButton(
+//           child: Icon(
+//             Icons.shopping_cart,
+//             color: Colors.white,
+//           ),
+//           onPressed: () {
+//             Scaffold.of(context).showSnackBar(processSnackbar);
+//             selectedProduct.isOrderable
+//                 ? model.addProduct(
+//                 variantId: selectedProduct.id, quantity: quantity)
+//                 : null;
+//             if (!model.isLoading) {
+//               Scaffold.of(context).showSnackBar(completeSnackbar);
+//             }
+//           },
+//           backgroundColor:
+//           selectedProduct.isOrderable ? Colors.orange : Colors.grey,
+//         );
+//       },
+//     );
+//   }
+
+  getSimilarProducts() {
+    Map<String, dynamic> responseBody = Map();
+    List<Product> variants = [];
+    List<OptionValue> optionValues = [];
+    List<OptionType> optionTypes = [];
+    http
+        .get(Settings.SERVER_URL +
+            'api/v1/taxons/products?id=${widget.product.taxonId}&per_page=15&data_set=small')
+        .then((response) {
+      responseBody = json.decode(response.body);
+      responseBody['products'].forEach((product) {
+        int review_product_id = product["id"];
+        variants = [];
+        if (product['has_variants']) {
+          product['variants'].forEach((variant) {
+            optionValues = [];
+            optionTypes = [];
+            variant['option_values'].forEach((option) {
+              setState(() {
+                optionValues.add(OptionValue(
+                  id: option['id'],
+                  name: option['name'],
+                  optionTypeId: option['option_type_id'],
+                  optionTypeName: option['option_type_name'],
+                  optionTypePresentation: option['option_type_presentation'],
+                ));
+              });
+            });
+            setState(() {
+              variants.add(Product(
+                  id: variant['id'],
+                  name: variant['name'],
+                  description: variant['description'],
+                  optionValues: optionValues,
+                  displayPrice: variant['display_price'],
+                  image: variant['images'][0]['product_url'],
+                  isOrderable: variant['is_orderable'],
+                  avgRating: double.parse(product['avg_rating']),
+                  reviewsCount: product['reviews_count'].toString(),
+                  reviewProductId: review_product_id));
+            });
+          });
+          product['option_types'].forEach((optionType) {
+            setState(() {
+              optionTypes.add(OptionType(
+                  id: optionType['id'],
+                  name: optionType['name'],
+                  position: optionType['position'],
+                  presentation: optionType['presentation']));
+            });
+          });
+          setState(() {
+            similarProducts.add(Product(
+                taxonId: product['taxon_ids'].first,
+                id: product['id'],
+                name: product['name'],
+                displayPrice: product['display_price'],
+                avgRating: double.parse(product['avg_rating']),
+                reviewsCount: product['reviews_count'].toString(),
+                image: product['master']['images'][0]['product_url'],
+                variants: variants,
+                reviewProductId: review_product_id,
+                hasVariants: product['has_variants'],
+                optionTypes: optionTypes));
+          });
+        } else {
+          setState(() {
+            similarProducts.add(Product(
+              taxonId: product['taxon_ids'].first,
+              id: product['id'],
+              name: product['name'],
+              displayPrice: product['display_price'],
+              avgRating: double.parse(product['avg_rating']),
+              reviewsCount: product['reviews_count'].toString(),
+              image: product['master']['images'][0]['product_url'],
+              hasVariants: product['has_variants'],
+              isOrderable: product['master']['is_orderable'],
+              reviewProductId: review_product_id,
+              description: product['description'],
+            ));
+          });
+        }
+      });
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
-}*/
+}
