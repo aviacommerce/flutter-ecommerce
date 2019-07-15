@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:ofypets_mobile_app/screens/review_detail.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
-
-import 'package:ofypets_mobile_app/utils/headers.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ofypets_mobile_app/screens/auth.dart';
 
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/models/review.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/screens/cart.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 import 'package:ofypets_mobile_app/widgets/snackbar.dart';
-import 'package:ofypets_mobile_app/models/option_type.dart';
-import 'package:ofypets_mobile_app/models/option_value.dart';
-import 'package:ofypets_mobile_app/widgets/similar_products_card.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -32,10 +28,10 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen>
     with SingleTickerProviderStateMixin {
-  bool _isLoading = true;
   TabController _tabController;
   Size _deviceSize;
   int quantity = 1;
+  double _rating;
   Product selectedProduct;
   bool _hasVariants = false;
   List<Review> reviews = [];
@@ -43,7 +39,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   double recommended_percent = 0;
   double avg_rating = 0;
   String htmlDescription;
-  List<Product> similarProducts = List();
 
   @override
   void initState() {
@@ -68,7 +63,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           widget.product.description != null ? widget.product.description : '';
     }
     get_reviews();
-    getSimilarProducts();
     super.initState();
   }
 
@@ -116,15 +110,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     });
   }
 
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
-
   @override
   Widget build(BuildContext context) {
-    print('IMAGE URL');
-    print(selectedProduct.image);
     _deviceSize = MediaQuery.of(context).size;
     return Scaffold(
-        key: _scaffoldKey,
         backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text('Item Details'),
@@ -156,7 +145,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
 
   Widget reviewsTab() {
     if (reviews.length == 0) {
-      return Container(child: Center(child: Text("No Reviews found")));
+      return Container(
+          alignment: Alignment.center,
+          child: Column(
+            children: <Widget>[
+              SizedBox(
+                height: 10,
+              ),
+              writeReview(),
+              Container(
+                height: 400,
+                alignment: Alignment.center,
+                child: Text("No Reviews found"),
+              )
+            ],
+          ));
     }
     return ListView.builder(
       itemCount: reviews.length + 1,
@@ -215,10 +218,66 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 )
               ],
             ),
+            SizedBox(
+              height: 15,
+            ),
+            writeReview(),
           ],
         ),
       ),
     );
+  }
+
+  Widget writeReview() {
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              height: 40.0,
+              width: 335,
+              child: GestureDetector(
+                onTap: () {
+                  if (model.isAuthenticated) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            ReviewDetailScreen(selectedProduct)));
+                  } else {
+                    Scaffold.of(context).showSnackBar(LoginErroSnackbar);
+                  }
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.green,
+                      style: BorderStyle.solid,
+                      width: 1.0,
+                    ),
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Center(
+                        child: Text(
+                          "WRITE A REVIEW",
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            )
+          ]);
+    });
   }
 
   Widget review(Review review) {
@@ -343,12 +402,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           itemBuilder: (context, index) {
             return Column(children: [
               optionTypeNames[index],
-              ListView(
+              SingleChildScrollView(
+                  child: ListView(
                 shrinkWrap: true,
                 children: <Widget>[
                   Row(children: optionValueNames),
                 ],
-              )
+              ))
             ]);
           },
         );
@@ -388,59 +448,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
-                Expanded(
-                  child: IconButton(
-                    padding: EdgeInsets.all(10),
-                    alignment: Alignment.topRight,
-                    icon: Icon(Icons.favorite),
-                    color: Colors.orange,
-                    onPressed: () async {
-                      final SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      String authToken = prefs.getString('spreeApiKey');
-
-                      if (authToken == null) {
-                        _scaffoldKey.currentState.showSnackBar(SnackBar(
-                          content: Text(
-                            'Please Login to add to Favorites',
-                          ),
-                          action: SnackBarAction(
-                            label: 'LOGIN',
-                            onPressed: () {
-                              MaterialPageRoute route = MaterialPageRoute(
-                                  builder: (context) => Authentication(0));
-                              Navigator.push(context, route);
-                            },
-                          ),
-                        ));
-                      } else {
-                        _scaffoldKey.currentState.showSnackBar(SnackBar(
-                          content: Text(
-                            'Adding to Favorites, please wait.',
-                          ),
-                          duration: Duration(seconds: 1),
-                        ));
-                        Map<String, String> headers = await getHeaders();
-                        http
-                            .post(Settings.SERVER_URL + 'favorite_products',
-                                body: json.encode({
-                                  'id':
-                                      widget.product.reviewProductId.toString()
-                                }),
-                                headers: headers)
-                            .then((response) {
-                          Map<dynamic, dynamic> responseBody =
-                              json.decode(response.body);
-
-                          _scaffoldKey.currentState.showSnackBar(SnackBar(
-                            content: Text(responseBody['message']),
-                            duration: Duration(seconds: 1),
-                          ));
-                        });
-                      }
-                    },
-                  ),
-                ),
                 ratingBar(selectedProduct.avgRating, 20),
                 Container(
                     margin: EdgeInsets.only(right: 10),
@@ -521,41 +528,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               child: Text("Description",
                   style:
                       TextStyle(fontWeight: FontWeight.w700, fontSize: 15.0))),
-          HtmlWidget(htmlDescription),
-          Container(
-              width: _deviceSize.width,
-              color: Colors.white,
-              child: ListTile(
-                dense: true,
-                leading: Icon(
-                  Icons.shop,
-                  color: Colors.green,
-                ),
-                title: Text('Similar Products',
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.green)),
-              )),
-          _isLoading
-              ? Container(
-                  height: _deviceSize.height * 0.5,
-                  alignment: Alignment.center,
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.blue,
-                  ),
-                )
-              : Container(
-                  height: _deviceSize.height * 0.5,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: similarProducts.length,
-                    itemBuilder: (context, index) {
-                      return similarProductCard(
-                          index, similarProducts, _deviceSize, context);
-                    },
-                  ),
-                ),
+          HtmlWidget(htmlDescription)
         ],
       ),
     );
@@ -587,6 +560,46 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   Widget addToCartFAB() {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
+        return _tabController.index == 0
+            ? FloatingActionButton(
+                child: Icon(
+                  Icons.shopping_cart,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Scaffold.of(context).showSnackBar(processSnackbar);
+                  selectedProduct.isOrderable
+                      ? model.addProduct(
+                          variantId: selectedProduct.id, quantity: quantity)
+                      : null;
+                  if (!model.isLoading) {
+                    Scaffold.of(context).showSnackBar(completeSnackbar);
+                  }
+                },
+                backgroundColor:
+                    selectedProduct.isOrderable ? Colors.orange : Colors.grey,
+              )
+            : FloatingActionButton(
+                child: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  if (model.isAuthenticated) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            ReviewDetailScreen(selectedProduct)));
+                  } else {
+                    Scaffold.of(context).showSnackBar(LoginErroSnackbar);
+                  }
+                },
+                backgroundColor: Colors.orange);
+      },
+    );
+  }
+}
+/* return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
         return FloatingActionButton(
           child: Icon(
             Icons.shopping_cart,
@@ -596,105 +609,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             Scaffold.of(context).showSnackBar(processSnackbar);
             selectedProduct.isOrderable
                 ? model.addProduct(
-                    variantId: selectedProduct.id, quantity: quantity)
+                variantId: selectedProduct.id, quantity: quantity)
                 : null;
             if (!model.isLoading) {
               Scaffold.of(context).showSnackBar(completeSnackbar);
             }
           },
           backgroundColor:
-              selectedProduct.isOrderable ? Colors.orange : Colors.grey,
+          selectedProduct.isOrderable ? Colors.orange : Colors.grey,
         );
       },
     );
   }
-
-  getSimilarProducts() {
-    Map<String, dynamic> responseBody = Map();
-    List<Product> variants = [];
-    List<OptionValue> optionValues = [];
-    List<OptionType> optionTypes = [];
-    http
-        .get(Settings.SERVER_URL +
-            'api/v1/taxons/products?id=${widget.product.taxonId}&per_page=15&data_set=small')
-        .then((response) {
-      responseBody = json.decode(response.body);
-      responseBody['products'].forEach((product) {
-        int review_product_id = product["id"];
-        variants = [];
-        if (product['has_variants']) {
-          product['variants'].forEach((variant) {
-            optionValues = [];
-            optionTypes = [];
-            variant['option_values'].forEach((option) {
-              setState(() {
-                optionValues.add(OptionValue(
-                  id: option['id'],
-                  name: option['name'],
-                  optionTypeId: option['option_type_id'],
-                  optionTypeName: option['option_type_name'],
-                  optionTypePresentation: option['option_type_presentation'],
-                ));
-              });
-            });
-            setState(() {
-              variants.add(Product(
-                  id: variant['id'],
-                  name: variant['name'],
-                  description: variant['description'],
-                  optionValues: optionValues,
-                  displayPrice: variant['display_price'],
-                  image: variant['images'][0]['product_url'],
-                  isOrderable: variant['is_orderable'],
-                  avgRating: double.parse(product['avg_rating']),
-                  reviewsCount: product['reviews_count'].toString(),
-                  reviewProductId: review_product_id));
-            });
-          });
-          product['option_types'].forEach((optionType) {
-            setState(() {
-              optionTypes.add(OptionType(
-                  id: optionType['id'],
-                  name: optionType['name'],
-                  position: optionType['position'],
-                  presentation: optionType['presentation']));
-            });
-          });
-          setState(() {
-            similarProducts.add(Product(
-                taxonId: product['taxon_ids'].first,
-                id: product['id'],
-                name: product['name'],
-                displayPrice: product['display_price'],
-                avgRating: double.parse(product['avg_rating']),
-                reviewsCount: product['reviews_count'].toString(),
-                image: product['master']['images'][0]['product_url'],
-                variants: variants,
-                reviewProductId: review_product_id,
-                hasVariants: product['has_variants'],
-                optionTypes: optionTypes));
-          });
-        } else {
-          setState(() {
-            similarProducts.add(Product(
-              taxonId: product['taxon_ids'].first,
-              id: product['id'],
-              name: product['name'],
-              displayPrice: product['display_price'],
-              avgRating: double.parse(product['avg_rating']),
-              reviewsCount: product['reviews_count'].toString(),
-              image: product['master']['images'][0]['product_url'],
-              hasVariants: product['has_variants'],
-              isOrderable: product['master']['is_orderable'],
-              reviewProductId: review_product_id,
-              description: product['description'],
-            ));
-          });
-        }
-      });
-      setState(() {
-        _isLoading = false;
-      });
-    });
-  }
-}
+}*/

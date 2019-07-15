@@ -398,8 +398,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   getBanners() async {
-    http
-        .get(Settings.SERVER_URL +
+    http.get(Settings.SERVER_URL +
             'api/v1/taxonomies?q[name_cont]=Landing_Banner&set=nested')
         .then((response) {
       responseBody = json.decode(response.body);

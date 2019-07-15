@@ -28,6 +28,7 @@ getParams() async {
       body: json.encode(params),
       headers: headers);
   print("PAYUBIZ RESPONSE URL");
-  print(json.decode(response.body));
+  //print(response);
+  print(json.decode(response .body));
   
 }

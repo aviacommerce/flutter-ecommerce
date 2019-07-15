@@ -182,9 +182,7 @@ class _CategoryListingState extends State<CategoryListing> {
 
   getCategory() {
     categoryList = [];
-    http
-        .get(Settings.SERVER_URL +
-            'api/v1/taxonomies/${widget.parentId}/taxons/${widget.categoryId}')
+    http.get(Settings.SERVER_URL + 'api/v1/taxonomies/${widget.parentId}/taxons/${widget.categoryId}')
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['taxons'].forEach((category) {
@@ -193,6 +191,7 @@ class _CategoryListingState extends State<CategoryListing> {
             name: category['name'],
             parentId: widget.parentId));
       });
+     //print(Settings.SERVER_URL + 'api/v1/taxonomies/${widget.parentId}/taxons/${widget.categoryId}');
       setState(() {
         _isLoading = false;
         level = 0;

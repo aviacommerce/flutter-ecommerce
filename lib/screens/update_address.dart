@@ -61,10 +61,11 @@ class _UpdateAddressState extends State<UpdateAddress> {
               widget.shipAddress != null ? 'Update Address' : 'Add Address'),
         ),
         body: Card(
-          elevation: 5,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          margin: EdgeInsets.all(20),
+            elevation: 5,
+            shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: EdgeInsets.all(20),
+
           child: Form(
             key: _formKey,
             child: ListView(
@@ -80,16 +81,21 @@ class _UpdateAddressState extends State<UpdateAddress> {
                 buildMobileField('Mobile No. *'),
                 SizedBox(height: 20),
                 sendButton(),
+                SizedBox(height: 250,)
               ],
             ),
+
           ),
-        ));
+        )
+        );
   }
 
   Widget buildFirstNameField(String label) {
     return TextFormField(
-      validator: (String value) {
-        if (value.isEmpty) {
+      validator: (String value)
+      {
+        if (value.isEmpty)
+        {
           return 'First Name is required';
         }
       },
@@ -358,7 +364,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
             "address2": _address2,
             "city": _city,
             "address1": _address1,
-            "phone": _mobile,
+            "phone":  _mobile,
             "zipcode": _pincode,
             "state_name": selectedState,
             "state_id": _stateId,
