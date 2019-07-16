@@ -144,7 +144,7 @@ class _AddressPageState extends State<AddressPage> {
             ),
           ),
         );
-      }
+      } else return Container();
     });
   }
 }

@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/screens/product_detail.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
+import 'package:ofypets_mobile_app/screens/auth.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 Widget productContainer(BuildContext context, Product product, _) {
   return GestureDetector(
@@ -74,7 +81,50 @@ Widget productContainer(BuildContext context, Product product, _) {
                         alignment: Alignment.topRight,
                         icon: Icon(Icons.favorite),
                         color: Colors.orange,
-                        onPressed: () {},
+                        onPressed: () async {
+                          final SharedPreferences prefs =
+                              await SharedPreferences.getInstance();
+                          String authToken = prefs.getString('spreeApiKey');
+
+                          if (authToken == null) {
+                            Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                'Please Login to add to Favorites',
+                              ),
+                              action: SnackBarAction(
+                                label: 'LOGIN',
+                                onPressed: () {
+                                  MaterialPageRoute route = MaterialPageRoute(
+                                      builder: (context) => Authentication(0));
+                                  Navigator.push(context, route);
+                                },
+                              ),
+                            ));
+                          } else {
+                            Scaffold.of(context).showSnackBar(SnackBar(
+                              content: Text(
+                                'Adding to Favorites, please wait.',
+                              ),
+                              duration: Duration(seconds: 1),
+                            ));
+                            Map<String, String> headers = await getHeaders();
+                            http
+                                .post(Settings.SERVER_URL + 'favorite_products',
+                                    body: json.encode({
+                                      'id': product.reviewProductId.toString()
+                                    }),
+                                    headers: headers)
+                                .then((response) {
+                              Map<dynamic, dynamic> responseBody =
+                                  json.decode(response.body);
+
+                              Scaffold.of(context).showSnackBar(SnackBar(
+                                content: Text(responseBody['message']),
+                                duration: Duration(seconds: 1),
+                              ));
+                            });
+                          }
+                        },
                       ),
                     ],
                   ),

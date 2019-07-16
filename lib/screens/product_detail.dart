@@ -6,6 +6,7 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
@@ -17,6 +18,8 @@ import 'package:ofypets_mobile_app/widgets/snackbar.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
 import 'package:ofypets_mobile_app/widgets/similar_products_card.dart';
+import 'package:ofypets_mobile_app/screens/auth.dart';
+import 'package:ofypets_mobile_app/utils/headers.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -42,6 +45,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   double avg_rating = 0;
   String htmlDescription;
   List<Product> similarProducts = List();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -118,6 +122,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   Widget build(BuildContext context) {
     _deviceSize = MediaQuery.of(context).size;
     return Scaffold(
+        key: _scaffoldKey,
         backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text('Item Details'),
@@ -452,6 +457,59 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
+                Expanded(
+                  child: IconButton(
+                    padding: EdgeInsets.all(10),
+                    alignment: Alignment.topRight,
+                    icon: Icon(Icons.favorite),
+                    color: Colors.orange,
+                    onPressed: () async {
+                      final SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      String authToken = prefs.getString('spreeApiKey');
+
+                      if (authToken == null) {
+                        _scaffoldKey.currentState.showSnackBar(SnackBar(
+                          content: Text(
+                            'Please Login to add to Favorites',
+                          ),
+                          action: SnackBarAction(
+                            label: 'LOGIN',
+                            onPressed: () {
+                              MaterialPageRoute route = MaterialPageRoute(
+                                  builder: (context) => Authentication(0));
+                              Navigator.push(context, route);
+                            },
+                          ),
+                        ));
+                      } else {
+                        _scaffoldKey.currentState.showSnackBar(SnackBar(
+                          content: Text(
+                            'Adding to Favorites, please wait.',
+                          ),
+                          duration: Duration(seconds: 1),
+                        ));
+                        Map<String, String> headers = await getHeaders();
+                        http
+                            .post(Settings.SERVER_URL + 'favorite_products',
+                                body: json.encode({
+                                  'id':
+                                      widget.product.reviewProductId.toString()
+                                }),
+                                headers: headers)
+                            .then((response) {
+                          Map<dynamic, dynamic> responseBody =
+                              json.decode(response.body);
+
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                            content: Text(responseBody['message']),
+                            duration: Duration(seconds: 1),
+                          ));
+                        });
+                      }
+                    },
+                  ),
+                ),
                 ratingBar(selectedProduct.avgRating, 20),
                 Container(
                     margin: EdgeInsets.only(right: 10),
