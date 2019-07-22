@@ -1,17 +1,16 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:http/http.dart' as http;
-import 'package:scoped_model/scoped_model.dart';
-
-import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/models/brand.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/widgets/product_container.dart';
-import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
+import 'package:ofypets_mobile_app/models/product.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
+import 'package:ofypets_mobile_app/widgets/product_container_for_pagination.dart';
+import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 
 class BrandList extends StatefulWidget {
   @override
@@ -29,6 +28,11 @@ class _BrandListState extends State<BrandList> {
   Size _deviceSize;
   String _brandName = '';
   String _heading = 'By Brand';
+  final int perPage = TWENTY;
+  int currentPage = ONE;
+  int subCatId = ZERO;
+  int brandId = 0;
+  static const int PAGE_SIZE = 20;
   @override
   void initState() {
     super.initState();
@@ -117,51 +121,50 @@ class _BrandListState extends State<BrandList> {
             ),
             drawer: HomeDrawer(),
             body: Scrollbar(
-              child: _isLoading
-                  ? Container(
-                      height: _deviceSize.height,
-                    )
-                  : ListView.builder(
-                      itemCount:
-                          !_isSelected ? brands.length : productsByBrand.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        if (!_isSelected) {
-                          return Container(
-                              color: Colors.white,
-                              child: Column(children: [
-                                GestureDetector(
-                                    onTap: () {
-                                      productsByBrand = [];
-                                      getBrandProducts(brands[index].id);
-                                      setState(() {
-                                        _isSelected = true;
-                                        _isLoading = true;
-                                        _brandName = brands[index].name;
-                                      });
-                                    },
-                                    child: Container(
-                                        color: Colors.white,
-                                        width: _deviceSize.width,
-                                        alignment: Alignment.centerLeft,
-                                        margin: EdgeInsets.all(10),
-                                        padding: EdgeInsets.all(10),
-                                        child: Text(
-                                          brands[index].name,
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                          ),
-                                        ))),
-                                Divider()
-                              ]));
-                        } else {
-                          return GestureDetector(
-                              onTap: () {},
-                              child: productContainer(
-                                  productsByBrand[index], context));
-                        }
-                      },
-                    ),
-            )));
+                child: _isLoading
+                    ? Container(
+                        height: _deviceSize.height,
+                      )
+                    : !_isSelected
+                        ? ListView.builder(
+                            itemCount: brands.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                  color: Colors.white,
+                                  child: Column(children: [
+                                    GestureDetector(
+                                        onTap: () {
+                                          productsByBrand = [];
+                                          brandId = brands[index].id;
+                                          setState(() {
+                                            _isSelected = true;
+                                            //_isLoading = true;
+                                            _brandName = brands[index].name;
+                                          });
+                                        },
+                                        child: Container(
+                                            color: Colors.white,
+                                            width: _deviceSize.width,
+                                            alignment: Alignment.centerLeft,
+                                            margin: EdgeInsets.all(10),
+                                            padding: EdgeInsets.all(10),
+                                            child: Text(
+                                              brands[index].name,
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                              ),
+                                            ))),
+                                    Divider()
+                                  ]));
+                            })
+                        : Theme(
+                            data: ThemeData(primarySwatch: Colors.green),
+                            child: PagewiseListView(
+                              pageSize: PAGE_SIZE,
+                              itemBuilder: productContainer,
+                              pageFuture: (pageIndex) => getBrandProducts(0),
+                            ),
+                          ))));
   }
 
   getBrandsList() {
@@ -181,76 +184,61 @@ class _BrandListState extends State<BrandList> {
     });
   }
 
-  getBrandProducts(int id) {
+  Future<List<Product>> getBrandProducts(int id) async {
     List<Product> variants = [];
     List<OptionValue> optionValues = [];
     List<OptionType> optionTypes = [];
 
-    http
-        .get(Settings.SERVER_URL +
-            'api/v1/taxons/products?id=$id&per_page=20&data_set=small')
-        .then((response) {
-      responseBody = json.decode(response.body);
-      responseBody['products'].forEach((product) {
-        print('---------TAXON ID---------');
-        print(product['taxon_ids'].first);
-        int review_product_id = product["id"];
-        variants = [];
-        if (product['has_variants']) {
-          product['variants'].forEach((variant) {
-            optionValues = [];
-            optionTypes = [];
-            variant['option_values'].forEach((option) {
-              setState(() {
-                optionValues.add(OptionValue(
-                  id: option['id'],
-                  name: option['name'],
-                  optionTypeId: option['option_type_id'],
-                  optionTypeName: option['option_type_name'],
-                  optionTypePresentation: option['option_type_presentation'],
-                ));
-              });
-            });
+    final response = (await http.get(Settings.SERVER_URL +
+            'api/v1/taxons/products?id=$brandId&page=$currentPage&per_page=$perPage&data_set=small'))
+        .body;
+    currentPage++;
+    responseBody = json.decode(response);
+    responseBody['products'].forEach((product) {
+      print('---------TAXON ID---------');
+      print(product['taxon_ids'].first);
+      int review_product_id = product["id"];
+      variants = [];
+      if (product['has_variants']) {
+        product['variants'].forEach((variant) {
+          optionValues = [];
+          optionTypes = [];
+          variant['option_values'].forEach((option) {
             setState(() {
-              variants.add(Product(
-                  id: variant['id'],
-                  name: variant['name'],
-                  description: variant['description'],
-                  optionValues: optionValues,
-                  displayPrice: variant['display_price'],
-                  image: variant['images'][0]['product_url'],
-                  isOrderable: variant['is_orderable'],
-                  avgRating: double.parse(product['avg_rating']),
-                  reviewsCount: product['reviews_count'].toString(),
-                  reviewProductId: review_product_id));
-            });
-          });
-          product['option_types'].forEach((optionType) {
-            setState(() {
-              optionTypes.add(OptionType(
-                  id: optionType['id'],
-                  name: optionType['name'],
-                  position: optionType['position'],
-                  presentation: optionType['presentation']));
+              optionValues.add(OptionValue(
+                id: option['id'],
+                name: option['name'],
+                optionTypeId: option['option_type_id'],
+                optionTypeName: option['option_type_name'],
+                optionTypePresentation: option['option_type_presentation'],
+              ));
             });
           });
           setState(() {
-            productsByBrand.add(Product(
-                taxonId: product['taxon_ids'].first,
-                id: product['id'],
-                name: product['name'],
-                displayPrice: product['display_price'],
+            variants.add(Product(
+                id: variant['id'],
+                name: variant['name'],
+                description: variant['description'],
+                optionValues: optionValues,
+                displayPrice: variant['display_price'],
+                image: variant['images'][0]['product_url'],
+                isOrderable: variant['is_orderable'],
                 avgRating: double.parse(product['avg_rating']),
                 reviewsCount: product['reviews_count'].toString(),
-                image: product['master']['images'][0]['product_url'],
-                variants: variants,
-                reviewProductId: review_product_id,
-                hasVariants: product['has_variants'],
-                optionTypes: optionTypes));
+                reviewProductId: review_product_id));
           });
-        } else {
+        });
+        product['option_types'].forEach((optionType) {
           setState(() {
-            productsByBrand.add(Product(
+            optionTypes.add(OptionType(
+                id: optionType['id'],
+                name: optionType['name'],
+                position: optionType['position'],
+                presentation: optionType['presentation']));
+          });
+        });
+        setState(() {
+          productsByBrand.add(Product(
               taxonId: product['taxon_ids'].first,
               id: product['id'],
               name: product['name'],
@@ -258,18 +246,34 @@ class _BrandListState extends State<BrandList> {
               avgRating: double.parse(product['avg_rating']),
               reviewsCount: product['reviews_count'].toString(),
               image: product['master']['images'][0]['product_url'],
-              hasVariants: product['has_variants'],
-              isOrderable: product['master']['is_orderable'],
+              variants: variants,
               reviewProductId: review_product_id,
-              description: product['description'],
-            ));
-          });
-        }
-      });
-      setState(() {
+              hasVariants: product['has_variants'],
+              optionTypes: optionTypes));
+        });
+      } else {
+        setState(() {
+          productsByBrand.add(Product(
+            taxonId: product['taxon_ids'].first,
+            id: product['id'],
+            name: product['name'],
+            displayPrice: product['display_price'],
+            avgRating: double.parse(product['avg_rating']),
+            reviewsCount: product['reviews_count'].toString(),
+            image: product['master']['images'][0]['product_url'],
+            hasVariants: product['has_variants'],
+            isOrderable: product['master']['is_orderable'],
+            reviewProductId: review_product_id,
+            description: product['description'],
+          ));
+        });
+      }
+    });
+    return productsByBrand;
+    /*setState(() {
         _isLoading = false;
       });
-    });
+    });*/
   }
 
   Future<bool> _canLeave() {
