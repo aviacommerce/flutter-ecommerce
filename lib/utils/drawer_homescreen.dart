@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ofypets_mobile_app/screens/account.dart';
 import 'package:ofypets_mobile_app/screens/order_history.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
@@ -63,6 +64,34 @@ class _HomeDrawer extends State<HomeDrawer> {
             MaterialPageRoute orderList =
                 MaterialPageRoute(builder: (context) => FavoritesScreen());
             Navigator.push(context, orderList);
+          } else {
+            MaterialPageRoute route =
+                MaterialPageRoute(builder: (context) => Authentication(0));
+
+            Navigator.push(context, route);
+          }
+        },
+      );
+    });
+  }
+
+  Widget accountListTile() {
+    return ScopedModelDescendant(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return ListTile(
+        leading: Icon(
+          Icons.person,
+          color: Colors.green,
+        ),
+        title: Text(
+          'Account',
+          style: TextStyle(color: Colors.green),
+        ),
+        onTap: () {
+          if (model.isAuthenticated) {
+            MaterialPageRoute account =
+                MaterialPageRoute(builder: (context) => Account());
+            Navigator.push(context, account);
           } else {
             MaterialPageRoute route =
                 MaterialPageRoute(builder: (context) => Authentication(0));
@@ -226,18 +255,7 @@ class _HomeDrawer extends State<HomeDrawer> {
             ),
           ),
           favoritesLineTile(),
-          orderHistoryLineTile(),
-          ListTile(
-            leading: Icon(
-              Icons.person,
-              color: Colors.green,
-            ),
-            title: Text(
-              'Account',
-              style: TextStyle(color: Colors.green),
-            ),
-          ),
-          logOutButton(),
+          accountListTile(),
           Divider(),
           ListTile(
             title: Text(
