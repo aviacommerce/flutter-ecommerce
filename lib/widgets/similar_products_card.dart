@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-
-import 'package:scoped_model/scoped_model.dart';
-
-import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/product_detail.dart';
-import 'package:ofypets_mobile_app/widgets/snackbar.dart';
+import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
+import 'package:ofypets_mobile_app/widgets/todays_deals_card.dart';
 
 Widget similarProductCard(int index, List<Product> todaysDealProducts,
     Size _deviceSize, BuildContext context) {
@@ -55,6 +51,8 @@ Widget similarProductCard(int index, List<Product> todaysDealProducts,
                     Text(displayProduct.reviewsCount),
                   ],
                 ),
+                Divider(),
+                AddToCart(displayProduct, index, todaysDealProducts),
               ],
             ),
           )));

@@ -1,13 +1,23 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+
 import 'package:ofypets_mobile_app/screens/account.dart';
 import 'package:ofypets_mobile_app/screens/order_history.dart';
 import 'package:scoped_model/scoped_model.dart';
+
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
 import 'package:ofypets_mobile_app/screens/favorites.dart';
+import 'package:ofypets_mobile_app/screens/order_history.dart';
+import 'package:ofypets_mobile_app/screens/retun_policy.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import 'headers.dart';
 
 class HomeDrawer extends StatefulWidget {
   @override
@@ -17,9 +27,30 @@ class HomeDrawer extends StatefulWidget {
 }
 
 class _HomeDrawer extends State<HomeDrawer> {
+  int favCount = 0;
   @override
   void initState() {
     super.initState();
+    getFavoritesCount();
+  }
+
+  getFavoritesCount() async {
+    favCount = 0;
+    Map<String, String> headers = await getHeaders();
+    Map<String, dynamic> responseBody = Map();
+    http
+        .get(
+            Settings.SERVER_URL +
+                'spree/user_favorite_products.json?&data_set=small',
+            headers: headers)
+        .then((response) {
+      responseBody = json.decode(response.body);
+      responseBody['data'].forEach((favoriteObj) {
+        setState(() {
+          favCount++;
+        });
+      });
+    });
   }
 
   String userName = '';
@@ -55,6 +86,30 @@ class _HomeDrawer extends State<HomeDrawer> {
           Icons.favorite,
           color: Colors.green,
         ),
+        trailing: favCount != null && favCount > 0
+            ? Stack(
+                children: <Widget>[
+                  Icon(Icons.brightness_1, size: 30.0, color: Colors.green),
+                  Container(
+                    width: 30.0,
+                    height: 30.0,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 5.0),
+                      child: Text(
+                        '${favCount}',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : Container(
+                width: 30.0,
+                height: 30.0,
+              ),
         title: Text(
           'Favorites',
           style: TextStyle(color: Colors.green),
@@ -186,9 +241,9 @@ class _HomeDrawer extends State<HomeDrawer> {
   }
 
   formatName() {
-     if (userName != null) {
-       return userName[0].toUpperCase() + userName.substring(1).split('@')[0];
-     }
+    if (userName != null) {
+      return userName[0].toUpperCase() + userName.substring(1).split('@')[0];
+    }
   }
 
   getUserName() async {
@@ -262,20 +317,45 @@ class _HomeDrawer extends State<HomeDrawer> {
               '24/7 Help',
             ),
           ),
-          ListTile(
-            leading: Icon(
-              Icons.call,
-            ),
-            title: Text(
-              'Call: 917-6031-568',
+          InkWell(
+            onTap: () {
+              _callMe('917-6031-568');
+            },
+            child: ListTile(
+              leading: Icon(
+                Icons.call,
+              ),
+              title: Text(
+                'Call: 917-6031-568',
+              ),
             ),
           ),
-          ListTile(
-            leading: Icon(
-              Icons.mail,
+          InkWell(
+            onTap: () {
+              _sendMail('support@ofypets.com');
+            },
+            child: ListTile(
+              leading: Icon(
+                Icons.mail,
+              ),
+              title: Text(
+                'Email: support@ofypets.com',
+              ),
             ),
-            title: Text(
-              'Email: support@ofypets.com',
+          ),
+          InkWell(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return ReturnPolicy();
+              }));
+            },
+            child: ListTile(
+              leading: Icon(
+                Icons.assignment,
+              ),
+              title: Text(
+                'Return Policy',
+              ),
             ),
           ),
           ListTile(
@@ -286,32 +366,27 @@ class _HomeDrawer extends State<HomeDrawer> {
               'Share the App',
             ),
           ),
-          ListTile(
-            leading: Icon(
-              Icons.alternate_email,
-            ),
-            title: Text(
-              'App Feedback',
-            ),
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.assignment,
-            ),
-            title: Text(
-              'Privacy Policy',
-            ),
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.assignment,
-            ),
-            title: Text(
-              'Terms and Policies',
-            ),
-          ),
         ],
       ),
     );
+  }
+}
+
+_sendMail(String email) async {
+  // Android and iOS
+  final uri = 'mailto:$email?subject=&body=';
+  if (await canLaunch(uri)) {
+    await launch(uri);
+  } else {
+    throw 'Could not launch $uri';
+  }
+}
+
+_callMe(String phone) async {
+  final uri = 'tel:$phone';
+  if (await canLaunch(uri)) {
+    await launch(uri);
+  } else {
+    throw 'Could not launch $uri';
   }
 }

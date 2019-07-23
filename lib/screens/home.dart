@@ -1,25 +1,21 @@
 import 'dart:convert';
 
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:scoped_model/scoped_model.dart';
-
-import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/models/category.dart';
-import 'package:ofypets_mobile_app/screens/auth.dart';
-
-import 'package:ofypets_mobile_app/widgets/todays_deals_card.dart';
-import 'package:ofypets_mobile_app/screens/cart.dart';
-import 'package:ofypets_mobile_app/widgets/category_box.dart';
-import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
+import 'package:ofypets_mobile_app/models/product.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/screens/auth.dart';
 import 'package:ofypets_mobile_app/screens/search.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
+import 'package:ofypets_mobile_app/widgets/category_box.dart';
+import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
+import 'package:ofypets_mobile_app/widgets/todays_deals_card.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -39,10 +35,12 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Product> todaysDealProducts = [];
   List<Category> categories = [];
   List<String> bannerImageUrls = [];
+  int favCount;
 
   @override
   void initState() {
     super.initState();
+    // getFavoritesCount();
     getBanners();
     getCategories();
     getTodaysDeals();
@@ -398,7 +396,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   getBanners() async {
-    http.get(Settings.SERVER_URL +
+    http
+        .get(Settings.SERVER_URL +
             'api/v1/taxonomies?q[name_cont]=Landing_Banner&set=nested')
         .then((response) {
       responseBody = json.decode(response.body);
