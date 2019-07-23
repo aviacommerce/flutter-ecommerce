@@ -11,7 +11,8 @@ import 'package:intl/intl.dart';
 class OrderResponse extends StatefulWidget {
   final String orderNumber;
   Map<dynamic, dynamic> detailOrder;
-  OrderResponse({this.orderNumber, this.detailOrder});
+  bool success;
+  OrderResponse({this.orderNumber, this.detailOrder, this.success});
   @override
   State<StatefulWidget> createState() {
     return _OrderResponseState();
@@ -87,7 +88,10 @@ class _OrderResponseState extends State<OrderResponse> {
                               children: <Widget>[
                                 widget.orderNumber != null
                                     ? new Text(
-                                        'Your order successfully placed!',
+                                        widget.success != null &&
+                                                !widget.success
+                                            ? 'Payment Failed!! Please try again.'
+                                            : 'Your order successfully placed!',
                                         style: new TextStyle(
                                             fontSize: 18.0,
                                             fontWeight: FontWeight.w500),
@@ -132,10 +136,9 @@ class _OrderResponseState extends State<OrderResponse> {
                                         child: responseBody["completed_at"] !=
                                                 null
                                             ? Text((formatter.format(
-                                                DateTime.parse(
-                                                    (responseBody
-                                                            ["completed_at"]
-                                                        .split('+05:30')[0])))))
+                                                DateTime.parse((responseBody[
+                                                        "completed_at"]
+                                                    .split('+05:30')[0])))))
                                             : Text("Date Missing!"))
                                   ],
                                 ),

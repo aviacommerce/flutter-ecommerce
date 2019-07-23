@@ -117,9 +117,7 @@ mixin CartModel on Model {
 
     if (url != '') {
       _lineItems = [];
-      http
-          .get(Settings.SERVER_URL + url, headers: headers)
-          .then((response) {
+      http.get(Settings.SERVER_URL + url, headers: headers).then((response) {
         print(
             '------------------------- RESPONSE ------------------------------');
         responseBody = json.decode(response.body);
@@ -199,7 +197,10 @@ mixin CartModel on Model {
     Map<String, String> headers = await getHeaders();
 
     Map<String, dynamic> paymentPayload = {
-      'payment': {'payment_method_id': 3, 'amount': order.itemTotal}
+      'payment': {
+        'payment_method_id': paymentMethodId,
+        'amount': order.itemTotal
+      }
     };
     http.Response response = await http.post(
         Settings.SERVER_URL +

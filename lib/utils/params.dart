@@ -10,9 +10,11 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 
 getParams() async {
+  print("GETTTING PARAMS");
+  Map<String, dynamic> urlResponse;
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   String surl = '${Settings.SERVER_URL}payment/handle_payubiz';
-  String furl = '${Settings.SERVER_URL}payment/handle_payubiz';
+  String furl = '${Settings.SERVER_URL}payment/canceled_payubiz';
 
   Map<String, String> headers = await getHeaders();
 
@@ -27,8 +29,7 @@ getParams() async {
       Settings.SERVER_URL + 'payment/post_request_payubiz',
       body: json.encode(params),
       headers: headers);
-  print("PAYUBIZ RESPONSE URL");
-  //print(response);
-  print(json.decode(response .body));
-  
+
+  urlResponse = json.decode(response.body);
+  return urlResponse['url'];
 }

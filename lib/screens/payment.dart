@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/order_response.dart';
 import 'package:ofypets_mobile_app/utils/params.dart';
+import 'package:ofypets_mobile_app/screens/payubiz.dart';
+import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/models/payment_methods.dart';
 
 class PaymentScreen extends StatefulWidget {
   @override
@@ -13,11 +19,18 @@ class PaymentScreen extends StatefulWidget {
   }
 }
 
-enum SingingCharacter { cod, payubiz }
-
 class _PaymentScreenState extends State<PaymentScreen> {
+  bool _isLoading = true;
+  static List<PaymentMethod> paymentMethods = List();
+
+  @override
+  initState() {
+    super.initState();
+    getPaymentMethods();
+  }
+
 // In the State of a stateful widget:
-  SingingCharacter _character = SingingCharacter.cod;
+  int _character = paymentMethods.length > 0 ? paymentMethods[1].id : null;
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
@@ -25,7 +38,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
       return Scaffold(
         appBar: AppBar(
             title: Text('Payment Methods'),
-            bottom: model.isLoading
+            bottom: model.isLoading || _isLoading
                 ? PreferredSize(
                     child: LinearProgressIndicator(),
                     preferredSize: Size.fromHeight(10),
@@ -34,36 +47,65 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     child: Container(),
                     preferredSize: Size.fromHeight(10),
                   )),
-        body: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              RadioListTile<SingingCharacter>(
-                title: const Text('Cash on Delivery'),
-                value: SingingCharacter.cod,
-                groupValue: _character,
-                onChanged: (SingingCharacter value) {
-                  setState(() {
-                    _character = value;
-                  });
-                },
-                activeColor: Colors.green,
+        body: _isLoading
+            ? Container()
+            : SingleChildScrollView(
+                child: Column(
+                  children: <Widget>[
+                    RadioListTile<dynamic>(
+                      title: Text(paymentMethods.first.name),
+                      value: paymentMethods.first.id,
+                      groupValue: _character,
+                      onChanged: (value) {
+                        setState(() {
+                          _character = value;
+                        });
+                      },
+                      activeColor: Colors.green,
+                    ),
+                    RadioListTile<dynamic>(
+                      title: Text(paymentMethods[1].name),
+                      value: paymentMethods[1].id,
+                      groupValue: _character,
+                      onChanged: (value) {
+                        setState(() {
+                          _character = value;
+                        });
+                      },
+                      activeColor: Colors.green,
+                    )
+                  ],
+                ),
               ),
-              RadioListTile<SingingCharacter>(
-                title: const Text('PayuBiz'),
-                value: SingingCharacter.payubiz,
-                groupValue: _character,
-                onChanged: (SingingCharacter value) {
-                  setState(() {
-                    _character = value;
-                  });
-                },
-                activeColor: Colors.green,
-              ),
-            ],
-          ),
-        ),
-        bottomNavigationBar: paymentButton(context),
+        bottomNavigationBar: !_isLoading ? paymentButton(context) : Container(),
       );
+    });
+  }
+
+  getPaymentMethods() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, String> headers = await getHeaders();
+    Map<dynamic, dynamic> responseBody;
+
+    http.Response response = await http.get(
+        Settings.SERVER_URL +
+            'api/v1/orders/${prefs.getString('orderNumber')}/payments/new?order_token=${prefs.getString('orderToken')}',
+        headers: headers);
+    responseBody = json.decode(response.body);
+    print('PAYMENT RESPONSE');
+    print(responseBody);
+
+    responseBody['payment_methods'].forEach((paymentObj) {
+      setState(() {
+        paymentMethods
+            .add(PaymentMethod(id: paymentObj['id'], name: paymentObj['name']));
+      });
+    });
+    print(paymentMethods.first.id);
+    print(paymentMethods[1].id);
+    setState(() {
+      _isLoading = false;
+      _character = paymentMethods.first.id;
     });
   }
 
@@ -76,16 +118,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           color: Colors.green,
           child: Text(
-            _character == SingingCharacter.cod
+            _character == paymentMethods[1].id
                 ? 'PAY ON DELIVERY'
                 : 'CONTINUE TO PAYUBIZ',
             style: TextStyle(
                 fontSize: 20, color: Colors.white, fontWeight: FontWeight.w300),
           ),
           onPressed: () async {
-            if (_character == SingingCharacter.cod) {
+            if (_character == paymentMethods[1].id) {
               bool isComplete = false;
-              isComplete = await model.completeOrder(3);
+              isComplete = await model.completeOrder(paymentMethods[1].id);
               if (isComplete) {
                 bool isChanged = false;
 
@@ -99,7 +141,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             } else {
               print('PAYUBIZ');
               bool isComplete = false;
-              isComplete = await model.completeOrder(2);
+              isComplete = await model.completeOrder(paymentMethods.first.id);
               if (isComplete) {
                 bool isChanged = false;
 
@@ -108,7 +150,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 }
                 if (isChanged) {
                   // pushSuccessPage();
-                  getParams();
+                  String url = await getParams();
+                  print(url);
+                  MaterialPageRoute payment = MaterialPageRoute(
+                      builder: (context) => PayubizScreen(url));
+                  Navigator.push(context, payment);
                 }
               }
             }

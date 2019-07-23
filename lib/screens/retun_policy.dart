@@ -45,6 +45,6 @@ Widget _normalText(String text) {
 Widget _headingText(String text) {
   return Text(
     text,
-    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 23.0),
+    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
   );
 }
