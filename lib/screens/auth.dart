@@ -42,14 +42,14 @@ class _AuthenticationState extends State<Authentication>
         length: 2,
         child: Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.green.shade300,
+            backgroundColor: Colors.green,
             leading: IconButton(
               icon: Icon(Icons.close),
               onPressed: () => Navigator.of(context).pop(),
             ),
             bottom: TabBar(
               controller: _tabController,
-              indicatorColor: Colors.green.shade300,
+              indicatorColor: Colors.green,
               tabs: [
                 Padding(
                   padding: EdgeInsets.all(12.0),
@@ -101,10 +101,10 @@ class _AuthenticationState extends State<Authentication>
                 ),
                 _isLoader
                     ? CircularProgressIndicator(
-                        backgroundColor: Colors.green.shade300)
+                        backgroundColor: Colors.green)
                     : RaisedButton(
                         textColor: Colors.white,
-                        color: Colors.green.shade300,
+                        color: Colors.orange,
                         child: Text('LOGIN'),
                         onPressed: () => _submitLogin(model),
                       ),

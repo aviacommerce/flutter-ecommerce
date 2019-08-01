@@ -22,7 +22,8 @@ getParams() async {
     'params': {
       'surl': surl,
       'furl': furl,
-      'order_number': prefs.getString('orderNumber')
+      'order_number': prefs.getString('orderNumber'),
+      'ismobileview': true
     }
   };
   http.Response response = await http.post(

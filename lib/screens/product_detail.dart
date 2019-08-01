@@ -240,52 +240,63 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   Widget writeReview() {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-      return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              height: 40.0,
-              width: 335,
-              child: GestureDetector(
-                onTap: () {
-                  if (model.isAuthenticated) {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            ReviewDetailScreen(selectedProduct)));
-                  } else {
-                    Scaffold.of(context).showSnackBar(LoginErroSnackbar);
-                  }
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.green,
-                      style: BorderStyle.solid,
-                      width: 1.0,
-                    ),
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.circular(8.0),
+      return Row(mainAxisAlignment: MainAxisAlignment.center, children: <
+          Widget>[
+        Container(
+          height: 40.0,
+          width: 335,
+          child: GestureDetector(
+            onTap: () {
+              if (model.isAuthenticated) {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => ReviewDetailScreen(selectedProduct)));
+              } else {
+                // Scaffold.of(context).showSnackBar(LoginErroSnackbar);
+                _scaffoldKey.currentState.showSnackBar(SnackBar(
+                  content: Text(
+                    'Please Login Review',
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Center(
-                        child: Text(
-                          "WRITE A REVIEW",
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      )
-                    ],
+                  action: SnackBarAction(
+                    label: 'LOGIN',
+                    onPressed: () {
+                      MaterialPageRoute route = MaterialPageRoute(
+                          builder: (context) => Authentication(0));
+                      Navigator.push(context, route);
+                    },
                   ),
+                ));
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.green,
+                  style: BorderStyle.solid,
+                  width: 1.0,
                 ),
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(8.0),
               ),
-            )
-          ]);
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Center(
+                    child: Text(
+                      "WRITE A REVIEW",
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        )
+      ]);
     });
   }
 
