@@ -138,14 +138,34 @@ class _ChangePasswordState extends State<ChangePassword> {
       _savingNewPassword = false;
     });
     if (response.statusCode == 200) {
-      updateResponse = json.decode(response.body);
-      String successMsg = updateResponse['status'];
-      Navigator.popUntil(
-          context, ModalRoute.withName(Navigator.defaultRouteName));
-      Scaffold.of(context).showSnackBar(SnackBar(content: Text(successMsg)));
+      _showSuccessDialog(context);
+      _newPasswordTextFieldController.text = '';
+      _confirmTextFieldController.text = '';
     } else {
       Scaffold.of(context)
           .showSnackBar(SnackBar(content: Text("Failed to change password")));
     }
+  }
+
+  void _showSuccessDialog(context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Password"),
+            content: new Text("Password changed successfully."),
+            actions: <Widget>[
+              new FlatButton(
+                child: Text(
+                  "OK",
+                  style: TextStyle(color: Colors.black),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
   }
 }
