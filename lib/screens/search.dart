@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
@@ -29,6 +28,19 @@ class _ProductSearchState extends State<ProductSearch> {
   int subCatId = ZERO;
   bool isSearched = false;
   static const int PAGE_SIZE = 20;
+  final scrollController = ScrollController();
+  bool hasMore = false;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    scrollController.addListener(() {
+      if (scrollController.position.maxScrollExtent ==
+          scrollController.offset) {
+        searchProduct();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +60,7 @@ class _ProductSearchState extends State<ProductSearch> {
               ),
               Container(
                 width: MediaQuery.of(context).size.width,
-                height: 50,
+                height: 49,
                 decoration: BoxDecoration(
                     shape: BoxShape.rectangle,
                     color: Colors.white,
@@ -81,12 +93,10 @@ class _ProductSearchState extends State<ProductSearch> {
                   icon: Icon(Icons.search),
                   onPressed: () {
                     FocusScope.of(context).requestFocus(new FocusNode());
-                    print('SEARCH');
-                    print(slug);
-                    setState(() {
-                      isSearched = true;
-                    });
-                    // searchProduct();
+                    isSearched = true;
+                    searchProducts = [];
+                    currentPage = 1;
+                    searchProduct();
                   },
                 ),
               )
@@ -95,26 +105,51 @@ class _ProductSearchState extends State<ProductSearch> {
           preferredSize: Size.fromHeight(20),
         ),
       ),
-      body: isSearched
-          ? Theme(
-              data: ThemeData(primarySwatch: Colors.green),
-              child: PagewiseListView(
-                pageSize: PAGE_SIZE,
-                itemBuilder: favoriteCard,
-                pageFuture: (pageIndex) => searchProduct(),
-              ))
-          : Center(
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.green,
-              ),
-            ),
+      body: _isLoading
+          ? LinearProgressIndicator()
+          : isSearched
+              ? Theme(
+                  data: ThemeData(primarySwatch: Colors.green),
+                  child: ListView.builder(
+                      controller: scrollController,
+                      itemCount: searchProducts.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index < searchProducts.length) {
+                          return favoriteCard(
+                              context, searchProducts[index], index);
+                        }
+                        if (hasMore && searchProducts.length == 0) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 50.0),
+                            child: Center(
+                              child: Text(
+                                'No Product Found',
+                                style: TextStyle(fontSize: 20.0),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          );
+                        }
+                        if (!hasMore) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 25.0),
+                            child: Center(child: CircularProgressIndicator()),
+                          );
+                        }
+                      }),
+                )
+              : Center(
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.green,
+                  ),
+                ),
     );
   }
 
   Widget favoriteCard(BuildContext context, SearchProduct product, int index) {
     return GestureDetector(
         onTap: () {
-          getProductDetail(index);
+          getProductDetail(product);
         },
         child: Card(
             elevation: 2,
@@ -167,19 +202,17 @@ class _ProductSearchState extends State<ProductSearch> {
             )));
   }
 
-  getProductDetail(int index) async {
+  getProductDetail(SearchProduct searchProduct) async {
     Map<String, String> headers = await getHeaders();
     Map<String, dynamic> responseBody = Map();
     print('GETTING DETAILS');
     setState(() {
       _isLoading = true;
-      searchProducts.clear();
     });
-    http.Response response =
-        await http.get(Settings.SERVER_URL + 'api/v1/products/7?data_set=large',
-            // 'api/v1/products/${searchProducts[index].slug}?data_set=large',
-
-            headers: headers);
+    http.Response response = await http.get(
+        Settings.SERVER_URL +
+            'api/v1/products/${searchProduct.slug}?data_set=large',
+        headers: headers);
 
     responseBody = json.decode(response.body);
     print('------------IMAGE URL RECEIVED----------');
@@ -282,7 +315,9 @@ class _ProductSearchState extends State<ProductSearch> {
     Map<String, String> headers = await getHeaders();
     Map<String, dynamic> responseBody = Map();
     print('SENDING REQUEST');
-    searchProducts = [];
+    setState(() {
+      hasMore = false;
+    });
     http.Response response = await http.get(
         Settings.SERVER_URL +
             'api/v1/products?q[name_cont_all]=$slug&page=$currentPage&per_page=$perPage&data_set=small',
@@ -294,15 +329,17 @@ class _ProductSearchState extends State<ProductSearch> {
     responseBody['data'].forEach((favoriteObj) {
       print(favoriteObj['attributes']['slug']);
 
-      setState(() {
-        searchProducts.add(SearchProduct(
-            name: favoriteObj['attributes']['name'],
-            image: favoriteObj['attributes']['product_url'],
-            price: favoriteObj['attributes']['price'],
-            currencySymbol: favoriteObj['attributes']['currency_symbol'],
-            slug: favoriteObj['attributes']['slug']));
-      });
+      searchProducts.add(SearchProduct(
+          name: favoriteObj['attributes']['name'],
+          image: favoriteObj['attributes']['product_url'],
+          price: favoriteObj['attributes']['price'],
+          currencySymbol: favoriteObj['attributes']['currency_symbol'],
+          slug: favoriteObj['attributes']['slug']));
     });
+    setState(() {
+      hasMore = true;
+    });
+
     return searchProducts;
   }
 }

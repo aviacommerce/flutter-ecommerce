@@ -7,6 +7,7 @@ import 'package:ofypets_mobile_app/models/brand.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
+import 'package:ofypets_mobile_app/screens/search.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
 import 'package:ofypets_mobile_app/widgets/product_container_for_pagination.dart';
@@ -52,7 +53,11 @@ class _BrandListState extends State<BrandList> {
                   actions: <Widget>[
                     IconButton(
                       icon: Icon(Icons.search),
-                      onPressed: () {},
+                      onPressed: () {
+                        MaterialPageRoute route = MaterialPageRoute(
+                            builder: (context) => ProductSearch());
+                        Navigator.of(context).push(route);
+                      },
                     ),
                     shoppingCartIconButton()
                   ],

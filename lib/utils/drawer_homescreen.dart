@@ -1,13 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-
-import 'package:ofypets_mobile_app/screens/account.dart';
-import 'package:ofypets_mobile_app/screens/order_history.dart';
-import 'package:scoped_model/scoped_model.dart';
-
 import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/screens/account.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
 import 'package:ofypets_mobile_app/screens/favorites.dart';
 import 'package:ofypets_mobile_app/screens/order_history.dart';
@@ -86,15 +82,14 @@ class _HomeDrawer extends State<HomeDrawer> {
           Icons.favorite,
           color: Colors.green,
         ),
-        trailing: favCount != null && favCount > 0
-            ? Stack(
-                children: <Widget>[
-                  Icon(Icons.brightness_1, size: 30.0, color: Colors.green),
-                  Container(
-                    width: 30.0,
-                    height: 30.0,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 5.0),
+        trailing: Container(
+          width: 30.0,
+          height: 30.0,
+          child: favCount != null && favCount > 0
+              ? Stack(
+                  children: <Widget>[
+                    Icon(Icons.brightness_1, size: 30.0, color: Colors.green),
+                    Center(
                       child: Text(
                         '${favCount}',
                         style: TextStyle(
@@ -103,13 +98,13 @@ class _HomeDrawer extends State<HomeDrawer> {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                  ),
-                ],
-              )
-            : Container(
-                width: 30.0,
-                height: 30.0,
-              ),
+                  ],
+                )
+              : Container(
+                  width: 30.0,
+                  height: 30.0,
+                ),
+        ),
         title: Text(
           'Favorites',
           style: TextStyle(color: Colors.green),

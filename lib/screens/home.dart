@@ -64,11 +64,11 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (BuildContext context, Widget child, MainModel model) {
       return Scaffold(
         appBar: AppBar(
-          centerTitle: true,
           title: Container(
               padding: EdgeInsets.all(10),
               child: Text(
                 'ofypets',
+                textAlign: TextAlign.start,
                 style: TextStyle(fontFamily: 'HolyFat', fontSize: 50),
               )),
           actions: <Widget>[
@@ -91,17 +91,24 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                   width: _deviceSize.width,
                   color: Colors.white,
-                  child: ListTile(
-                    dense: true,
-                    leading: Icon(
-                      Icons.category,
-                      color: Colors.blue,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.category,
+                          color: Colors.blue,
+                        ),
+                        SizedBox(
+                          width: 8.0,
+                        ),
+                        Text('Shop by Category',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.black)),
+                      ],
                     ),
-                    title: Text('Categories',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.blue)),
                   ))
             ]),
           ),
@@ -116,30 +123,42 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   )
                 ]))
-              : SliverGrid(
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2),
-                  delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                    return categoryBox(index, context, _deviceSize, categories);
-                  }, childCount: categories.length + 1),
-                ),
+              : categories.length > 0
+                  ? SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2),
+                      delegate: SliverChildBuilderDelegate(
+                          (BuildContext context, int index) {
+                        return categoryBox(
+                            index, context, _deviceSize, categories);
+                      }, childCount: categories.length + 1),
+                    )
+                  : Center(
+                      child: Text('No items present'),
+                    ),
           SliverList(
             delegate: SliverChildListDelegate([
               Container(
                   width: _deviceSize.width,
                   color: Colors.white,
-                  child: ListTile(
-                    dense: true,
-                    leading: Icon(
-                      Icons.today,
-                      color: Colors.deepOrange,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          Icons.local_offer,
+                          color: Colors.orange,
+                        ),
+                        SizedBox(
+                          width: 8.0,
+                        ),
+                        Text('Today\'s Deals',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.black)),
+                      ],
                     ),
-                    title: Text('Today\'s Deals',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.deepOrange)),
                   ))
             ]),
           ),
@@ -147,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ? SliverList(
                   delegate: SliverChildListDelegate([
                   Container(
-                    height: _deviceSize.height * 0.5,
+                    height: _deviceSize.height * 0.47,
                     alignment: Alignment.center,
                     child: CircularProgressIndicator(
                       backgroundColor: Colors.blue,
@@ -156,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ]))
               : SliverToBoxAdapter(
                   child: Container(
-                    height: _deviceSize.height * 0.5,
+                    height: _deviceSize.height * 0.47,
                     child: ListView.builder(
                       scrollDirection: Axis.horizontal,
                       itemCount: todaysDealProducts.length,
@@ -382,7 +401,7 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(5)),
         width: _deviceSize.width,
-        height: 50,
+        height: 49,
         margin: EdgeInsets.all(010),
         child: ListTile(
           leading: Icon(Icons.search),

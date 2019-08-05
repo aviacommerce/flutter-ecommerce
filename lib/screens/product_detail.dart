@@ -1,25 +1,26 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
-import 'package:ofypets_mobile_app/screens/review_detail.dart';
-import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/models/review.dart';
-import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
-import 'package:ofypets_mobile_app/widgets/snackbar.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
-import 'package:ofypets_mobile_app/widgets/similar_products_card.dart';
+import 'package:ofypets_mobile_app/models/product.dart';
+import 'package:ofypets_mobile_app/models/review.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
+import 'package:ofypets_mobile_app/screens/review_detail.dart';
+import 'package:ofypets_mobile_app/screens/search.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
+import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
+import 'package:ofypets_mobile_app/widgets/similar_products_card.dart';
+import 'package:ofypets_mobile_app/widgets/snackbar.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProductDetailScreen extends StatefulWidget {
   final Product product;
@@ -129,7 +130,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.search),
-              onPressed: () {},
+              onPressed: () {
+                MaterialPageRoute route =
+                    MaterialPageRoute(builder: (context) => ProductSearch());
+                Navigator.of(context).push(route);
+              },
             ),
             shoppingCartIconButton()
           ],
@@ -400,7 +405,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                         border: Border.all(
                       color: selectedProduct.optionValues[0].name ==
                               optionValue.name
-                          ? Colors.red
+                          ? Colors.green
                           : Colors.black,
                     )),
                     alignment: Alignment.centerLeft,
@@ -411,7 +416,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       style: TextStyle(
                           color: selectedProduct.optionValues[0].name ==
                                   optionValue.name
-                              ? Colors.red
+                              ? Colors.green
                               : Colors.black),
                     ))));
           });
@@ -468,6 +473,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(left: 10.0),
+                  child: Text(
+                    'by ${selectedProduct.name.split(' ')[0]}',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.normal,
+                        color: Colors.green),
+                  ),
+                ),
                 Expanded(
                   child: IconButton(
                     padding: EdgeInsets.all(10),
@@ -596,7 +611,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           ),
           addToCartFlatButton(),
           Container(
-              padding: EdgeInsets.only(left: 8.0),
+              padding: EdgeInsets.only(left: 8.0, top: 8.0),
               alignment: Alignment.centerLeft,
               child: Text("Description",
                   style:
@@ -606,20 +621,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               width: _deviceSize.width,
               color: Colors.white,
               child: ListTile(
-                dense: true,
+                /* dense: true,
                 leading: Icon(
                   Icons.shop,
                   color: Colors.green,
-                ),
+                ),*/
                 title: Text('Similar Products',
                     style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
-                        color: Colors.green)),
+                        color: Colors.black)),
               )),
           _isLoading
               ? Container(
-                  height: _deviceSize.height * 0.5,
+                  height: _deviceSize.height * 0.47,
                   alignment: Alignment.center,
                   child: CircularProgressIndicator(
                     backgroundColor: Colors.blue,
@@ -644,21 +659,38 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   Widget addToCartFlatButton() {
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
-        return FlatButton(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          child: Text(
-              selectedProduct.isOrderable ? 'ADD TO CART' : 'OUT OF STOCK'),
-          onPressed: () {
-            Scaffold.of(context).showSnackBar(processSnackbar);
-            if (selectedProduct.isOrderable) {
-              model.addProduct(
-                  variantId: selectedProduct.id, quantity: quantity);
-            }
-            if (!model.isLoading) {
-              Scaffold.of(context).showSnackBar(completeSnackbar);
-            }
-          },
+        return Padding(
+          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+          child: Container(
+            width: double.infinity,
+            height: 45.0,
+            child: FlatButton(
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  color:
+                      selectedProduct.isOrderable ? Colors.green : Colors.grey,
+                ),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                selectedProduct.isOrderable ? 'ADD TO CART' : 'OUT OF STOCK',
+                style: TextStyle(
+                    color: selectedProduct.isOrderable
+                        ? Colors.green
+                        : Colors.grey),
+              ),
+              onPressed: () {
+                Scaffold.of(context).showSnackBar(processSnackbar);
+                if (selectedProduct.isOrderable) {
+                  model.addProduct(
+                      variantId: selectedProduct.id, quantity: quantity);
+                }
+                if (!model.isLoading) {
+                  Scaffold.of(context).showSnackBar(completeSnackbar);
+                }
+              },
+            ),
+          ),
         );
       },
     );

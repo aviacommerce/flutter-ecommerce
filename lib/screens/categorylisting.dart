@@ -7,6 +7,7 @@ import 'package:ofypets_mobile_app/models/category.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
+import 'package:ofypets_mobile_app/screens/search.dart';
 import 'package:ofypets_mobile_app/utils/color_list.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
@@ -41,7 +42,8 @@ class _CategoryListingState extends State<CategoryListing> {
   @override
   void initState() {
     super.initState();
-    header.add(textField(widget.categoryName, FontWeight.bold, 0));
+    header.add(
+        textField(widget.categoryName, FontWeight.normal, 0, Colors.white));
     getCategory();
   }
 
@@ -56,7 +58,11 @@ class _CategoryListingState extends State<CategoryListing> {
             actions: <Widget>[
               IconButton(
                 icon: Icon(Icons.search),
-                onPressed: () {},
+                onPressed: () {
+                  MaterialPageRoute route =
+                      MaterialPageRoute(builder: (context) => ProductSearch());
+                  Navigator.of(context).push(route);
+                },
               ),
               shoppingCartIconButton()
             ],
@@ -125,8 +131,10 @@ class _CategoryListingState extends State<CategoryListing> {
     );
   }
 
-  Widget textField(String text, FontWeight fontWeight, int categoryLevel) {
+  Widget textField(
+      String text, FontWeight fontWeight, int categoryLevel, Color textColor) {
     int sublevel;
+
     return GestureDetector(
         onTap: () {
           sublevel = level - categoryLevel;
@@ -139,8 +147,8 @@ class _CategoryListingState extends State<CategoryListing> {
         },
         child: Text(
           text,
-          style: TextStyle(
-              color: Colors.white, fontSize: 18, fontWeight: fontWeight),
+          style:
+              TextStyle(color: textColor, fontSize: 18, fontWeight: fontWeight),
         ));
   }
 
@@ -150,15 +158,15 @@ class _CategoryListingState extends State<CategoryListing> {
           if (level == 0) {
             getSubCategory(categoryList[index].id);
             setState(() {
-              header.add(textField(
-                  ' > ' + categoryList[index].name, FontWeight.bold, 1));
+              header.add(textField(' > ' + categoryList[index].name,
+                  FontWeight.normal, 1, Colors.white));
             });
           } else {
             subCatId = subCategoryList[index].id;
             loadProductsByCategory();
             setState(() {
-              header.add(textField(
-                  ' > ' + subCategoryList[index].name, FontWeight.bold, 2));
+              header.add(textField(' > ' + subCategoryList[index].name,
+                  FontWeight.normal, 2, Colors.white));
             });
           }
         },

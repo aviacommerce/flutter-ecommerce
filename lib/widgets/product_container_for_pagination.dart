@@ -1,14 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/screens/product_detail.dart';
-import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
+import 'package:ofypets_mobile_app/screens/product_detail.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
 Widget productContainer(BuildContext context, Product product, _) {
   return GestureDetector(
@@ -34,16 +34,6 @@ Widget productContainer(BuildContext context, Product product, _) {
                           'images/placeholders/no-product-image.png'),
                     ),
                   ),
-                  Container(
-                      padding: EdgeInsets.all(10),
-                      width: 150,
-                      alignment: Alignment.center,
-                      child: Text(
-                        'MORE OPTIONS AVAILABLE',
-                        style: TextStyle(
-                            fontWeight: FontWeight.w300, fontSize: 12),
-                        textAlign: TextAlign.center,
-                      ))
                 ],
               ),
               SizedBox(
@@ -52,13 +42,26 @@ Widget productContainer(BuildContext context, Product product, _) {
               Expanded(
                   child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Container(
-                    child: Text(
-                      product.name,
-                      textAlign: TextAlign.left,
-                      style: TextStyle(fontSize: 15),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 5.0, top: 10.0),
+                    child: RichText(
+                      text: TextSpan(children: [
+                        TextSpan(
+                          text: product.name.split(' ')[0],
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(
+                          text: product.name.replaceAll(
+                              new RegExp('${product.name.split(' ')[0]}'), ''),
+                          style: TextStyle(fontSize: 15, color: Colors.black),
+                        ),
+                      ]),
                     ),
                   ),
                   SizedBox(height: 10),
@@ -133,9 +136,22 @@ Widget productContainer(BuildContext context, Product product, _) {
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       ratingBar(product.avgRating, 20),
+                      SizedBox(
+                        width: 5.0,
+                      ),
                       Text(product.reviewsCount),
                     ],
                   ),
+                  Container(
+                      padding:
+                          EdgeInsets.only(top: 10.0, bottom: 10.0, left: 5.0),
+                      alignment: Alignment.topLeft,
+                      child: Text(
+                        'More Options Available',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w300, fontSize: 14),
+                        textAlign: TextAlign.center,
+                      ))
                 ],
               )),
             ],

@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-
-import 'package:scoped_model/scoped_model.dart';
-
-import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/product_detail.dart';
+import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/widgets/snackbar.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class AddToCart extends StatefulWidget {
   List<Product> todaysDealProducts;
-   int index;
-   Product product;
+  int index;
+  Product product;
   AddToCart(this.product, this.index, this.todaysDealProducts);
   @override
   State<StatefulWidget> createState() {
@@ -27,7 +25,8 @@ class _AddToCartState extends State<AddToCart> {
         builder: (BuildContext context, Widget child, MainModel model) {
       return FlatButton(
         onPressed: () async {
-          print('selectedProductIndex'); print(widget.index);
+          print('selectedProductIndex');
+          print(widget.index);
           setState(() {
             selectedIndex = widget.index;
           });
@@ -77,9 +76,11 @@ Widget todaysDealsCard(int index, List<Product> todaysDealProducts,
       child: SizedBox(
           width: _deviceSize.width * 0.4,
           child: Card(
-            borderOnForeground: true,
+            shape: RoundedRectangleBorder(
+                side: BorderSide(color: Colors.grey.withOpacity(0.4)),
+                borderRadius: BorderRadius.circular(4.0)),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 FadeInImage(
                   image: NetworkImage(displayProduct.image),
@@ -89,25 +90,38 @@ Widget todaysDealsCard(int index, List<Product> todaysDealProducts,
                   height: 100,
                 ),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+                  width: double.infinity,
+                  height: 60.0,
+                  padding: EdgeInsets.only(left: 12.0, right: 12.0),
                   child: Text(
                     displayProduct.name,
+                    overflow: TextOverflow.ellipsis,
                     maxLines: 3,
                   ),
                 ),
-                Text(
-                  displayProduct.displayPrice,
-                  style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15),
+                Container(
+                  width: double.infinity,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 12.0),
+                    child: Text(
+                      displayProduct.displayPrice,
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15),
+                    ),
+                  ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    ratingBar(displayProduct.avgRating, 20),
-                    Text(displayProduct.reviewsCount),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.only(left: 12.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      ratingBar(displayProduct.avgRating, 20),
+                      Text(displayProduct.reviewsCount),
+                    ],
+                  ),
                 ),
                 Divider(),
                 AddToCart(displayProduct, index, todaysDealProducts),

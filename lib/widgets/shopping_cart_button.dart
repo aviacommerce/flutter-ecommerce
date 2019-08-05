@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
-import 'package:scoped_model/scoped_model.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/cart.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 Widget shoppingCartIconButton() {
   return ScopedModelDescendant<MainModel>(
@@ -30,23 +29,24 @@ Widget shoppingCartIconButton() {
                 onPressed: null,
               ),
               new Positioned(
-                child: new Stack(
-                  children: <Widget>[
-                    new Icon(Icons.brightness_1,
-                        size: 20.0, color: Colors.orange),
-                    new Positioned(
-                        top: 3.0,
-                        right: 4.0,
-                        child: new Center(
-                          child: new Text(
-                            model.lineItems.length.toString(),
-                            style: new TextStyle(
-                                color: Colors.white,
-                                fontSize: 11.0,
-                                fontWeight: FontWeight.w500),
-                          ),
-                        )),
-                  ],
+                child: Container(
+                  width: 21.0,
+                  height: 21.0,
+                  child: new Stack(
+                    children: <Widget>[
+                      new Icon(Icons.brightness_1,
+                          size: 21.0, color: Colors.orange),
+                      new Center(
+                        child: new Text(
+                          model.lineItems.length.toString(),
+                          style: new TextStyle(
+                              color: Colors.white,
+                              fontSize: 11.0,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               )
             ],
