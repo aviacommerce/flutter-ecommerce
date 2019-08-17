@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
+import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/order_history.dart';
 import 'package:ofypets_mobile_app/screens/change_email.dart';
 import 'package:ofypets_mobile_app/screens/change_password.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ofypets_mobile_app/screens/my_address.dart';
+import 'package:ofypets_mobile_app/screens/order_history.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Account extends StatelessWidget {
   @override
@@ -59,6 +60,15 @@ class Account extends StatelessWidget {
             ),
             onTap: () {
               navigate_option("change_password", context, model);
+            },
+          ),
+          ListTile(
+            title: Text(
+              "My Addresses",
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            onTap: () {
+              navigate_option("change_address", context, model);
             },
           ),
           logOutButton()
@@ -154,6 +164,13 @@ class Account extends StatelessWidget {
         {
           MaterialPageRoute orderList =
               MaterialPageRoute(builder: (context) => ChangePassword());
+          Navigator.push(context, orderList);
+        }
+        break;
+      case "change_address":
+        {
+          MaterialPageRoute orderList =
+              MaterialPageRoute(builder: (context) => MyAddressPage());
           Navigator.push(context, orderList);
         }
     }

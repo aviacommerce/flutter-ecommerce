@@ -51,7 +51,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
-    print(widget.product.hasVariants);
     if (widget.product.hasVariants != null) {
       if (widget.product.hasVariants) {
         _hasVariants = widget.product.hasVariants;
@@ -76,10 +75,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   }
 
   get_reviews() {
-    print('selectedProductId');
-    print(selectedProduct);
-    print('reviewproductid');
-    print(selectedProduct.reviewProductId);
     Map<dynamic, dynamic> responseBody;
     Map<String, String> headers = {
       'Content-Type': 'application/json',
@@ -245,63 +240,65 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   Widget writeReview() {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-      return Row(mainAxisAlignment: MainAxisAlignment.center, children: <
-          Widget>[
-        Container(
-          height: 40.0,
-          width: 335,
-          child: GestureDetector(
-            onTap: () {
-              if (model.isAuthenticated) {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => ReviewDetailScreen(selectedProduct)));
-              } else {
-                // Scaffold.of(context).showSnackBar(LoginErroSnackbar);
-                _scaffoldKey.currentState.showSnackBar(SnackBar(
-                  content: Text(
-                    'Please Login Review',
-                  ),
-                  action: SnackBarAction(
-                    label: 'LOGIN',
-                    onPressed: () {
-                      MaterialPageRoute route = MaterialPageRoute(
-                          builder: (context) => Authentication(0));
-                      Navigator.push(context, route);
-                    },
-                  ),
-                ));
-              }
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.green,
-                  style: BorderStyle.solid,
-                  width: 1.0,
-                ),
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Center(
-                    child: Text(
-                      "WRITE A REVIEW",
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1,
+      return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              height: 40.0,
+              width: 335,
+              child: GestureDetector(
+                onTap: () {
+                  if (model.isAuthenticated) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) =>
+                            ReviewDetailScreen(selectedProduct)));
+                  } else {
+                    // Scaffold.of(context).showSnackBar(LoginErroSnackbar);
+                    _scaffoldKey.currentState.showSnackBar(SnackBar(
+                      content: Text(
+                        'Please Login Review',
                       ),
+                      action: SnackBarAction(
+                        label: 'LOGIN',
+                        onPressed: () {
+                          MaterialPageRoute route = MaterialPageRoute(
+                              builder: (context) => Authentication(0));
+                          Navigator.push(context, route);
+                        },
+                      ),
+                    ));
+                  }
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.green,
+                      style: BorderStyle.solid,
+                      width: 1.0,
                     ),
-                  )
-                ],
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Center(
+                        child: Text(
+                          "WRITE A REVIEW",
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ),
-        )
-      ]);
+            )
+          ]);
     });
   }
 
@@ -421,22 +418,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     ))));
           });
         });
-        return ListView.builder(
+        return Container(
+          height: 60.0,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: optionValueNames,
+          ),
+        );
+        /*return ListView.builder(
           shrinkWrap: true,
           itemCount: 1,
           itemBuilder: (context, index) {
-            return Column(children: [
-              optionTypeNames[index],
-              SingleChildScrollView(
-                  child: ListView(
-                shrinkWrap: true,
-                children: <Widget>[
-                  Row(children: optionValueNames),
-                ],
-              ))
-            ]);
+            return Container(
+              height: 60.0,
+              child: Column(children: [
+                optionTypeNames[index],
+                SingleChildScrollView(
+                    child: ListView(
+
+                  shrinkWrap: true,
+                  children: <Widget>[
+                    Row(children: optionValueNames),
+                  ],
+                ))
+              ]),
+            );
           },
-        );
+        );*/
       } else {
         return Container();
       }

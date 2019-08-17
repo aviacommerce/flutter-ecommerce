@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/screens/order_response.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PayubizScreen extends StatefulWidget {
   String url;
@@ -52,7 +51,9 @@ class _PayubizScreenState extends State<PayubizScreen> {
       onWillPop: () async => (false),
       child: Scaffold(
           appBar: AppBar(
-            automaticallyImplyLeading: false,
+            iconTheme: IconThemeData(
+              color: Colors.black, //change your color here
+            ),
             title: Text(
               'Payubiz',
               style: TextStyle(
