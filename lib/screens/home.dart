@@ -133,8 +133,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             index, context, _deviceSize, categories);
                       }, childCount: categories.length + 1),
                     )
-                  : Center(
-                      child: Text('No items present'),
+                  : SliverList(
+                      delegate: SliverChildListDelegate([
+                        Container(
+                          width: _deviceSize.width,
+                          color: Colors.white,
+                          child: Center(
+                            child: Text('No items present'),
+                          ),
+                        ),
+                      ]),
                     ),
           SliverList(
             delegate: SliverChildListDelegate([

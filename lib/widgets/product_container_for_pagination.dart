@@ -50,15 +50,16 @@ Widget productContainer(BuildContext context, Product product, _) {
                     child: RichText(
                       text: TextSpan(children: [
                         TextSpan(
-                          text: product.name.split(' ')[0],
+                          text: '${product.name.split(' ')[0]}\n',
                           style: TextStyle(
                               color: Colors.black,
                               fontSize: 16.0,
                               fontWeight: FontWeight.bold),
                         ),
                         TextSpan(
-                          text: product.name.replaceAll(
-                              new RegExp('${product.name.split(' ')[0]}'), ''),
+                          text: product.name.substring(
+                              product.name.split(' ')[0].length + 1,
+                              product.name.length),
                           style: TextStyle(fontSize: 15, color: Colors.black),
                         ),
                       ]),

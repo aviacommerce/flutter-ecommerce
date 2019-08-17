@@ -33,7 +33,7 @@ Widget categoryBox(int index, BuildContext context, Size _deviceSize,
                             'Shop By Brand',
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 20,
+                                fontSize: 16,
                                 fontWeight: FontWeight.w600),
                             textAlign: TextAlign.center,
                           ),
