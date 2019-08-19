@@ -1,33 +1,45 @@
 PODS:
   - Flutter (1.0.0)
+  - flutter_webview_plugin (0.0.1):
+    - Flutter
   - get_version (0.0.1):
     - Flutter
   - package_info (0.0.1):
     - Flutter
   - shared_preferences (0.0.1):
     - Flutter
+  - url_launcher (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - Flutter (from `.symlinks/flutter/ios`)
+  - flutter_webview_plugin (from `.symlinks/plugins/flutter_webview_plugin/ios`)
   - get_version (from `.symlinks/plugins/get_version/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
+  - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: ".symlinks/flutter/ios"
+  flutter_webview_plugin:
+    :path: ".symlinks/plugins/flutter_webview_plugin/ios"
   get_version:
     :path: ".symlinks/plugins/get_version/ios"
   package_info:
     :path: ".symlinks/plugins/package_info/ios"
   shared_preferences:
     :path: ".symlinks/plugins/shared_preferences/ios"
+  url_launcher:
+    :path: ".symlinks/plugins/url_launcher/ios"
 
 SPEC CHECKSUMS:
   Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
+  flutter_webview_plugin: ed9e8a6a96baf0c867e90e1bce2673913eeac694
   get_version: 2bc18c4e26a265571662cab5d38f8b50dc8c1c77
   package_info: 78cabb3c322943c55d39676f4a5bfc748c01d055
   shared_preferences: 1feebfa37bb57264736e16865e7ffae7fc99b523
+  url_launcher: 0067ddb8f10d36786672aa0722a21717dba3a298
 
 PODFILE CHECKSUM: 0ace6dcc4948b4468f937371b24e2f9227defe1a
 
