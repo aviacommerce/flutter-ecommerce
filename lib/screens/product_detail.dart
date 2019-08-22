@@ -687,16 +687,18 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                         ? Colors.green
                         : Colors.grey),
               ),
-              onPressed: () {
-                Scaffold.of(context).showSnackBar(processSnackbar);
-                if (selectedProduct.isOrderable) {
-                  model.addProduct(
-                      variantId: selectedProduct.id, quantity: quantity);
-                }
-                if (!model.isLoading) {
-                  Scaffold.of(context).showSnackBar(completeSnackbar);
-                }
-              },
+              onPressed: selectedProduct.isOrderable
+                  ? () {
+                      Scaffold.of(context).showSnackBar(processSnackbar);
+                      if (selectedProduct.isOrderable) {
+                        model.addProduct(
+                            variantId: selectedProduct.id, quantity: quantity);
+                        if (!model.isLoading) {
+                          Scaffold.of(context).showSnackBar(completeSnackbar);
+                        }
+                      }
+                    }
+                  : () {},
             ),
           ),
         );
@@ -713,16 +715,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   Icons.shopping_cart,
                   color: Colors.white,
                 ),
-                onPressed: () {
-                  Scaffold.of(context).showSnackBar(processSnackbar);
-                  selectedProduct.isOrderable
-                      ? model.addProduct(
-                          variantId: selectedProduct.id, quantity: quantity)
-                      : null;
-                  if (!model.isLoading) {
-                    Scaffold.of(context).showSnackBar(completeSnackbar);
-                  }
-                },
+                onPressed: selectedProduct.isOrderable
+                    ? () {
+                        Scaffold.of(context).showSnackBar(processSnackbar);
+                        selectedProduct.isOrderable
+                            ? model.addProduct(
+                                variantId: selectedProduct.id,
+                                quantity: quantity)
+                            : null;
+                        if (!model.isLoading) {
+                          Scaffold.of(context).showSnackBar(completeSnackbar);
+                        }
+                      }
+                    : () {},
                 backgroundColor:
                     selectedProduct.isOrderable ? Colors.orange : Colors.grey,
               )
