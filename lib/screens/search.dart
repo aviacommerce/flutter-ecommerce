@@ -7,10 +7,12 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:ofypets_mobile_app/models/brand.dart';
 import 'package:ofypets_mobile_app/models/category.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
+
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
 import 'package:ofypets_mobile_app/widgets/product_container.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class ProductSearch extends StatefulWidget {
   @override
@@ -130,7 +132,9 @@ class _ProductSearchState extends State<ProductSearch> {
                     child: IconButton(
                       icon: Icon(Icons.search),
                       onPressed: () {
-                        FocusScope.of(mainContext).requestFocus(new FocusNode());
+                        FocusScope.of(mainContext)
+                            .requestFocus(new FocusNode());
+
                         isSearched = true;
                         searchProducts = [];
                         currentPage = 1;
@@ -146,7 +150,7 @@ class _ProductSearchState extends State<ProductSearch> {
           endDrawer: filterDrawer(),
           body: Stack(
             children: <Widget>[
-              _isLoading
+              model.isLoading
                   ? LinearProgressIndicator()
                   : isSearched
                       ? Theme(
@@ -158,8 +162,10 @@ class _ProductSearchState extends State<ProductSearch> {
                                 if (index < searchProducts.length) {
                                   // return favoriteCard(
                                   //     context, searchProducts[index], index);
-                                  return productContainer(context, searchProducts[index], index
-                                      );
+                                  return productContainer(
+                                      _scaffoldKey.currentContext,
+                                      searchProducts[index],
+                                      index);
                                 }
                                 if (hasMore && searchProducts.length == 0) {
                                   return Padding(

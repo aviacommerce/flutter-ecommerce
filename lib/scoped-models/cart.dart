@@ -1,20 +1,19 @@
-import 'package:flutter/material.dart';
-
-import 'package:scoped_model/scoped_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:ofypets_mobile_app/models/line_item.dart';
+import 'package:ofypets_mobile_app/models/option_type.dart';
+import 'package:ofypets_mobile_app/models/option_value.dart';
+import 'package:ofypets_mobile_app/models/order.dart';
+import 'package:ofypets_mobile_app/models/product.dart';
+import 'package:ofypets_mobile_app/models/variant.dart';
+
+import 'package:ofypets_mobile_app/screens/product_detail.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
-import 'package:ofypets_mobile_app/models/order.dart';
-import 'package:ofypets_mobile_app/models/line_item.dart';
-import 'package:ofypets_mobile_app/models/variant.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/models/option_value.dart';
-import 'package:ofypets_mobile_app/models/option_type.dart';
-import 'package:ofypets_mobile_app/screens/product_detail.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 mixin CartModel on Model {
   List<LineItem> _lineItems = [];
@@ -42,10 +41,9 @@ mixin CartModel on Model {
     Product tappedProduct = Product();
 
     setLoading(true);
-    
+
     http.Response response = await http.get(
-        Settings.SERVER_URL +
-            'api/v1/products/$slug?data_set=large',
+        Settings.SERVER_URL + 'api/v1/products/$slug?data_set=large',
         headers: headers);
 
     responseBody = json.decode(response.body);
@@ -62,85 +60,85 @@ mixin CartModel on Model {
         optionTypes = [];
         variant['data']['included']['option_values'].forEach((option) {
           // setState(() {
-            optionValues.add(OptionValue(
-              id: option['data']['attributes']['id'],
-              name: option['data']['attributes']['name'],
-              optionTypeId: option['data']['attributes']['option_type_id'],
-              optionTypeName: option['data']['attributes']['option_type_name'],
-              optionTypePresentation: option['data']['attributes']
-                  ['option_type_presentation'],
-            ));
+          optionValues.add(OptionValue(
+            id: option['data']['attributes']['id'],
+            name: option['data']['attributes']['name'],
+            optionTypeId: option['data']['attributes']['option_type_id'],
+            optionTypeName: option['data']['attributes']['option_type_name'],
+            optionTypePresentation: option['data']['attributes']
+                ['option_type_presentation'],
+          ));
           // });
         });
         // setState(() {
-          variants.add(Product(
-              id: variant['data']['attributes']['id'],
-              name: variant['data']['attributes']['name'],
-              description: variant['data']['attributes']['description'],
-              optionValues: optionValues,
-              displayPrice: variant['data']['attributes']['display_price'],
-              image: variant['data']['included']['images'][0]['data']
-                  ['attributes']['product_url'],
-              isOrderable: variant['data']['attributes']['is_orderable'],
-              avgRating: double.parse(
-                  responseBody['data']['attributes']['avg_rating']),
-              reviewsCount: responseBody['data']['attributes']['reviews_count']
-                  .toString(),
-              reviewProductId: reviewProductId));
-        // });
-      });
-      responseBody['data']['included']['option_types'].forEach((optionType) {
-        // setState(() {
-          optionTypes.add(OptionType(
-              id: optionType['data']['attributes']['id'],
-              name: optionType['data']['attributes']['name'],
-              position: optionType['data']['attributes']['position'],
-              presentation: optionType['data']['attributes']['presentation']));
-        // });
-      });
-      // setState(() {
-        tappedProduct = Product(
-            name: responseBody['data']['attributes']['name'],
-            displayPrice: responseBody['data']['attributes']['display_price'],
+        variants.add(Product(
+            id: variant['data']['attributes']['id'],
+            name: variant['data']['attributes']['name'],
+            description: variant['data']['attributes']['description'],
+            optionValues: optionValues,
+            displayPrice: variant['data']['attributes']['display_price'],
+            image: variant['data']['included']['images'][0]['data']
+                ['attributes']['product_url'],
+            isOrderable: variant['data']['attributes']['is_orderable'],
             avgRating:
                 double.parse(responseBody['data']['attributes']['avg_rating']),
             reviewsCount:
                 responseBody['data']['attributes']['reviews_count'].toString(),
-            image: responseBody['data']['included']['master']['data']
-                ['included']['images'][0]['data']['attributes']['product_url'],
-            variants: variants,
-            reviewProductId: reviewProductId,
-            hasVariants: responseBody['data']['attributes']['has_variants'],
-            optionTypes: optionTypes,
-            taxonId: responseBody['data']['attributes']['taxon_ids'].first,
-            );
+            reviewProductId: reviewProductId));
+        // });
+      });
+      responseBody['data']['included']['option_types'].forEach((optionType) {
+        // setState(() {
+        optionTypes.add(OptionType(
+            id: optionType['data']['attributes']['id'],
+            name: optionType['data']['attributes']['name'],
+            position: optionType['data']['attributes']['position'],
+            presentation: optionType['data']['attributes']['presentation']));
+        // });
+      });
+      // setState(() {
+      tappedProduct = Product(
+        name: responseBody['data']['attributes']['name'],
+        displayPrice: responseBody['data']['attributes']['display_price'],
+        avgRating:
+            double.parse(responseBody['data']['attributes']['avg_rating']),
+        reviewsCount:
+            responseBody['data']['attributes']['reviews_count'].toString(),
+        image: responseBody['data']['included']['master']['data']['included']
+            ['images'][0]['data']['attributes']['product_url'],
+        variants: variants,
+        reviewProductId: reviewProductId,
+        hasVariants: responseBody['data']['attributes']['has_variants'],
+        optionTypes: optionTypes,
+        taxonId: responseBody['data']['attributes']['taxon_ids'].first,
+      );
       // });
     } else {
       // setState(() {
-        tappedProduct = Product(
-          id: responseBody['data']['included']['id'],
-          name: responseBody['data']['attributes']['name'],
-          displayPrice: responseBody['data']['attributes']['display_price'],
-          avgRating:
-              double.parse(responseBody['data']['attributes']['avg_rating']),
-          reviewsCount:
-              responseBody['data']['attributes']['reviews_count'].toString(),
-          image: responseBody['data']['included']['master']['data']['included']
-              ['images'][0]['data']['attributes']['product_url'],
-          hasVariants: responseBody['data']['attributes']['has_variants'],
-          isOrderable: responseBody['data']['included']['master']['data']
-              ['attributes']['is_orderable'],
-          reviewProductId: reviewProductId,
-          description: responseBody['data']['attributes']['description'],
-          taxonId: responseBody['data']['attributes']['taxon_ids'].first,
-        );
+      tappedProduct = Product(
+        id: responseBody['data']['included']['id'],
+        name: responseBody['data']['attributes']['name'],
+        displayPrice: responseBody['data']['attributes']['display_price'],
+        avgRating:
+            double.parse(responseBody['data']['attributes']['avg_rating']),
+        reviewsCount:
+            responseBody['data']['attributes']['reviews_count'].toString(),
+        image: responseBody['data']['included']['master']['data']['included']
+            ['images'][0]['data']['attributes']['product_url'],
+        hasVariants: responseBody['data']['attributes']['has_variants'],
+        isOrderable: responseBody['data']['included']['master']['data']
+            ['attributes']['is_orderable'],
+        reviewProductId: reviewProductId,
+        description: responseBody['data']['attributes']['description'],
+        taxonId: responseBody['data']['attributes']['taxon_ids'].first,
+      );
       // });
     }
-    setLoading(false);
 
     MaterialPageRoute route = MaterialPageRoute(
         builder: (context) => ProductDetailScreen(tappedProduct));
     Navigator.push(context, route);
+    setLoading(false);
   }
 
   void addProduct({int variantId, int quantity}) async {
