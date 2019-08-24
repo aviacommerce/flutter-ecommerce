@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:http/http.dart' as http;
+import 'package:scoped_model/scoped_model.dart';
+
 import 'package:ofypets_mobile_app/models/brand.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
@@ -10,8 +12,9 @@ import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/screens/search.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
-import 'package:ofypets_mobile_app/widgets/product_container_for_pagination.dart';
+import 'package:ofypets_mobile_app/widgets/product_container.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 
 class BrandList extends StatefulWidget {
   @override
@@ -43,133 +46,137 @@ class _BrandListState extends State<BrandList> {
   @override
   Widget build(BuildContext context) {
     _deviceSize = MediaQuery.of(context).size;
-    return WillPopScope(
-        onWillPop: () => _canLeave(),
-        child: Scaffold(
-            appBar: PreferredSize(
-              preferredSize: Size.fromHeight(140.0),
-              child: AppBar(
-                  title: Text('Shop'),
-                  actions: <Widget>[
-                    IconButton(
-                      icon: Icon(Icons.search),
-                      onPressed: () {
-                        MaterialPageRoute route = MaterialPageRoute(
-                            builder: (context) => ProductSearch());
-                        Navigator.of(context).push(route);
-                      },
-                    ),
-                    shoppingCartIconButton()
-                  ],
-                  bottom: PreferredSize(
-                      preferredSize: Size(_deviceSize.width, 40),
-                      child: Column(children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _isSelected = false;
-                                  });
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                    left: 70,
-                                    bottom: 20,
-                                  ),
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    _heading,
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 20,
-                                        fontWeight: _isSelected
-                                            ? FontWeight.w200
-                                            : FontWeight.bold),
-                                  ),
-                                )),
-                            _isSelected
-                                ? Container(
+
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return WillPopScope(
+          onWillPop: () => _canLeave(),
+          child: Scaffold(
+              appBar: PreferredSize(
+                preferredSize: Size.fromHeight(140.0),
+                child: AppBar(
+                    title: Text('Shop'),
+                    actions: <Widget>[
+                      IconButton(
+                        icon: Icon(Icons.search),
+                        onPressed: () {
+                          MaterialPageRoute route = MaterialPageRoute(
+                              builder: (context) => ProductSearch());
+                          Navigator.of(context).push(route);
+                        },
+                      ),
+                      shoppingCartIconButton()
+                    ],
+                    bottom: PreferredSize(
+                        preferredSize: Size(_deviceSize.width, 40),
+                        child: Column(children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _isSelected = false;
+                                    });
+                                  },
+                                  child: Container(
                                     margin: EdgeInsets.only(
+                                      left: 70,
                                       bottom: 20,
                                     ),
                                     alignment: Alignment.centerLeft,
                                     child: Text(
-                                      ' > ',
+                                      _heading,
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 20,
-                                          fontWeight: FontWeight.w200),
+                                          fontWeight: _isSelected
+                                              ? FontWeight.w200
+                                              : FontWeight.bold),
                                     ),
-                                  )
-                                : Container(),
-                            _isSelected
-                                ? Container(
-                                    margin: EdgeInsets.only(
-                                      bottom: 20,
-                                    ),
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      _brandName,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  )
-                                : Container()
-                          ],
-                        ),
-                        _isLoading ? LinearProgressIndicator() : Container()
-                      ]))),
-            ),
-            drawer: HomeDrawer(),
-            body: Scrollbar(
-                child: _isLoading
-                    ? Container(
-                        height: _deviceSize.height,
-                      )
-                    : !_isSelected
-                        ? ListView.builder(
-                            itemCount: brands.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Container(
-                                  color: Colors.white,
-                                  child: Column(children: [
-                                    GestureDetector(
-                                        onTap: () {
-                                          productsByBrand = [];
-                                          brandId = brands[index].id;
-                                          setState(() {
-                                            _isSelected = true;
-                                            //_isLoading = true;
-                                            _brandName = brands[index].name;
-                                          });
-                                        },
-                                        child: Container(
+                                  )),
+                              _isSelected
+                                  ? Container(
+                                      margin: EdgeInsets.only(
+                                        bottom: 20,
+                                      ),
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        ' > ',
+                                        style: TextStyle(
                                             color: Colors.white,
-                                            width: _deviceSize.width,
-                                            alignment: Alignment.centerLeft,
-                                            margin: EdgeInsets.all(10),
-                                            padding: EdgeInsets.all(10),
-                                            child: Text(
-                                              brands[index].name,
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                              ),
-                                            ))),
-                                    Divider()
-                                  ]));
-                            })
-                        : Theme(
-                            data: ThemeData(primarySwatch: Colors.green),
-                            child: PagewiseListView(
-                              pageSize: PAGE_SIZE,
-                              itemBuilder: productContainer,
-                              pageFuture: (pageIndex) => getBrandProducts(0),
-                            ),
-                          ))));
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w200),
+                                      ),
+                                    )
+                                  : Container(),
+                              _isSelected
+                                  ? Container(
+                                      margin: EdgeInsets.only(
+                                        bottom: 20,
+                                      ),
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        _brandName,
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    )
+                                  : Container()
+                            ],
+                          ),
+                          _isLoading || model.isLoading ? LinearProgressIndicator() : Container()
+                        ]))),
+              ),
+              drawer: HomeDrawer(),
+              body: Scrollbar(
+                  child: _isLoading
+                      ? Container(
+                          height: _deviceSize.height,
+                        )
+                      : !_isSelected
+                          ? ListView.builder(
+                              itemCount: brands.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Container(
+                                    color: Colors.white,
+                                    child: Column(children: [
+                                      GestureDetector(
+                                          onTap: () {
+                                            productsByBrand = [];
+                                            brandId = brands[index].id;
+                                            setState(() {
+                                              _isSelected = true;
+                                              //_isLoading = true;
+                                              _brandName = brands[index].name;
+                                            });
+                                          },
+                                          child: Container(
+                                              color: Colors.white,
+                                              width: _deviceSize.width,
+                                              alignment: Alignment.centerLeft,
+                                              margin: EdgeInsets.all(10),
+                                              padding: EdgeInsets.all(10),
+                                              child: Text(
+                                                brands[index].name,
+                                                style: TextStyle(
+                                                  fontSize: 20,
+                                                ),
+                                              ))),
+                                      Divider()
+                                    ]));
+                              })
+                          : Theme(
+                              data: ThemeData(primarySwatch: Colors.green),
+                              child: PagewiseListView(
+                                pageSize: PAGE_SIZE,
+                                itemBuilder: productContainer,
+                                pageFuture: (pageIndex) => getBrandProducts(0),
+                              ),
+                            ))));
+    });
   }
 
   getBrandsList() {
@@ -202,7 +209,7 @@ class _BrandListState extends State<BrandList> {
     responseBody['products'].forEach((product) {
       print('---------TAXON ID---------');
       print(product['taxon_ids'].first);
-      int review_product_id = product["id"];
+      int reviewProductId = product["id"];
       variants = [];
       if (product['has_variants']) {
         product['variants'].forEach((variant) {
@@ -221,6 +228,7 @@ class _BrandListState extends State<BrandList> {
           });
           setState(() {
             variants.add(Product(
+                slug: variant['slug'],
                 id: variant['id'],
                 name: variant['name'],
                 description: variant['description'],
@@ -230,7 +238,7 @@ class _BrandListState extends State<BrandList> {
                 isOrderable: variant['is_orderable'],
                 avgRating: double.parse(product['avg_rating']),
                 reviewsCount: product['reviews_count'].toString(),
-                reviewProductId: review_product_id));
+                reviewProductId: reviewProductId));
           });
         });
         product['option_types'].forEach((optionType) {
@@ -244,6 +252,7 @@ class _BrandListState extends State<BrandList> {
         });
         setState(() {
           productsByBrand.add(Product(
+              slug: product['slug'],
               taxonId: product['taxon_ids'].first,
               id: product['id'],
               name: product['name'],
@@ -252,13 +261,14 @@ class _BrandListState extends State<BrandList> {
               reviewsCount: product['reviews_count'].toString(),
               image: product['master']['images'][0]['product_url'],
               variants: variants,
-              reviewProductId: review_product_id,
+              reviewProductId: reviewProductId,
               hasVariants: product['has_variants'],
               optionTypes: optionTypes));
         });
       } else {
         setState(() {
           productsByBrand.add(Product(
+            slug: product['slug'],
             taxonId: product['taxon_ids'].first,
             id: product['id'],
             name: product['name'],
@@ -268,7 +278,7 @@ class _BrandListState extends State<BrandList> {
             image: product['master']['images'][0]['product_url'],
             hasVariants: product['has_variants'],
             isOrderable: product['master']['is_orderable'],
-            reviewProductId: review_product_id,
+            reviewProductId: reviewProductId,
             description: product['description'],
           ));
         });

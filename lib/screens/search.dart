@@ -2,15 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:scoped_model/scoped_model.dart';
+
 import 'package:ofypets_mobile_app/models/brand.dart';
 import 'package:ofypets_mobile_app/models/category.dart';
-import 'package:ofypets_mobile_app/models/option_type.dart';
-import 'package:ofypets_mobile_app/models/option_value.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/models/searchProduct.dart';
-import 'package:ofypets_mobile_app/screens/product_detail.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:ofypets_mobile_app/widgets/product_container.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 
 class ProductSearch extends StatefulWidget {
   @override
@@ -22,7 +22,8 @@ class ProductSearch extends StatefulWidget {
 class _ProductSearchState extends State<ProductSearch> {
   String slug = '';
   TextEditingController _controller;
-  List<SearchProduct> searchProducts = [];
+  // List<SearchProduct> searchProducts = [];
+  List<Product> searchProducts = [];
   bool _isLoading = false;
   Product tappedProduct = Product();
   final int perPage = TWENTY;
@@ -76,298 +77,140 @@ class _ProductSearchState extends State<ProductSearch> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    _deviceSize = MediaQuery.of(context).size;
-    return Scaffold(
-        key: _scaffoldKey,
-        appBar: AppBar(
-          bottom: PreferredSize(
-            child: Stack(
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    color: Colors.green,
-                  ),
-                  // margin: EdgeInsets.all(10),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 49,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5)),
-                  margin: EdgeInsets.all(10),
-                ),
-                Container(
-                  padding: EdgeInsets.only(left: 15),
-                  child: TextField(
-                    controller: _controller,
-                    onChanged: (value) {
-                      setState(() {
-                        slug = value;
-                      });
-                    },
-                    autofocus: true,
-                    decoration: InputDecoration(
-                        labelText: 'Find the best for your pet...',
-                        border: InputBorder.none,
-                        labelStyle: TextStyle(
-                            fontWeight: FontWeight.w300, fontSize: 18)),
-                  ),
-                ),
-                Container(
-                  height: 50,
-                  margin: EdgeInsets.all(10),
-                  width: MediaQuery.of(context).size.width,
-                  alignment: Alignment.centerRight,
-                  child: IconButton(
-                    icon: Icon(Icons.search),
-                    onPressed: () {
-                      FocusScope.of(context).requestFocus(new FocusNode());
-                      isSearched = true;
-                      searchProducts = [];
-                      currentPage = 1;
-                      searchProduct();
-                    },
-                  ),
-                )
-              ],
-            ),
-            preferredSize: Size.fromHeight(20),
-          ),
-        ),
-        endDrawer: filterDrawer(),
-        body: Stack(
-          children: <Widget>[
-            _isLoading
-                ? LinearProgressIndicator()
-                : isSearched
-                    ? Theme(
-                        data: ThemeData(primarySwatch: Colors.green),
-                        child: ListView.builder(
-                            controller: scrollController,
-                            itemCount: searchProducts.length + 1,
-                            itemBuilder: (context, index) {
-                              if (index < searchProducts.length) {
-                                return favoriteCard(
-                                    context, searchProducts[index], index);
-                              }
-                              if (hasMore && searchProducts.length == 0) {
-                                return Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 50.0),
-                                  child: Center(
-                                    child: Text(
-                                      'No Product Found',
-                                      style: TextStyle(fontSize: 20.0),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                );
-                              }
-                              if (!hasMore) {
-                                return Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 25.0),
-                                  child: Center(
-                                      child: CircularProgressIndicator()),
-                                );
-                              } else {
-                                return Container();
-                              }
-                            }),
-                      )
-                    : Center(
-                        child: CircularProgressIndicator(
-                          backgroundColor: Colors.green,
-                        ),
-                      ),
-            Container(
-              padding: EdgeInsets.only(right: 20.0, top: 15.0),
-              alignment: Alignment.topRight,
-              child: FloatingActionButton(
-                onPressed: () {
-                  _scaffoldKey.currentState.openEndDrawer();
-                },
-                child: Icon(
-                  Icons.filter_list,
-                  color: Colors.white,
-                ),
-                backgroundColor: Colors.orange,
-              ),
-            ),
-          ],
-        ));
-  }
-
-  Widget favoriteCard(BuildContext context, SearchProduct product, int index) {
-    return GestureDetector(
-        onTap: () {
-          getProductDetail(product);
-        },
-        child: Card(
-            elevation: 2,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-            margin: EdgeInsets.all(10),
-            child: Column(
-              children: <Widget>[
-                Row(children: [
+  Widget build(BuildContext mainContext) {
+    _deviceSize = MediaQuery.of(mainContext).size;
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            bottom: PreferredSize(
+              child: Stack(
+                children: [
                   Container(
-                    padding: EdgeInsets.all(10),
-                    height: 150,
-                    width: 150,
-                    color: Colors.white,
-                    child: product.image != null
-                        ? FadeInImage(
-                            image: NetworkImage(product.image),
-                            placeholder: AssetImage(
-                                'images/placeholders/no-product-image.png'),
-                          )
-                        : Image.asset(
-                            'images/placeholders/no-product-image.png'),
+                    width: MediaQuery.of(mainContext).size.width,
+                    height: 70,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      color: Colors.green,
+                    ),
+                    // margin: EdgeInsets.all(10),
                   ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Container(
-                          child: Text(
-                            product.name,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(fontSize: 15),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Container(
-                          child: Text(
-                            product.currencySymbol + product.price,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(fontSize: 15, color: Colors.red),
-                          ),
-                        ),
-                      ],
+                  Container(
+                    width: MediaQuery.of(mainContext).size.width,
+                    height: 49,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5)),
+                    margin: EdgeInsets.all(10),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(left: 15),
+                    child: TextField(
+                      controller: _controller,
+                      onChanged: (value) {
+                        setState(() {
+                          slug = value;
+                        });
+                      },
+                      autofocus: true,
+                      decoration: InputDecoration(
+                          labelText: 'Find the best for your pet...',
+                          border: InputBorder.none,
+                          labelStyle: TextStyle(
+                              fontWeight: FontWeight.w300, fontSize: 18)),
+                    ),
+                  ),
+                  Container(
+                    height: 50,
+                    margin: EdgeInsets.all(10),
+                    width: MediaQuery.of(context).size.width,
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      icon: Icon(Icons.search),
+                      onPressed: () {
+                        FocusScope.of(mainContext).requestFocus(new FocusNode());
+                        isSearched = true;
+                        searchProducts = [];
+                        currentPage = 1;
+                        searchProduct();
+                      },
                     ),
                   )
-                ])
-              ],
-            )));
+                ],
+              ),
+              preferredSize: Size.fromHeight(20),
+            ),
+          ),
+          endDrawer: filterDrawer(),
+          body: Stack(
+            children: <Widget>[
+              _isLoading
+                  ? LinearProgressIndicator()
+                  : isSearched
+                      ? Theme(
+                          data: ThemeData(primarySwatch: Colors.green),
+                          child: ListView.builder(
+                              controller: scrollController,
+                              itemCount: searchProducts.length + 1,
+                              itemBuilder: (mainContext, index) {
+                                if (index < searchProducts.length) {
+                                  // return favoriteCard(
+                                  //     context, searchProducts[index], index);
+                                  return productContainer(context, searchProducts[index], index
+                                      );
+                                }
+                                if (hasMore && searchProducts.length == 0) {
+                                  return Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 50.0),
+                                    child: Center(
+                                      child: Text(
+                                        'No Product Found',
+                                        style: TextStyle(fontSize: 20.0),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                if (!hasMore || model.isLoading) {
+                                  return Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(vertical: 25.0),
+                                    child: Center(
+                                        child: CircularProgressIndicator()),
+                                  );
+                                } else {
+                                  return Container();
+                                }
+                              }),
+                        )
+                      : Center(
+                          child: CircularProgressIndicator(
+                            backgroundColor: Colors.green,
+                          ),
+                        ),
+              Container(
+                padding: EdgeInsets.only(right: 20.0, top: 15.0),
+                alignment: Alignment.topRight,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    _scaffoldKey.currentState.openEndDrawer();
+                  },
+                  child: Icon(
+                    Icons.filter_list,
+                    color: Colors.white,
+                  ),
+                  backgroundColor: Colors.orange,
+                ),
+              ),
+            ],
+          ));
+    });
   }
 
-  getProductDetail(SearchProduct searchProduct) async {
-    Map<String, String> headers = await getHeaders();
-    Map<String, dynamic> responseBody = Map();
-    print('GETTING DETAILS');
-    setState(() {
-      _isLoading = true;
-    });
-    http.Response response = await http.get(
-        Settings.SERVER_URL +
-            'api/v1/products/${searchProduct.slug}?data_set=large',
-        headers: headers);
-
-    responseBody = json.decode(response.body);
-    print('------------IMAGE URL RECEIVED----------');
-    print(responseBody['data']['included']['master']['data']['included']
-        ['images'][0]['data']['attributes']['product_url']);
-    List<Product> variants = [];
-    List<OptionValue> optionValues = [];
-    List<OptionType> optionTypes = [];
-
-    int review_product_id = responseBody['data']['attributes']["id"];
-    variants = [];
-    if (responseBody['data']['attributes']['has_variants']) {
-      responseBody['data']['included']['variants'].forEach((variant) {
-        optionValues = [];
-        optionTypes = [];
-        variant['data']['included']['option_values'].forEach((option) {
-          setState(() {
-            optionValues.add(OptionValue(
-              id: option['data']['attributes']['id'],
-              name: option['data']['attributes']['name'],
-              optionTypeId: option['data']['attributes']['option_type_id'],
-              optionTypeName: option['data']['attributes']['option_type_name'],
-              optionTypePresentation: option['data']['attributes']
-                  ['option_type_presentation'],
-            ));
-          });
-        });
-        setState(() {
-          variants.add(Product(
-              id: variant['data']['attributes']['id'],
-              name: variant['data']['attributes']['name'],
-              description: variant['data']['attributes']['description'],
-              optionValues: optionValues,
-              displayPrice: variant['data']['attributes']['display_price'],
-              image: variant['data']['included']['images'][0]['data']
-                  ['attributes']['product_url'],
-              isOrderable: variant['data']['attributes']['is_orderable'],
-              avgRating: double.parse(
-                  responseBody['data']['attributes']['avg_rating']),
-              reviewsCount: responseBody['data']['attributes']['reviews_count']
-                  .toString(),
-              reviewProductId: review_product_id));
-        });
-      });
-      responseBody['data']['included']['option_types'].forEach((optionType) {
-        setState(() {
-          optionTypes.add(OptionType(
-              id: optionType['data']['attributes']['id'],
-              name: optionType['data']['attributes']['name'],
-              position: optionType['data']['attributes']['position'],
-              presentation: optionType['data']['attributes']['presentation']));
-        });
-      });
-      setState(() {
-        tappedProduct = Product(
-            name: responseBody['data']['attributes']['name'],
-            displayPrice: responseBody['data']['attributes']['display_price'],
-            avgRating:
-                double.parse(responseBody['data']['attributes']['avg_rating']),
-            reviewsCount:
-                responseBody['data']['attributes']['reviews_count'].toString(),
-            image: responseBody['data']['included']['master']['data']
-                ['included']['images'][0]['data']['attributes']['product_url'],
-            variants: variants,
-            reviewProductId: review_product_id,
-            hasVariants: responseBody['data']['attributes']['has_variants'],
-            optionTypes: optionTypes);
-      });
-    } else {
-      setState(() {
-        tappedProduct = Product(
-          id: responseBody['data']['included']['id'],
-          name: responseBody['data']['attributes']['name'],
-          displayPrice: responseBody['data']['attributes']['display_price'],
-          avgRating:
-              double.parse(responseBody['data']['attributes']['avg_rating']),
-          reviewsCount:
-              responseBody['data']['attributes']['reviews_count'].toString(),
-          image: responseBody['data']['included']['master']['data']['included']
-              ['images'][0]['data']['attributes']['product_url'],
-          hasVariants: responseBody['data']['attributes']['has_variants'],
-          isOrderable: responseBody['data']['included']['master']['data']
-              ['attributes']['is_orderable'],
-          reviewProductId: review_product_id,
-          description: responseBody['data']['attributes']['description'],
-        );
-      });
-    }
-    setState(() {
-      _isLoading = false;
-    });
-    print('PRODUCT IS');
-    print(tappedProduct);
-    MaterialPageRoute route = MaterialPageRoute(
-        builder: (context) => ProductDetailScreen(tappedProduct));
-    Navigator.push(context, route);
-  }
-
-  Future<List<SearchProduct>> searchProduct([String sortBy]) async {
+  Future<List<Product>> searchProduct([String sortBy]) async {
     Map<String, String> headers = await getHeaders();
     Map<String, dynamic> responseBody = Map();
     print('SENDING REQUEST');
@@ -388,20 +231,20 @@ class _ProductSearchState extends State<ProductSearch> {
     }
     currentPage++;
     responseBody = json.decode(response.body);
-    print('------------SEARCH RESPONSE----------');
-    print(responseBody);
-    responseBody['data'].forEach((favoriteObj) {
-      print(favoriteObj['attributes']['slug']);
-
-      searchProducts.add(SearchProduct(
-          name: favoriteObj['attributes']['name'],
-          image: favoriteObj['attributes']['product_url'],
-          price: favoriteObj['attributes']['price'],
-          currencySymbol: favoriteObj['attributes']['currency_symbol'],
-          slug: favoriteObj['attributes']['slug']));
+    responseBody['data'].forEach((searchObj) {
+      searchProducts.add(Product(
+          reviewProductId: searchObj['id'],
+          name: searchObj['attributes']['name'],
+          image: searchObj['attributes']['product_url'],
+          displayPrice: searchObj['attributes']['currency_symbol'] +
+              searchObj['attributes']['price'],
+          slug: searchObj['attributes']['slug'],
+          avgRating: double.parse(searchObj['attributes']['avg_rating']),
+          reviewsCount: searchObj['attributes']['reviews_count'].toString()));
     });
     setState(() {
       hasMore = true;
+      _isLoading = false;
     });
 
     return searchProducts;
@@ -460,7 +303,7 @@ class _ProductSearchState extends State<ProductSearch> {
                           Navigator.pop(context);
                           productsByBrand = [];
                           setState(() {
-                            //_isLoading = true;
+                            _isLoading = true;
                             slug = brands[index].name;
                             isSearched = true;
                             searchProducts = [];

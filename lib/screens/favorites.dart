@@ -186,7 +186,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     List<OptionValue> optionValues = [];
     List<OptionType> optionTypes = [];
 
-    int review_product_id = responseBody['data']['attributes']["id"];
+    int reviewProductId = responseBody['data']['attributes']["id"];
     variants = [];
     if (responseBody['data']['attributes']['has_variants']) {
       responseBody['data']['included']['variants'].forEach((variant) {
@@ -218,7 +218,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   responseBody['data']['attributes']['avg_rating']),
               reviewsCount: responseBody['data']['attributes']['reviews_count']
                   .toString(),
-              reviewProductId: review_product_id));
+              reviewProductId: reviewProductId));
         });
       });
       responseBody['data']['included']['option_types'].forEach((optionType) {
@@ -243,7 +243,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             image: responseBody['data']['included']['master']['data']
                 ['included']['images'][0]['data']['attributes']['product_url'],
             variants: variants,
-            reviewProductId: review_product_id,
+            reviewProductId: reviewProductId,
             hasVariants: responseBody['data']['attributes']['has_variants'],
             optionTypes: optionTypes);
       });
@@ -263,7 +263,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           hasVariants: responseBody['data']['attributes']['has_variants'],
           isOrderable: responseBody['data']['included']['master']['data']
               ['attributes']['is_orderable'],
-          reviewProductId: review_product_id,
+          reviewProductId: reviewProductId,
           description: responseBody['data']['attributes']['description'],
         );
       });

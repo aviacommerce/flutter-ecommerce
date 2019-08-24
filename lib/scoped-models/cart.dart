@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
+
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+
 import 'dart:convert';
 
 import 'package:ofypets_mobile_app/utils/constants.dart';
@@ -8,6 +11,10 @@ import 'package:ofypets_mobile_app/utils/headers.dart';
 import 'package:ofypets_mobile_app/models/order.dart';
 import 'package:ofypets_mobile_app/models/line_item.dart';
 import 'package:ofypets_mobile_app/models/variant.dart';
+import 'package:ofypets_mobile_app/models/product.dart';
+import 'package:ofypets_mobile_app/models/option_value.dart';
+import 'package:ofypets_mobile_app/models/option_type.dart';
+import 'package:ofypets_mobile_app/screens/product_detail.dart';
 
 mixin CartModel on Model {
   List<LineItem> _lineItems = [];
@@ -24,20 +31,129 @@ mixin CartModel on Model {
     return _isLoading;
   }
 
+  void setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
+  }
+
+  void getProductDetail(String slug, BuildContext context) async {
+    Map<String, String> headers = await getHeaders();
+    Map<String, dynamic> responseBody = Map();
+    Product tappedProduct = Product();
+
+    setLoading(true);
+    
+    http.Response response = await http.get(
+        Settings.SERVER_URL +
+            'api/v1/products/$slug?data_set=large',
+        headers: headers);
+
+    responseBody = json.decode(response.body);
+
+    List<Product> variants = [];
+    List<OptionValue> optionValues = [];
+    List<OptionType> optionTypes = [];
+
+    int reviewProductId = responseBody['data']['attributes']["id"];
+    variants = [];
+    if (responseBody['data']['attributes']['has_variants']) {
+      responseBody['data']['included']['variants'].forEach((variant) {
+        optionValues = [];
+        optionTypes = [];
+        variant['data']['included']['option_values'].forEach((option) {
+          // setState(() {
+            optionValues.add(OptionValue(
+              id: option['data']['attributes']['id'],
+              name: option['data']['attributes']['name'],
+              optionTypeId: option['data']['attributes']['option_type_id'],
+              optionTypeName: option['data']['attributes']['option_type_name'],
+              optionTypePresentation: option['data']['attributes']
+                  ['option_type_presentation'],
+            ));
+          // });
+        });
+        // setState(() {
+          variants.add(Product(
+              id: variant['data']['attributes']['id'],
+              name: variant['data']['attributes']['name'],
+              description: variant['data']['attributes']['description'],
+              optionValues: optionValues,
+              displayPrice: variant['data']['attributes']['display_price'],
+              image: variant['data']['included']['images'][0]['data']
+                  ['attributes']['product_url'],
+              isOrderable: variant['data']['attributes']['is_orderable'],
+              avgRating: double.parse(
+                  responseBody['data']['attributes']['avg_rating']),
+              reviewsCount: responseBody['data']['attributes']['reviews_count']
+                  .toString(),
+              reviewProductId: reviewProductId));
+        // });
+      });
+      responseBody['data']['included']['option_types'].forEach((optionType) {
+        // setState(() {
+          optionTypes.add(OptionType(
+              id: optionType['data']['attributes']['id'],
+              name: optionType['data']['attributes']['name'],
+              position: optionType['data']['attributes']['position'],
+              presentation: optionType['data']['attributes']['presentation']));
+        // });
+      });
+      // setState(() {
+        tappedProduct = Product(
+            name: responseBody['data']['attributes']['name'],
+            displayPrice: responseBody['data']['attributes']['display_price'],
+            avgRating:
+                double.parse(responseBody['data']['attributes']['avg_rating']),
+            reviewsCount:
+                responseBody['data']['attributes']['reviews_count'].toString(),
+            image: responseBody['data']['included']['master']['data']
+                ['included']['images'][0]['data']['attributes']['product_url'],
+            variants: variants,
+            reviewProductId: reviewProductId,
+            hasVariants: responseBody['data']['attributes']['has_variants'],
+            optionTypes: optionTypes,
+            taxonId: responseBody['data']['attributes']['taxon_ids'].first,
+            );
+      // });
+    } else {
+      // setState(() {
+        tappedProduct = Product(
+          id: responseBody['data']['included']['id'],
+          name: responseBody['data']['attributes']['name'],
+          displayPrice: responseBody['data']['attributes']['display_price'],
+          avgRating:
+              double.parse(responseBody['data']['attributes']['avg_rating']),
+          reviewsCount:
+              responseBody['data']['attributes']['reviews_count'].toString(),
+          image: responseBody['data']['included']['master']['data']['included']
+              ['images'][0]['data']['attributes']['product_url'],
+          hasVariants: responseBody['data']['attributes']['has_variants'],
+          isOrderable: responseBody['data']['included']['master']['data']
+              ['attributes']['is_orderable'],
+          reviewProductId: reviewProductId,
+          description: responseBody['data']['attributes']['description'],
+          taxonId: responseBody['data']['attributes']['taxon_ids'].first,
+        );
+      // });
+    }
+    setLoading(false);
+
+    MaterialPageRoute route = MaterialPageRoute(
+        builder: (context) => ProductDetailScreen(tappedProduct));
+    Navigator.push(context, route);
+  }
+
   void addProduct({int variantId, int quantity}) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     _lineItems.clear();
     _isLoading = true;
     notifyListeners();
-    print('ADD TO CART');
     final String orderToken = prefs.getString('orderToken');
 
     if (orderToken != null) {
-      print('ORDER TOKEN AVAILABLE');
       createNewLineItem(variantId, quantity);
     } else {
-      print('ORDER TOKEN UNAVAILABLE, FETCH TOKEN ');
       createNewOrder(variantId, quantity);
     }
     notifyListeners();
@@ -118,8 +234,6 @@ mixin CartModel on Model {
     if (url != '') {
       _lineItems = [];
       http.get(Settings.SERVER_URL + url, headers: headers).then((response) {
-        print(
-            '------------------------- RESPONSE ------------------------------');
         responseBody = json.decode(response.body);
         responseBody['line_items'].forEach((lineItem) {
           variant = Variant(
@@ -220,4 +334,5 @@ mixin CartModel on Model {
     order = null;
     notifyListeners();
   }
+
 }

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:scoped_model/scoped_model.dart';
+
 import 'package:ofypets_mobile_app/models/category.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
@@ -10,8 +12,9 @@ import 'package:ofypets_mobile_app/screens/search.dart';
 import 'package:ofypets_mobile_app/utils/color_list.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
-import 'package:ofypets_mobile_app/widgets/product_container_for_pagination.dart';
+import 'package:ofypets_mobile_app/widgets/product_container.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 
 class CategoryListing extends StatefulWidget {
   final String categoryName;
@@ -141,72 +144,77 @@ class _CategoryListingState extends State<CategoryListing> {
   @override
   Widget build(BuildContext context) {
     _deviceSize = MediaQuery.of(context).size;
-    return WillPopScope(
-      onWillPop: () => _canLeave(),
-      child: Scaffold(
-          key: _scaffoldKey,
-          appBar: AppBar(
-            title: Text('Shop'),
-            elevation: 0.0,
-            actions: <Widget>[
-              IconButton(
-                icon: Icon(Icons.search),
-                onPressed: () {
-                  MaterialPageRoute route =
-                      MaterialPageRoute(builder: (context) => ProductSearch());
-                  Navigator.of(context).push(route);
-                },
-              ),
-              shoppingCartIconButton()
-            ],
-          ),
-          drawer: HomeDrawer(),
-          endDrawer: filterDrawer(),
-          body: Stack(
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 50.0),
-                child: !_isLoading ? body(level) : Container(),
-              ),
-              Container(
-                color: Colors.green,
-                height: 50.0,
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.only(
-                        left: 70,
-                      ),
-                      height: 30.0,
-                      alignment: Alignment.centerLeft,
-                      child: headerRow(),
-                    ),
-                  ],
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return WillPopScope(
+        onWillPop: () => _canLeave(),
+        child: Scaffold(
+            key: _scaffoldKey,
+            appBar: AppBar(
+              title: Text('Shop'),
+              elevation: 0.0,
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () {
+                    MaterialPageRoute route = MaterialPageRoute(
+                        builder: (context) => ProductSearch());
+                    Navigator.of(context).push(route);
+                  },
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 50.0),
-                child: _isLoading ? LinearProgressIndicator() : Container(),
-              ),
-              level == 2
-                  ? Container(
-                      padding: EdgeInsets.only(right: 20.0, top: 15.0),
-                      alignment: Alignment.topRight,
-                      child: FloatingActionButton(
-                        onPressed: () {
-                          _scaffoldKey.currentState.openEndDrawer();
-                        },
-                        child: Icon(
-                          Icons.filter_list,
-                          color: Colors.white,
+                shoppingCartIconButton()
+              ],
+            ),
+            drawer: HomeDrawer(),
+            endDrawer: filterDrawer(),
+            body: Stack(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(top: 50.0),
+                  child: !_isLoading ? body(level) : Container(),
+                ),
+                Container(
+                  color: Colors.green,
+                  height: 50.0,
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(
+                          left: 70,
                         ),
-                        backgroundColor: Colors.orange,
+                        height: 30.0,
+                        alignment: Alignment.centerLeft,
+                        child: headerRow(),
                       ),
-                    )
-                  : Container(),
-            ],
-          )),
-    );
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 50.0),
+                  child: model.isLoading || _isLoading
+                      ? LinearProgressIndicator()
+                      : Container(),
+                ),
+                level == 2
+                    ? Container(
+                        padding: EdgeInsets.only(right: 20.0, top: 15.0),
+                        alignment: Alignment.topRight,
+                        child: FloatingActionButton(
+                          onPressed: () {
+                            _scaffoldKey.currentState.openEndDrawer();
+                          },
+                          child: Icon(
+                            Icons.filter_list,
+                            color: Colors.white,
+                          ),
+                          backgroundColor: Colors.orange,
+                        ),
+                      )
+                    : Container(),
+              ],
+            )),
+      );
+    });
   }
 
   Widget filterDrawer() {
@@ -493,7 +501,7 @@ class _CategoryListingState extends State<CategoryListing> {
     responseBody = json.decode(response);
     print(responseBody);
     responseBody['products'].forEach((product) {
-      int review_product_id = product["id"];
+      int reviewProductId = product["id"];
       variants = [];
       if (product['has_variants']) {
         product['variants'].forEach((variant) {
@@ -510,6 +518,7 @@ class _CategoryListingState extends State<CategoryListing> {
           });
 
           variants.add(Product(
+              slug: variant['slug'],
               id: variant['id'],
               name: variant['name'],
               description: variant['description'],
@@ -519,7 +528,7 @@ class _CategoryListingState extends State<CategoryListing> {
               isOrderable: variant['is_orderable'],
               avgRating: double.parse(product['avg_rating']),
               reviewsCount: product['reviews_count'].toString(),
-              reviewProductId: review_product_id));
+              reviewProductId: reviewProductId));
         });
         product['option_types'].forEach((optionType) {
           optionTypes.add(OptionType(
@@ -530,6 +539,7 @@ class _CategoryListingState extends State<CategoryListing> {
         });
 
         productsByCategory.add(Product(
+            slug: product['slug'],
             taxonId: product['taxon_ids'].first,
             id: product['id'],
             name: product['name'],
@@ -538,11 +548,12 @@ class _CategoryListingState extends State<CategoryListing> {
             reviewsCount: product['reviews_count'].toString(),
             image: product['master']['images'][0]['product_url'],
             variants: variants,
-            reviewProductId: review_product_id,
+            reviewProductId: reviewProductId,
             hasVariants: product['has_variants'],
             optionTypes: optionTypes));
       } else {
         productsByCategory.add(Product(
+          slug: product['slug'],
           taxonId: product['taxon_ids'].first,
           id: product['id'],
           name: product['name'],
@@ -552,7 +563,7 @@ class _CategoryListingState extends State<CategoryListing> {
           image: product['master']['images'][0]['product_url'],
           hasVariants: product['has_variants'],
           isOrderable: product['master']['is_orderable'],
-          reviewProductId: review_product_id,
+          reviewProductId: reviewProductId,
           description: product['description'],
         ));
       }

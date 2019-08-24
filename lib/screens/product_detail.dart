@@ -785,7 +785,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         .then((response) {
       responseBody = json.decode(response.body);
       responseBody['products'].forEach((product) {
-        int review_product_id = product["id"];
+        int reviewProductId = product["id"];
         variants = [];
         if (product['has_variants']) {
           product['variants'].forEach((variant) {
@@ -813,7 +813,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   isOrderable: variant['is_orderable'],
                   avgRating: double.parse(product['avg_rating']),
                   reviewsCount: product['reviews_count'].toString(),
-                  reviewProductId: review_product_id));
+                  reviewProductId: reviewProductId));
             });
           });
           product['option_types'].forEach((optionType) {
@@ -835,7 +835,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 reviewsCount: product['reviews_count'].toString(),
                 image: product['master']['images'][0]['product_url'],
                 variants: variants,
-                reviewProductId: review_product_id,
+                reviewProductId: reviewProductId,
                 hasVariants: product['has_variants'],
                 optionTypes: optionTypes));
           });
@@ -851,7 +851,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               image: product['master']['images'][0]['product_url'],
               hasVariants: product['has_variants'],
               isOrderable: product['master']['is_orderable'],
-              reviewProductId: review_product_id,
+              reviewProductId: reviewProductId,
               description: product['description'],
             ));
           });

@@ -39,6 +39,7 @@ class _PayubizScreenState extends State<PayubizScreen> {
   @override
   Widget build(BuildContext context) {
     flutterWebviewPlugin.onUrlChanged.listen((String url) {
+      print("CHANGED URL $url" );
       if (url.split('?')[0] == Settings.WEB_URL + 'checkout/order-success') {
         pushSuccessPage(true);
       } else if (url.split('?')[0] ==
