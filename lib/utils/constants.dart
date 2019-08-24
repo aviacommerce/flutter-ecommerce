@@ -2,7 +2,6 @@ class Settings {
   // static const String SERVER_URL = 'https://ofypets.indiepet.co.in/';
   // static const String WEB_URL = 'https://beta.ofypets.com/';
   static const String WEB_URL = 'https://www.ofypets.com/';
-
   static const String SERVER_URL = 'https://app.ofypets.com/';
 
 // static const String SERVER_URL = 'https://65c5b1df.ngrok.io/';
@@ -38,3 +37,4 @@ final String returnPolicyText8 =
 final String returnPolicyHeading9 = 'Shipping';
 final String returnPolicyText9 =
     'To return your product, you should mail your product to: 59 MN Nagar, Kolathur, Chennai, Tamil Nadu, INDIA 600099\n\nYou will be responsible for paying for your own shipping costs for returning your item. Shipping costs are non-refundable. If you receive a refund, the cost of return shipping will be deducted from your refund.\n\nDepending on where you live, the time it may take for your exchanged product to reach you, may vary. \n\nIf you are shipping an item over 1000 Rs, you should consider using a trackable shipping service or purchasing shipping insurance. We don’t guarantee that we will receive your returned item.';
+final fontFamily = 'RobotoCondensed';

@@ -279,9 +279,11 @@ class _CategoryListingState extends State<CategoryListing> {
                             ? subCatListForFilter[index]
                             : isFilterDataLoading
                                 ? progressBar()
-                                : subCatListForFilter[index]);
+                                : subCatListForFilter[index] != null
+                                    ? subCatListForFilter[index]
+                                    : progressBar());
                   },
-                  itemCount: categoryList.length,
+                  itemCount: categoryList != null ? categoryList.length : 0,
                 )),
           ),
         ],

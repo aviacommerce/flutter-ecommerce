@@ -77,6 +77,13 @@ flutter:
     - family: HolyFat
       fonts:
         - asset: fonts/Holyfat.ttf
+        - asset: fonts/RobotoCondensed-Regular.ttf
+    - family: RobotoCondensed
+      fonts:
+        - asset: fonts/RobotoCondensed-Regular.ttf
+        - asset: fonts/RobotoCondensed-Light.ttf
+        - asset: fonts/RobotoCondensed-Bold.ttf
+
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

@@ -104,9 +104,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         Text('Shop by Category',
                             style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 17,
                                 fontWeight: FontWeight.normal,
-                                color: Colors.black)),
+                                fontFamily: fontFamily)),
                       ],
                     ),
                   ))
@@ -162,9 +162,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         Text('Today\'s Deals',
                             style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 17,
                                 fontWeight: FontWeight.normal,
-                                color: Colors.black)),
+                                fontFamily: fontFamily)),
                       ],
                     ),
                   ))

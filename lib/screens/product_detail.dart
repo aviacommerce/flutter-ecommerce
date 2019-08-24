@@ -330,7 +330,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           Expanded(
             flex: 3,
             child: Container(
-              padding: EdgeInsets.only(bottom: 12.0),
               decoration: BoxDecoration(
                   border: Border(
                       bottom:
@@ -484,11 +483,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 Padding(
                   padding: const EdgeInsets.only(left: 10.0),
                   child: Text(
-                    'by ${selectedProduct.name.split(' ')[0]}',
+                    'By ${selectedProduct.name.split(' ')[0]}',
                     style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 17,
                         fontWeight: FontWeight.normal,
-                        color: Colors.green),
+                        color: Colors.green,
+                        fontFamily: fontFamily),
                   ),
                 ),
                 Expanded(
@@ -552,10 +552,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             ),
           ),
           Container(
+            alignment: Alignment.centerLeft,
             padding: EdgeInsets.all(10),
             child: Text(
               selectedProduct.name,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: fontFamily),
+              textAlign: TextAlign.start,
             ),
           ),
           variantRow(),
@@ -566,9 +571,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               padding: EdgeInsets.all(10),
               child: Text(
                 'Quantity: ',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
+                style: TextStyle(fontSize: 17, fontFamily: fontFamily),
               ),
             )),
             IconButton(
@@ -581,7 +584,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 }
               },
             ),
-            Text(quantity.toString()),
+            Text(
+              quantity.toString(),
+              style: TextStyle(fontFamily: fontFamily),
+            ),
             IconButton(
               icon: Icon(Icons.add),
               onPressed: () {
@@ -599,9 +605,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 padding: EdgeInsets.all(10),
                 child: Text(
                   'Price :',
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
+                  style: TextStyle(fontSize: 17, fontFamily: fontFamily),
                 ),
               ),
               Container(
@@ -610,20 +614,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 child: Text(
                   selectedProduct.displayPrice,
                   style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       color: Colors.red,
-                      fontWeight: FontWeight.bold),
+                      fontWeight: FontWeight.bold,
+                      fontFamily: fontFamily),
                 ),
               ),
             ],
           ),
           addToCartFlatButton(),
           Container(
-              padding: EdgeInsets.only(left: 8.0, top: 8.0),
+              padding: EdgeInsets.only(left: 10.0, top: 8.0),
               alignment: Alignment.centerLeft,
-              child: Text("Description",
-                  style:
-                      TextStyle(fontWeight: FontWeight.w700, fontSize: 15.0))),
+              child: Text("Description", style: TextStyle(fontSize: 15.0))),
           HtmlWidget(htmlDescription),
           Container(
               width: _deviceSize.width,
