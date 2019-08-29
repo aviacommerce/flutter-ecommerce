@@ -33,6 +33,7 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen>
     with SingleTickerProviderStateMixin {
+  bool discount = true;
   bool _isLoading = true;
   TabController _tabController;
   Size _deviceSize;
@@ -55,17 +56,23 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       if (widget.product.hasVariants) {
         _hasVariants = widget.product.hasVariants;
         selectedProduct = widget.product.variants.first;
+        discount = (double.parse(widget.product.variants.first.costPrice) -
+                            double.parse(widget.product.variants.first.price)) > 0? true: false;
         htmlDescription = widget.product.variants.first.description != null
             ? widget.product.variants.first.description
             : '';
       } else {
         selectedProduct = widget.product;
+        discount = (double.parse(widget.product.costPrice) -
+                            double.parse(widget.product.price)) > 0? true: false;
         htmlDescription = widget.product.description != null
             ? widget.product.description
             : '';
       }
     } else {
       selectedProduct = widget.product;
+      discount = (double.parse(widget.product.costPrice) -
+                            double.parse(widget.product.price)) > 0? true: false;
       htmlDescription =
           widget.product.description != null ? widget.product.description : '';
     }
@@ -391,6 +398,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       if (variant.optionValues[0] == optionValue) {
                         setState(() {
                           selectedProduct = variant;
+                          discount = (double.parse(variant.costPrice) -
+                            double.parse(variant.price)) > 0? true: false;
                         });
                       }
                     });
@@ -424,26 +433,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             children: optionValueNames,
           ),
         );
-        /*return ListView.builder(
-          shrinkWrap: true,
-          itemCount: 1,
-          itemBuilder: (context, index) {
-            return Container(
-              height: 60.0,
-              child: Column(children: [
-                optionTypeNames[index],
-                SingleChildScrollView(
-                    child: ListView(
-
-                  shrinkWrap: true,
-                  children: <Widget>[
-                    Row(children: optionValueNames),
-                  ],
-                ))
-              ]),
-            );
-          },
-        );*/
       } else {
         return Container();
       }
@@ -453,218 +442,216 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   }
 
   Widget highlightsTab() {
-    return SingleChildScrollView(
-      child: Column(
-        children: <Widget>[
-          Container(
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: Container(
-                    alignment: Alignment.center,
-                    height: 300,
-                    child: FadeInImage(
-                      image: NetworkImage(selectedProduct.image),
-                      placeholder: AssetImage(
-                          'images/placeholders/no-product-image.png'),
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Container(
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: 300,
+                      child: FadeInImage(
+                        image: NetworkImage(selectedProduct.image),
+                        placeholder: AssetImage(
+                            'images/placeholders/no-product-image.png'),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Divider(),
-          Container(
-            width: _deviceSize.width,
-            alignment: Alignment.centerRight,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.only(left: 10.0),
-                  child: Text(
-                    'By ${selectedProduct.name.split(' ')[0]}',
-                    style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.normal,
-                        color: Colors.green,
-                        fontFamily: fontFamily),
+            Divider(),
+            Container(
+              width: _deviceSize.width,
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10.0),
+                    child: Text(
+                      'By ${selectedProduct.name.split(' ')[0]}',
+                      style: TextStyle(
+                          fontSize: 17,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.green,
+                          fontFamily: fontFamily),
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: IconButton(
-                    padding: EdgeInsets.all(10),
-                    alignment: Alignment.topRight,
-                    icon: Icon(Icons.favorite),
-                    color: Colors.orange,
-                    onPressed: () async {
-                      final SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      String authToken = prefs.getString('spreeApiKey');
+                  Expanded(
+                    child: IconButton(
+                      padding: EdgeInsets.all(10),
+                      alignment: Alignment.topRight,
+                      icon: Icon(Icons.favorite),
+                      color: Colors.orange,
+                      onPressed: () async {
+                        final SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        String authToken = prefs.getString('spreeApiKey');
 
-                      if (authToken == null) {
-                        _scaffoldKey.currentState.showSnackBar(SnackBar(
-                          content: Text(
-                            'Please Login to add to Favorites',
-                          ),
-                          action: SnackBarAction(
-                            label: 'LOGIN',
-                            onPressed: () {
-                              MaterialPageRoute route = MaterialPageRoute(
-                                  builder: (context) => Authentication(0));
-                              Navigator.push(context, route);
-                            },
-                          ),
-                        ));
-                      } else {
-                        _scaffoldKey.currentState.showSnackBar(SnackBar(
-                          content: Text(
-                            'Adding to Favorites, please wait.',
-                          ),
-                          duration: Duration(seconds: 1),
-                        ));
-                        Map<String, String> headers = await getHeaders();
-                        http
-                            .post(Settings.SERVER_URL + 'favorite_products',
-                                body: json.encode({
-                                  'id':
-                                      widget.product.reviewProductId.toString()
-                                }),
-                                headers: headers)
-                            .then((response) {
-                          Map<dynamic, dynamic> responseBody =
-                              json.decode(response.body);
-
+                        if (authToken == null) {
                           _scaffoldKey.currentState.showSnackBar(SnackBar(
-                            content: Text(responseBody['message']),
+                            content: Text(
+                              'Please Login to add to Favorites',
+                            ),
+                            action: SnackBarAction(
+                              label: 'LOGIN',
+                              onPressed: () {
+                                MaterialPageRoute route = MaterialPageRoute(
+                                    builder: (context) => Authentication(0));
+                                Navigator.push(context, route);
+                              },
+                            ),
+                          ));
+                        } else {
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                            content: Text(
+                              'Adding to Favorites, please wait.',
+                            ),
                             duration: Duration(seconds: 1),
                           ));
-                        });
-                      }
-                    },
+                          Map<String, String> headers = await getHeaders();
+                          http
+                              .post(Settings.SERVER_URL + 'favorite_products',
+                                  body: json.encode({
+                                    'id': widget.product.reviewProductId
+                                        .toString()
+                                  }),
+                                  headers: headers)
+                              .then((response) {
+                            Map<dynamic, dynamic> responseBody =
+                                json.decode(response.body);
+
+                            _scaffoldKey.currentState.showSnackBar(SnackBar(
+                              content: Text(responseBody['message']),
+                              duration: Duration(seconds: 1),
+                            ));
+                          });
+                        }
+                      },
+                    ),
                   ),
-                ),
-                ratingBar(selectedProduct.avgRating, 20),
-                Container(
-                    margin: EdgeInsets.only(right: 10),
-                    child: Text(selectedProduct.reviewsCount)),
-              ],
+                  ratingBar(selectedProduct.avgRating, 20),
+                  Container(
+                      margin: EdgeInsets.only(right: 10),
+                      child: Text(selectedProduct.reviewsCount)),
+                ],
+              ),
             ),
-          ),
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: EdgeInsets.all(10),
-            child: Text(
-              selectedProduct.name,
-              style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: fontFamily),
-              textAlign: TextAlign.start,
-            ),
-          ),
-          variantRow(),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Expanded(
-                child: Container(
+            Container(
               alignment: Alignment.centerLeft,
               padding: EdgeInsets.all(10),
               child: Text(
-                'Quantity: ',
-                style: TextStyle(fontSize: 17, fontFamily: fontFamily),
+                selectedProduct.name,
+                style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: fontFamily),
+                textAlign: TextAlign.start,
               ),
-            )),
-            IconButton(
-              icon: Icon(Icons.remove),
-              onPressed: () {
-                if (quantity > 1) {
-                  setState(() {
-                    quantity = quantity - 1;
-                  });
-                }
-              },
             ),
-            Text(
-              quantity.toString(),
-              style: TextStyle(fontFamily: fontFamily),
-            ),
-            IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () {
-                setState(() {
-                  quantity = quantity + 1;
-                });
-              },
-            ),
-          ]),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Container(
+            variantRow(),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Expanded(
+                  child: Container(
                 alignment: Alignment.centerLeft,
                 padding: EdgeInsets.all(10),
                 child: Text(
-                  'Price :',
+                  'Quantity: ',
                   style: TextStyle(fontSize: 17, fontFamily: fontFamily),
                 ),
-              ),
-              Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  selectedProduct.displayPrice,
-                  style: TextStyle(
-                      fontSize: 17,
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: fontFamily),
-                ),
-              ),
-            ],
-          ),
-          addToCartFlatButton(),
-          Container(
-              padding: EdgeInsets.only(left: 10.0, top: 8.0),
-              alignment: Alignment.centerLeft,
-              child: Text("Description", style: TextStyle(fontSize: 15.0))),
-          HtmlWidget(htmlDescription),
-          Container(
-              width: _deviceSize.width,
-              color: Colors.white,
-              child: ListTile(
-                /* dense: true,
-                leading: Icon(
-                  Icons.shop,
-                  color: Colors.green,
-                ),*/
-                title: Text('Similar Products',
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black)),
               )),
-          _isLoading
-              ? Container(
-                  height: _deviceSize.height * 0.47,
-                  alignment: Alignment.center,
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.blue,
+              IconButton(
+                icon: Icon(Icons.remove),
+                onPressed: () {
+                  if (quantity > 1) {
+                    setState(() {
+                      quantity = quantity - 1;
+                    });
+                  }
+                },
+              ),
+              Text(
+                quantity.toString(),
+                style: TextStyle(fontFamily: fontFamily),
+              ),
+              IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () {
+                  setState(() {
+                    quantity = quantity + 1;
+                  });
+                },
+              ),
+            ]),
+            discount ?
+            buildPriceRow('M.R.P',
+                '${selectedProduct.currencySymbol} ${selectedProduct.costPrice}',
+                strike: true) : Container(),
+            buildPriceRow('Price', selectedProduct.displayPrice, strike: false),
+            discount ?
+            buildPriceRow(
+                'You Save:',
+                '${selectedProduct.currencySymbol}' +
+                    (double.parse(selectedProduct.costPrice) -
+                            double.parse(selectedProduct.price))
+                        .toString() +
+                    '(' +
+                    (((double.parse(selectedProduct.costPrice) -
+                                    double.parse(selectedProduct.price)) /
+                                double.parse(selectedProduct.costPrice)) *
+                            100)
+                        .round()
+                        .toString() +
+                    '%)', strike: false) : Container(),
+            addToCartFlatButton(),
+            Container(
+                padding: EdgeInsets.only(left: 10.0, top: 8.0),
+                alignment: Alignment.centerLeft,
+                child: Text("Description", style: TextStyle(fontSize: 15.0))),
+            HtmlWidget(htmlDescription),
+            Column(
+              children: <Widget>[
+                Container(
+                    width: _deviceSize.width,
+                    color: Colors.white,
+                    child: ListTile(
+                      title: Text('Similar Products',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black)),
+                    )),
+                model.isLoading ? LinearProgressIndicator() : Container()
+              ],
+            ),
+            _isLoading
+                ? Container(
+                    height: _deviceSize.height * 0.47,
+                    alignment: Alignment.center,
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.green,
+                    ),
+                  )
+                : Container(
+                    height: _deviceSize.height * 0.5,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: similarProducts.length,
+                      itemBuilder: (context, index) {
+                        return similarProductCard(
+                            index, similarProducts, _deviceSize, context);
+                      },
+                    ),
                   ),
-                )
-              : Container(
-                  height: _deviceSize.height * 0.5,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: similarProducts.length,
-                    itemBuilder: (context, index) {
-                      return similarProductCard(
-                          index, similarProducts, _deviceSize, context);
-                    },
-                  ),
-                ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 
   Widget addToCartFlatButton() {
@@ -753,29 +740,38 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     );
   }
 
-//  return ScopedModelDescendant<MainModel>(
-//       builder: (BuildContext context, Widget child, MainModel model) {
-//         return FloatingActionButton(
-//           child: Icon(
-//             Icons.shopping_cart,
-//             color: Colors.white,
-//           ),
-//           onPressed: () {
-//             Scaffold.of(context).showSnackBar(processSnackbar);
-//             selectedProduct.isOrderable
-//                 ? model.addProduct(
-//                 variantId: selectedProduct.id, quantity: quantity)
-//                 : null;
-//             if (!model.isLoading) {
-//               Scaffold.of(context).showSnackBar(completeSnackbar);
-//             }
-//           },
-//           backgroundColor:
-//           selectedProduct.isOrderable ? Colors.orange : Colors.grey,
-//         );
-//       },
-//     );
-//   }
+  Widget buildPriceRow(String key, String value, {bool strike}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Container(
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.all(10),
+          child: Text(
+            key,
+            style: TextStyle(
+              fontSize: 17,
+              fontFamily: fontFamily,
+            ),
+          ),
+        ),
+        Container(
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.all(10),
+          child: Text(
+            value,
+            style: TextStyle(
+                fontSize: 17,
+                color: strike? Colors.black: Colors.red,
+                fontWeight: FontWeight.bold,
+                fontFamily: fontFamily,
+                decoration:
+                    strike ? TextDecoration.lineThrough : TextDecoration.none),
+          ),
+        ),
+      ],
+    );
+  }
 
   getSimilarProducts() {
     Map<String, dynamic> responseBody = Map();
@@ -810,6 +806,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   id: variant['id'],
                   name: variant['name'],
                   description: variant['description'],
+                  slug: variant['slug'],
                   optionValues: optionValues,
                   displayPrice: variant['display_price'],
                   image: variant['images'][0]['product_url'],
@@ -833,6 +830,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 taxonId: product['taxon_ids'].first,
                 id: product['id'],
                 name: product['name'],
+                slug: product['slug'],
                 displayPrice: product['display_price'],
                 avgRating: double.parse(product['avg_rating']),
                 reviewsCount: product['reviews_count'].toString(),
@@ -848,6 +846,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               taxonId: product['taxon_ids'].first,
               id: product['id'],
               name: product['name'],
+              slug: product['slug'],
               displayPrice: product['display_price'],
               avgRating: double.parse(product['avg_rating']),
               reviewsCount: product['reviews_count'].toString(),

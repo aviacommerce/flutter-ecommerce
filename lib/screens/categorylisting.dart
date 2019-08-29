@@ -294,7 +294,9 @@ class _CategoryListingState extends State<CategoryListing> {
   List<Widget> progressBar() {
     List<Widget> progressBar = [];
     progressBar.add(
-      CircularProgressIndicator(),
+      CircularProgressIndicator(
+        backgroundColor: Colors.green,
+      ),
     );
     return progressBar;
   }
@@ -347,7 +349,7 @@ class _CategoryListingState extends State<CategoryListing> {
                 if (!hasMore) {
                   return Padding(
                     padding: EdgeInsets.symmetric(vertical: 25.0),
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(child: CircularProgressIndicator(backgroundColor: Colors.green,)),
                   );
                 } else {
                   return Container();

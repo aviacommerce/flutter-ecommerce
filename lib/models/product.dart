@@ -9,6 +9,8 @@ class Product {
   final String name;
   final String displayPrice;
   final String costPrice;
+  final String price;
+  final String currencySymbol;
   final String image;
   final double avgRating;
   final String reviewsCount;
@@ -28,6 +30,7 @@ class Product {
       this.name,
       this.displayPrice,
       this.costPrice,
+      this.price,
       this.image,
       this.avgRating,
       this.reviewsCount,
@@ -37,5 +40,6 @@ class Product {
       this.description,
       this.optionValues,
       this.reviewProductId,
-      this.optionTypes});
+      this.optionTypes,
+      this.currencySymbol});
 }

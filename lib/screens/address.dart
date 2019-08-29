@@ -35,9 +35,11 @@ class _AddressPageState extends State<AddressPage> {
             child: Column(
           children: <Widget>[
             FlatButton(
-              child: Text(model.order.shipAddress != null
-                  ? 'EDIT ADDRESS'
-                  : 'ADD ADDRESS'),
+              child: Text(model.isLoading
+                  ? ''
+                  : model.order.shipAddress != null
+                      ? 'EDIT ADDRESS'
+                      : 'ADD ADDRESS'),
               onPressed: () {
                 MaterialPageRoute payment = MaterialPageRoute(
                     builder: (context) =>
@@ -85,6 +87,7 @@ class _AddressPageState extends State<AddressPage> {
             if (stateChanged) {
               print('STATE IS CHANGED, FETCH CURRENT ORDER');
               model.fetchCurrentOrder();
+              model.getPaymentMethods();
               MaterialPageRoute payment =
                   MaterialPageRoute(builder: (context) => PaymentScreen());
               Navigator.push(context, payment);

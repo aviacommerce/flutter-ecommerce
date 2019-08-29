@@ -69,7 +69,9 @@ class _OrderResponseState extends State<OrderResponse> {
                     Navigator.popUntil(context,
                         ModalRoute.withName(Navigator.defaultRouteName));
                   } else {
-                    Navigator.of(context).pop();
+                    // Navigator.of(context).pop();
+                                        Navigator.popUntil(context,
+                        ModalRoute.withName(Navigator.defaultRouteName));
                   }
                 },
               ),
@@ -225,7 +227,7 @@ class _OrderResponseState extends State<OrderResponse> {
                   )
                 : Center(
                     child: CircularProgressIndicator(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Colors.green,
                   )),
           ));
     });

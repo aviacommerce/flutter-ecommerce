@@ -39,7 +39,7 @@ class _PayubizScreenState extends State<PayubizScreen> {
   @override
   Widget build(BuildContext context) {
     flutterWebviewPlugin.onUrlChanged.listen((String url) {
-      print("CHANGED URL $url" );
+      print("CHANGED URL $url");
       if (url.split('?')[0] == Settings.WEB_URL + 'checkout/order-success') {
         pushSuccessPage(true);
       } else if (url.split('?')[0] ==
@@ -49,11 +49,18 @@ class _PayubizScreenState extends State<PayubizScreen> {
     });
 
     return WillPopScope(
-      onWillPop: () async => (false),
+      onWillPop: () async {
+        pushSuccessPage(false);
+        return false;
+      },
       child: Scaffold(
           appBar: AppBar(
-            iconTheme: IconThemeData(
-              color: Colors.black, //change your color here
+            leading: IconButton(
+              color: Colors.black,
+              icon: Icon(Icons.arrow_back_ios),
+              onPressed: () {
+                pushSuccessPage(false);
+              },
             ),
             title: Text(
               'Payubiz',
@@ -68,7 +75,12 @@ class _PayubizScreenState extends State<PayubizScreen> {
           body: WebviewScaffold(
             url: widget.url,
             withJavascript: true,
-            // hidden: true,
+            hidden: true,
+            initialChild: Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.green,
+              ),
+            ),
           )),
     );
   }

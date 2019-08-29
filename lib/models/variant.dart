@@ -3,6 +3,7 @@ class Variant {
   final String displayPrice;
   final int quantity;
   final String name;
+  final String costPrice;
 
-  Variant({this.image, this.displayPrice, this.name, this.quantity});
+  Variant({this.image, this.displayPrice, this.name, this.quantity, this.costPrice});
 }

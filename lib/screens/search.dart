@@ -185,7 +185,7 @@ class _ProductSearchState extends State<ProductSearch> {
                                     padding:
                                         EdgeInsets.symmetric(vertical: 25.0),
                                     child: Center(
-                                        child: CircularProgressIndicator()),
+                                        child: CircularProgressIndicator(backgroundColor: Colors.green,)),
                                   );
                                 } else {
                                   return Container();

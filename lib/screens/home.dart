@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Product> todaysDealProducts = [];
   List<Category> categories = [];
   List<String> bannerImageUrls = [];
+  List<String> bannerLinks = [];
   int favCount;
 
   @override
@@ -119,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: _deviceSize.height * 0.5,
                     alignment: Alignment.center,
                     child: CircularProgressIndicator(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: Colors.green,
                     ),
                   )
                 ]))
@@ -177,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: _deviceSize.height * 0.47,
                     alignment: Alignment.center,
                     child: CircularProgressIndicator(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: Colors.green,
                     ),
                   )
                 ]))
@@ -250,24 +251,29 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
     } else {
-      return Container(
-        width: _deviceSize.width * 0.8,
-        child: Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-          elevation: 2,
-          margin: EdgeInsets.symmetric(
-              vertical: _deviceSize.height * 0.05,
-              horizontal: _deviceSize.width * 0.02),
-          child: ClipRRect(
-            borderRadius: BorderRadius.all(Radius.circular(4)),
-            child: FadeInImage(
-              image: NetworkImage(bannerImageUrls[index]),
-              placeholder: AssetImage('images/placeholders/slider1.jpg'),
-              fit: BoxFit.fill,
+      return GestureDetector(
+          onTap: () {
+            print(bannerLinks[index]);
+          },
+          child: Container(
+            width: _deviceSize.width * 0.8,
+            child: Card(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4)),
+              elevation: 2,
+              margin: EdgeInsets.symmetric(
+                  vertical: _deviceSize.height * 0.05,
+                  horizontal: _deviceSize.width * 0.02),
+              child: ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(4)),
+                child: FadeInImage(
+                  image: NetworkImage(bannerImageUrls[index]),
+                  placeholder: AssetImage('images/placeholders/slider1.jpg'),
+                  fit: BoxFit.fill,
+                ),
+              ),
             ),
-          ),
-        ),
-      );
+          ));
     }
   }
 
@@ -339,6 +345,7 @@ class _HomeScreenState extends State<HomeScreen> {
               variants.add(Product(
                   id: variant['id'],
                   name: variant['name'],
+                  slug: variant['slug'],
                   description: variant['description'],
                   optionValues: optionValues,
                   displayPrice: variant['display_price'],
@@ -363,6 +370,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 taxonId: product['taxon_ids'].first,
                 id: product['id'],
                 name: product['name'],
+                slug: product['slug'],
                 displayPrice: product['display_price'],
                 avgRating: double.parse(product['avg_rating']),
                 reviewsCount: product['reviews_count'].toString(),
@@ -378,6 +386,7 @@ class _HomeScreenState extends State<HomeScreen> {
               taxonId: product['taxon_ids'].first,
               id: product['id'],
               name: product['name'],
+              slug: product['slug'],
               displayPrice: product['display_price'],
               avgRating: double.parse(product['avg_rating']),
               reviewsCount: product['reviews_count'].toString(),
@@ -397,29 +406,34 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget searchBar() {
-    return GestureDetector(
-      onTap: () {
-        MaterialPageRoute route =
-            MaterialPageRoute(builder: (context) => ProductSearch());
-        Navigator.of(context).push(route);
-      },
-      child: Container(
-        decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(5)),
-        width: _deviceSize.width,
-        height: 49,
-        margin: EdgeInsets.all(010),
-        child: ListTile(
-          leading: Icon(Icons.search),
-          title: Text(
-            'Find the best for your pet...',
-            style: TextStyle(fontWeight: FontWeight.w300),
-          ),
-        ),
-      ),
-    );
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return GestureDetector(
+          onTap: () {
+            MaterialPageRoute route =
+                MaterialPageRoute(builder: (context) => ProductSearch());
+            Navigator.of(context).push(route);
+          },
+          child: Column(children: [
+            Container(
+              decoration: BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(5)),
+              width: _deviceSize.width,
+              height: 49,
+              margin: EdgeInsets.all(010),
+              child: ListTile(
+                leading: Icon(Icons.search),
+                title: Text(
+                  'Find the best for your pet...',
+                  style: TextStyle(fontWeight: FontWeight.w300),
+                ),
+              ),
+            ),
+            model.isLoading ? LinearProgressIndicator() : Container()
+          ]));
+    });
   }
 
   getBanners() async {
@@ -428,9 +442,12 @@ class _HomeScreenState extends State<HomeScreen> {
             'api/v1/taxonomies?q[name_cont]=Landing_Banner&set=nested')
         .then((response) {
       responseBody = json.decode(response.body);
+      print("============== Taxons ============");
+      print(responseBody);
       responseBody['taxonomies'][0]['root']['taxons'].forEach((banner) {
         setState(() {
           bannerImageUrls.add(banner['icon']);
+          bannerLinks.add(banner['meta_title']); //  meta_title
         });
       });
       setState(() {

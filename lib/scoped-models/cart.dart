@@ -8,7 +8,7 @@ import 'package:ofypets_mobile_app/models/option_value.dart';
 import 'package:ofypets_mobile_app/models/order.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/models/variant.dart';
-
+import 'package:ofypets_mobile_app/models/payment_methods.dart';
 import 'package:ofypets_mobile_app/screens/product_detail.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
@@ -19,11 +19,16 @@ mixin CartModel on Model {
   List<LineItem> _lineItems = [];
   Order order;
   bool _isLoading = false;
+  List<PaymentMethod> _paymentMethods = [];
 
   Map<dynamic, dynamic> lineItemObject = Map();
 
   List<LineItem> get lineItems {
     return List.from(_lineItems);
+  }
+
+  List<PaymentMethod> get paymentMethods {
+    return List.from(_paymentMethods);
   }
 
   bool get isLoading {
@@ -39,14 +44,17 @@ mixin CartModel on Model {
     Map<String, String> headers = await getHeaders();
     Map<String, dynamic> responseBody = Map();
     Product tappedProduct = Product();
-
-    setLoading(true);
+    _isLoading = true;
+    notifyListeners();
+    // setLoading(true);
 
     http.Response response = await http.get(
         Settings.SERVER_URL + 'api/v1/products/$slug?data_set=large',
         headers: headers);
 
     responseBody = json.decode(response.body);
+    print("PRODUCT DETAIL RESPONSE BODY");
+    print(responseBody);
 
     List<Product> variants = [];
     List<OptionValue> optionValues = [];
@@ -56,6 +64,8 @@ mixin CartModel on Model {
     variants = [];
     if (responseBody['data']['attributes']['has_variants']) {
       responseBody['data']['included']['variants'].forEach((variant) {
+        print(
+            "CURRENCY SYMBOL + ${variant['data']['attributes']['currency_symbol']}");
         optionValues = [];
         optionTypes = [];
         variant['data']['included']['option_values'].forEach((option) {
@@ -77,6 +87,10 @@ mixin CartModel on Model {
             description: variant['data']['attributes']['description'],
             optionValues: optionValues,
             displayPrice: variant['data']['attributes']['display_price'],
+            price: variant['data']['attributes']['price'],
+            currencySymbol: responseBody['data']['attributes']
+                ['currency_symbol'],
+            costPrice: variant['data']['attributes']['cost_price'],
             image: variant['data']['included']['images'][0]['data']
                 ['attributes']['product_url'],
             isOrderable: variant['data']['attributes']['is_orderable'],
@@ -100,6 +114,9 @@ mixin CartModel on Model {
       tappedProduct = Product(
         name: responseBody['data']['attributes']['name'],
         displayPrice: responseBody['data']['attributes']['display_price'],
+        currencySymbol: responseBody['data']['attributes']['currency_symbol'],
+        price: responseBody['data']['attributes']['price'],
+        costPrice: responseBody['data']['attributes']['cost_price'],
         avgRating:
             double.parse(responseBody['data']['attributes']['avg_rating']),
         reviewsCount:
@@ -119,6 +136,9 @@ mixin CartModel on Model {
         id: responseBody['data']['included']['id'],
         name: responseBody['data']['attributes']['name'],
         displayPrice: responseBody['data']['attributes']['display_price'],
+        price: responseBody['data']['attributes']['display_price'],
+        currencySymbol: responseBody['data']['attributes']['currency_symbol'],
+        costPrice: responseBody['data']['attributes']['cost_price'],
         avgRating:
             double.parse(responseBody['data']['attributes']['avg_rating']),
         reviewsCount:
@@ -138,7 +158,9 @@ mixin CartModel on Model {
     MaterialPageRoute route = MaterialPageRoute(
         builder: (context) => ProductDetailScreen(tappedProduct));
     Navigator.push(context, route);
-    setLoading(false);
+    // setLoading(false);
+    _isLoading = false;
+    notifyListeners();
   }
 
   void addProduct({int variantId, int quantity}) async {
@@ -303,6 +325,7 @@ mixin CartModel on Model {
   }
 
   Future<bool> completeOrder(int paymentMethodId) async {
+    print("COMPLETE ORDER $paymentMethodId");
     _isLoading = true;
     notifyListeners();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -319,9 +342,34 @@ mixin CartModel on Model {
             'api/v1/orders/${prefs.getString('orderNumber')}/payments?order_token=${prefs.getString('orderToken')}',
         body: json.encode(paymentPayload),
         headers: headers);
+    print(json.decode(response.body));
     _isLoading = false;
     notifyListeners();
     return true;
+  }
+
+  getPaymentMethods() async {
+    _paymentMethods = [];
+    _isLoading = true;
+    notifyListeners();
+    Map<dynamic, dynamic> responseBody;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, String> headers = await getHeaders();
+    http.Response response = await http.get(
+        Settings.SERVER_URL +
+            'api/v1/orders/${prefs.getString('orderNumber')}/payments/new?order_token=${prefs.getString('orderToken')}',
+        headers: headers);
+    responseBody = json.decode(response.body);
+    responseBody['payment_methods'].forEach((paymentMethodObj) {
+      if (paymentMethodObj['name'] == 'Payubiz' ||
+          paymentMethodObj['name'] == 'COD') {
+        _paymentMethods.add(PaymentMethod(
+            id: paymentMethodObj['id'], name: paymentMethodObj['name']));
+        notifyListeners();
+      }
+    });
+    _isLoading = false;
+    notifyListeners();
   }
 
   clearData() async {
@@ -332,5 +380,4 @@ mixin CartModel on Model {
     order = null;
     notifyListeners();
   }
-
 }
