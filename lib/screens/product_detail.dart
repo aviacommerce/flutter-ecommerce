@@ -57,14 +57,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         _hasVariants = widget.product.hasVariants;
         selectedProduct = widget.product.variants.first;
         discount = (double.parse(widget.product.variants.first.costPrice) -
-                            double.parse(widget.product.variants.first.price)) > 0? true: false;
+                    double.parse(widget.product.variants.first.price)) >
+                0
+            ? true
+            : false;
         htmlDescription = widget.product.variants.first.description != null
             ? widget.product.variants.first.description
             : '';
       } else {
         selectedProduct = widget.product;
         discount = (double.parse(widget.product.costPrice) -
-                            double.parse(widget.product.price)) > 0? true: false;
+                    double.parse(widget.product.price)) >
+                0
+            ? true
+            : false;
         htmlDescription = widget.product.description != null
             ? widget.product.description
             : '';
@@ -72,7 +78,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     } else {
       selectedProduct = widget.product;
       discount = (double.parse(widget.product.costPrice) -
-                            double.parse(widget.product.price)) > 0? true: false;
+                  double.parse(widget.product.price)) >
+              0
+          ? true
+          : false;
       htmlDescription =
           widget.product.description != null ? widget.product.description : '';
     }
@@ -399,7 +408,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                         setState(() {
                           selectedProduct = variant;
                           discount = (double.parse(variant.costPrice) -
-                            double.parse(variant.price)) > 0? true: false;
+                                      double.parse(variant.price)) >
+                                  0
+                              ? true
+                              : false;
                         });
                       }
                     });
@@ -588,26 +600,29 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 },
               ),
             ]),
-            discount ?
-            buildPriceRow('M.R.P',
-                '${selectedProduct.currencySymbol} ${selectedProduct.costPrice}',
-                strike: true) : Container(),
+            discount
+                ? buildPriceRow('M.R.P',
+                    '${selectedProduct.currencySymbol} ${selectedProduct.costPrice}',
+                    strike: true)
+                : Container(),
             buildPriceRow('Price', selectedProduct.displayPrice, strike: false),
-            discount ?
-            buildPriceRow(
-                'You Save:',
-                '${selectedProduct.currencySymbol}' +
-                    (double.parse(selectedProduct.costPrice) -
-                            double.parse(selectedProduct.price))
-                        .toString() +
-                    '(' +
-                    (((double.parse(selectedProduct.costPrice) -
-                                    double.parse(selectedProduct.price)) /
-                                double.parse(selectedProduct.costPrice)) *
-                            100)
-                        .round()
-                        .toString() +
-                    '%)', strike: false) : Container(),
+            discount
+                ? buildPriceRow(
+                    'You Save:',
+                    '${selectedProduct.currencySymbol}' +
+                        (double.parse(selectedProduct.costPrice) -
+                                double.parse(selectedProduct.price))
+                            .toString() +
+                        '(' +
+                        (((double.parse(selectedProduct.costPrice) -
+                                        double.parse(selectedProduct.price)) /
+                                    double.parse(selectedProduct.costPrice)) *
+                                100)
+                            .round()
+                            .toString() +
+                        '%)',
+                    strike: false)
+                : Container(),
             addToCartFlatButton(),
             Container(
                 padding: EdgeInsets.only(left: 10.0, top: 8.0),
@@ -644,7 +659,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       itemCount: similarProducts.length,
                       itemBuilder: (context, index) {
                         return similarProductCard(
-                            index, similarProducts, _deviceSize, context);
+                            index, similarProducts, _deviceSize, context, true);
                       },
                     ),
                   ),
@@ -762,7 +777,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             value,
             style: TextStyle(
                 fontSize: 17,
-                color: strike? Colors.black: Colors.red,
+                color: strike ? Colors.black : Colors.red,
                 fontWeight: FontWeight.bold,
                 fontFamily: fontFamily,
                 decoration:

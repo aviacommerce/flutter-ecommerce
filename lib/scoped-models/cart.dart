@@ -6,9 +6,9 @@ import 'package:ofypets_mobile_app/models/line_item.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
 import 'package:ofypets_mobile_app/models/order.dart';
+import 'package:ofypets_mobile_app/models/payment_methods.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/models/variant.dart';
-import 'package:ofypets_mobile_app/models/payment_methods.dart';
 import 'package:ofypets_mobile_app/models/address.dart';
 import 'package:ofypets_mobile_app/screens/product_detail.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
@@ -47,7 +47,8 @@ mixin CartModel on Model {
     notifyListeners();
   }
 
-  void getProductDetail(String slug, BuildContext context) async {
+  void getProductDetail(String slug, BuildContext context,
+      [bool isSimilarListing = false]) async {
     Map<String, String> headers = await getHeaders();
     Map<String, dynamic> responseBody = Map();
     Product tappedProduct = Product();
@@ -164,6 +165,7 @@ mixin CartModel on Model {
 
     MaterialPageRoute route = MaterialPageRoute(
         builder: (context) => ProductDetailScreen(tappedProduct));
+    if (isSimilarListing) Navigator.pop(context);
     Navigator.push(context, route);
     // setLoading(false);
     _isLoading = false;

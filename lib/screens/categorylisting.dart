@@ -189,11 +189,14 @@ class _CategoryListingState extends State<CategoryListing> {
                         ),
                         height: 30.0,
                         alignment: Alignment.centerLeft,
-                        child: ListView(
-                          scrollDirection: Axis.horizontal,
-                          children: <Widget>[
-                            headerRow(),
-                          ],
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 10.0),
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            children: <Widget>[
+                              headerRow(),
+                            ],
+                          ),
                         ),
                       ),
                     ],

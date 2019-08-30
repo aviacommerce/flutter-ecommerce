@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:scoped_model/scoped_model.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/widgets/todays_deals_card.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 Widget similarProductCard(int index, List<Product> todaysDealProducts,
-    Size _deviceSize, BuildContext context) {
+    Size _deviceSize, BuildContext context,
+    [bool isSimilarListing = false]) {
   Product displayProduct = todaysDealProducts[index].hasVariants
       ? todaysDealProducts[index].variants.first
       : todaysDealProducts[index];
@@ -14,7 +15,7 @@ Widget similarProductCard(int index, List<Product> todaysDealProducts,
       builder: (BuildContext context, Widget child, MainModel model) {
     return GestureDetector(
         onTap: () {
-          model.getProductDetail(todaysDealProducts[index].slug, context);
+          model.getProductDetail(todaysDealProducts[index].slug, context, true);
           // MaterialPageRoute addressRoute = MaterialPageRoute(
           //     builder: (context) =>
           //         ProductDetailScreen(todaysDealProducts[index]));

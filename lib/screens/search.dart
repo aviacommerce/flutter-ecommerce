@@ -96,61 +96,79 @@ class _ProductSearchState extends State<ProductSearch> {
           key: _scaffoldKey,
           appBar: AppBar(
             bottom: PreferredSize(
-              child: Stack(
-                children: [
+              child: Row(
+                children: <Widget>[
                   Container(
-                    width: MediaQuery.of(mainContext).size.width,
-                    height: 70,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      color: Colors.green,
-                    ),
-                    // margin: EdgeInsets.all(10),
-                  ),
-                  Container(
-                    width: MediaQuery.of(mainContext).size.width,
-                    height: 49,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5)),
-                    margin: EdgeInsets.all(10),
-                  ),
-                  Container(
-                    padding: EdgeInsets.only(left: 15),
-                    child: TextField(
-                      controller: _controller,
-                      onChanged: (value) {
-                        setState(() {
-                          slug = value;
-                        });
-                      },
-                      autofocus: true,
-                      decoration: InputDecoration(
-                          labelText: 'Find the best for your pet...',
-                          border: InputBorder.none,
-                          labelStyle: TextStyle(
-                              fontWeight: FontWeight.w300, fontSize: 18)),
-                    ),
-                  ),
-                  Container(
-                    height: 50,
-                    margin: EdgeInsets.all(10),
-                    width: MediaQuery.of(context).size.width,
-                    alignment: Alignment.centerRight,
+                    width: 30.0,
                     child: IconButton(
-                      icon: Icon(Icons.search),
-                      onPressed: () {
-                        FocusScope.of(mainContext)
-                            .requestFocus(new FocusNode());
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        }),
+                  ),
+                  Container(
+                    width: MediaQuery.of(mainContext).size.width - 40.0,
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(mainContext).size.width,
+                          height: 70,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            color: Colors.green,
+                          ),
+                          // margin: EdgeInsets.all(10),
+                        ),
+                        Container(
+                          width: MediaQuery.of(mainContext).size.width,
+                          height: 49,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(5)),
+                          margin: EdgeInsets.all(10),
+                        ),
+                        Container(
+                          padding: EdgeInsets.only(left: 15),
+                          child: TextField(
+                            controller: _controller,
+                            onChanged: (value) {
+                              setState(() {
+                                slug = value;
+                              });
+                            },
+                            autofocus: true,
+                            decoration: InputDecoration(
+                                labelText: 'Find the best for your pet...',
+                                border: InputBorder.none,
+                                labelStyle: TextStyle(
+                                    fontWeight: FontWeight.w300, fontSize: 18)),
+                          ),
+                        ),
+                        Container(
+                          height: 50,
+                          margin: EdgeInsets.all(10),
+                          width: MediaQuery.of(context).size.width,
+                          alignment: Alignment.centerRight,
+                          child: IconButton(
+                            icon: Icon(Icons.search),
+                            onPressed: () {
+                              FocusScope.of(mainContext)
+                                  .requestFocus(new FocusNode());
 
-                        isSearched = true;
-                        searchProducts = [];
-                        currentPage = 1;
-                        searchProduct();
-                      },
+                              isSearched = true;
+                              searchProducts = [];
+                              currentPage = 1;
+                              searchProduct();
+                            },
+                          ),
+                        )
+                      ],
                     ),
-                  )
+                  ),
                 ],
               ),
               preferredSize: Size.fromHeight(20),

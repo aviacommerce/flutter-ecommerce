@@ -103,7 +103,7 @@ class _AuthenticationState extends State<Authentication>
                     ? CircularProgressIndicator(backgroundColor: Colors.green)
                     : RaisedButton(
                         textColor: Colors.white,
-                        color: Colors.green.shade300,
+                        color: Colors.green,
                         child: Text('LOGIN'),
                         onPressed: () => _submitLogin(model),
                       ),
@@ -118,11 +118,10 @@ class _AuthenticationState extends State<Authentication>
                     }));
                   },
                   child: Text(
-                    'FORGET YOUR PASSWORD?',
+                    'FORGOT YOUR PASSWORD?',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green.shade300),
+                        fontWeight: FontWeight.bold, color: Colors.green),
                   ),
                 )
               ],
@@ -151,11 +150,10 @@ class _AuthenticationState extends State<Authentication>
                 height: 20.0,
               ),
               _isLoader
-                  ? CircularProgressIndicator(
-                      backgroundColor: Colors.green.shade300)
+                  ? CircularProgressIndicator(backgroundColor: Colors.green)
                   : RaisedButton(
                       textColor: Colors.white,
-                      color: Colors.green.shade300,
+                      color: Colors.green,
                       child: Text('SIGNUP'),
                       onPressed: () => _submitForm(),
                     ),
@@ -350,8 +348,8 @@ class _AuthenticationState extends State<Authentication>
       actions: <Widget>[
         FlatButton(
           child: Text('Okay',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold, color: Colors.green.shade300)),
+              style:
+                  TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
           onPressed: () {
             Navigator.of(context).pop();
           },
