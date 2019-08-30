@@ -2,12 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:scoped_model/scoped_model.dart';
-
 import 'package:ofypets_mobile_app/models/brand.dart';
 import 'package:ofypets_mobile_app/models/category.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
-
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
@@ -185,18 +182,16 @@ class _ProductSearchState extends State<ProductSearch> {
                                     padding:
                                         EdgeInsets.symmetric(vertical: 25.0),
                                     child: Center(
-                                        child: CircularProgressIndicator(backgroundColor: Colors.green,)),
+                                        child: CircularProgressIndicator(
+                                      backgroundColor: Colors.green,
+                                    )),
                                   );
                                 } else {
                                   return Container();
                                 }
                               }),
                         )
-                      : Center(
-                          child: CircularProgressIndicator(
-                            backgroundColor: Colors.green,
-                          ),
-                        ),
+                      : Container(),
               Container(
                 padding: EdgeInsets.only(right: 20.0, top: 15.0),
                 alignment: Alignment.topRight,

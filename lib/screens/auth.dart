@@ -1,12 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:scoped_model/scoped_model.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/home.dart';
-import 'package:ofypets_mobile_app/screens/forget_password.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/screens/forget_password.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Authentication extends StatefulWidget {
   final int index;
@@ -100,11 +100,10 @@ class _AuthenticationState extends State<Authentication>
                   height: 20.0,
                 ),
                 _isLoader
-                    ? CircularProgressIndicator(
-                        backgroundColor: Colors.green)
+                    ? CircularProgressIndicator(backgroundColor: Colors.green)
                     : RaisedButton(
                         textColor: Colors.white,
-                        color: Colors.orange,
+                        color: Colors.green.shade300,
                         child: Text('LOGIN'),
                         onPressed: () => _submitLogin(model),
                       ),
@@ -112,15 +111,11 @@ class _AuthenticationState extends State<Authentication>
                   height: 20.0,
                 ),
                 GestureDetector(
-                  onTap:(){
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context){
-                          return ForgetPassword();
-                          }
-                      )
-                    );
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return ForgetPassword();
+                    }));
                   },
                   child: Text(
                     'FORGET YOUR PASSWORD?',

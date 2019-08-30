@@ -2,19 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:scoped_model/scoped_model.dart';
-
 import 'package:ofypets_mobile_app/models/category.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/search.dart';
 import 'package:ofypets_mobile_app/utils/color_list.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
 import 'package:ofypets_mobile_app/widgets/product_container.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class CategoryListing extends StatefulWidget {
   final String categoryName;
@@ -133,12 +132,11 @@ class _CategoryListingState extends State<CategoryListing> {
               : Icon(Icons.radio_button_unchecked),*/
         ),
       ));
-      setState(() {
-        subCatListForFilter[currentIndex] = subCatList;
-        isFilterDataLoading = false;
-        // filterDrawer(subCatListForFilter);
-      });
     }
+    setState(() {
+      subCatListForFilter[currentIndex] = subCatList;
+      isFilterDataLoading = false;
+    });
   }
 
   @override
@@ -170,12 +168,12 @@ class _CategoryListingState extends State<CategoryListing> {
             body: Stack(
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(top: 50.0),
+                  padding: EdgeInsets.only(top: 59.0),
                   child: !_isLoading ? body(level) : Container(),
                 ),
                 Container(
                   color: Colors.green,
-                  height: 50.0,
+                  height: 59.0,
                   child: Column(
                     children: <Widget>[
                       Container(
@@ -184,20 +182,25 @@ class _CategoryListingState extends State<CategoryListing> {
                         ),
                         height: 30.0,
                         alignment: Alignment.centerLeft,
-                        child: headerRow(),
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: <Widget>[
+                            headerRow(),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: 50.0),
+                  padding: EdgeInsets.only(top: 59.0),
                   child: model.isLoading || _isLoading
                       ? LinearProgressIndicator()
                       : Container(),
                 ),
                 level == 2
                     ? Container(
-                        padding: EdgeInsets.only(right: 20.0, top: 15.0),
+                        padding: EdgeInsets.only(right: 20.0, top: 30.0),
                         alignment: Alignment.topRight,
                         child: FloatingActionButton(
                           onPressed: () {
@@ -281,7 +284,7 @@ class _CategoryListingState extends State<CategoryListing> {
                                 ? progressBar()
                                 : subCatListForFilter[index] != null
                                     ? subCatListForFilter[index]
-                                    : progressBar());
+                                    : emptyWidget());
                   },
                   itemCount: categoryList != null ? categoryList.length : 0,
                 )),
@@ -299,6 +302,12 @@ class _CategoryListingState extends State<CategoryListing> {
       ),
     );
     return progressBar;
+  }
+
+  List<Widget> emptyWidget() {
+    List<Widget> widgetList = [];
+    widgetList.add(Container());
+    return widgetList;
   }
 
   Widget body(int level) {
@@ -349,7 +358,10 @@ class _CategoryListingState extends State<CategoryListing> {
                 if (!hasMore) {
                   return Padding(
                     padding: EdgeInsets.symmetric(vertical: 25.0),
-                    child: Center(child: CircularProgressIndicator(backgroundColor: Colors.green,)),
+                    child: Center(
+                        child: CircularProgressIndicator(
+                      backgroundColor: Colors.green,
+                    )),
                   );
                 } else {
                   return Container();

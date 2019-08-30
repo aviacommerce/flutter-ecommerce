@@ -203,7 +203,7 @@ class _HomeDrawer extends State<HomeDrawer> {
                   Navigator.push(context, route);
                 },
               ),
-              Text('|',
+              Text(' | ',
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.w300)),
               GestureDetector(
