@@ -7,10 +7,12 @@ import 'package:scoped_model/scoped_model.dart';
 
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/models/address.dart';
 
 class UpdateAddress extends StatefulWidget {
-  final Map<String, dynamic> shipAddress;
-  UpdateAddress(this.shipAddress);
+  final bool order;
+  final dynamic shipAddress;
+  UpdateAddress(this.shipAddress, this.order);
   @override
   State<StatefulWidget> createState() {
     return _UpdateAddressState();
@@ -41,15 +43,24 @@ class _UpdateAddressState extends State<UpdateAddress> {
     // getUserInfo();
     super.initState();
     if (widget.shipAddress != null) {
-      selectedState = widget.shipAddress['state']['name'];
-      _firstName = widget.shipAddress['firstname'];
-      _lastName = widget.shipAddress['lastname'];
-      _address2 = widget.shipAddress['address2'];
-      _city = widget.shipAddress['city'];
-      _address1 = widget.shipAddress['address1'];
-      _mobile = widget.shipAddress['phone'];
-      _pincode = widget.shipAddress['zipcode'];
-      _stateId = widget.shipAddress['state_id'];
+      // selectedState = widget.shipAddress['state']['name'];
+      // _firstName = widget.shipAddress['firstname'];
+      // _lastName = widget.shipAddress['lastname'];
+      // _address2 = widget.shipAddress['address2'];
+      // _city = widget.shipAddress['city'];
+      // _address1 = widget.shipAddress['address1'];
+      // _mobile = widget.shipAddress['phone'];
+      // _pincode = widget.shipAddress['zipcode'];
+      // _stateId = widget.shipAddress['state_id'];
+      selectedState = widget.shipAddress.state;
+      _firstName = widget.shipAddress.firstName;
+      _lastName = widget.shipAddress.lastName;
+      _address2 = widget.shipAddress.address2;
+      _city = widget.shipAddress.city;
+      _address1 = widget.shipAddress.address1;
+      _mobile = widget.shipAddress.mobile;
+      _pincode = widget.shipAddress.pincode;
+      _stateId = widget.shipAddress.stateId;
     }
   }
 
@@ -61,11 +72,10 @@ class _UpdateAddressState extends State<UpdateAddress> {
               widget.shipAddress != null ? 'Update Address' : 'Add Address'),
         ),
         body: Card(
-            elevation: 5,
-            shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            margin: EdgeInsets.all(20),
-
+          elevation: 5,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: EdgeInsets.all(20),
           child: Form(
             key: _formKey,
             child: ListView(
@@ -81,21 +91,19 @@ class _UpdateAddressState extends State<UpdateAddress> {
                 buildMobileField('Mobile No. *'),
                 SizedBox(height: 20),
                 sendButton(),
-                SizedBox(height: 250,)
+                SizedBox(
+                  height: 250,
+                )
               ],
             ),
-
           ),
-        )
-        );
+        ));
   }
 
   Widget buildFirstNameField(String label) {
     return TextFormField(
-      validator: (String value)
-      {
-        if (value.isEmpty)
-        {
+      validator: (String value) {
+        if (value.isEmpty) {
           return 'First Name is required';
         }
       },
@@ -364,35 +372,67 @@ class _UpdateAddressState extends State<UpdateAddress> {
             "address2": _address2,
             "city": _city,
             "address1": _address1,
-            "phone":  _mobile,
+            "phone": _mobile,
             "zipcode": _pincode,
             "state_name": selectedState,
             "state_id": _stateId,
             "country_id": '105'
           };
 
-          if (widget.shipAddress != null) {
-            url =
-                'api/v1/orders/${prefs.getString('orderNumber')}/addresses/${widget.shipAddress['id']}';
-            data = {"address_params": address};
+          if (widget.order) {
+            print("ORDER ADDRESS");
+            if (widget.shipAddress != null) {
+              print("SHIP ADDRESS ID ${widget.shipAddress.id}");
+              print("ORDER NUMBER ${prefs.getString('orderNumber')}");
+
+              url =
+                  'api/v1/orders/${prefs.getString('orderNumber')}/addresses/${widget.shipAddress.id}';
+              data = {"address_params": address};
+            } else {
+              url =
+                  'api/v1/checkouts/${prefs.getString('orderNumber')}.json?order_token=${prefs.getString('orderToken')}';
+              data = {
+                "order": {
+                  "bill_address_attributes": address,
+                  "ship_address_attributes": address
+                }
+              };
+            }
           } else {
-            url =
-                'api/v1/checkouts/${prefs.getString('orderNumber')}.json?order_token=${prefs.getString('orderToken')}';
+            print("PROFILE ADDRESS");
+            url = "address/update_address";
             data = {
-              "order": {
-                "bill_address_attributes": address,
-                "ship_address_attributes": address
+              "user": {
+                "email": prefs.getString('email'),
+                "ship_address": address
               }
             };
           }
 
-          http.Response response = await http.put(Settings.SERVER_URL + url,
-              headers: headers, body: json.encode(data));
-          updateResponse = json.decode(response.body);
-
-          if (updateResponse.containsKey('id')) {
-            await model.fetchCurrentOrder();
-            Navigator.pop(context);
+          print("UPDATE ADDRESS RESPONSE $updateResponse");
+          if (widget.order) {
+            print("HEADERS $headers");
+            print("URL $url");
+            print("DATA $data");
+            http.Response response = await http.put(Settings.SERVER_URL + url,
+                headers: headers, body: json.encode(data));
+            print(response.body);
+            updateResponse = json.decode(response.body);
+            if (updateResponse.containsKey('id')) {
+              await model.fetchCurrentOrder();
+              await model.getAddress();
+              Navigator.pop(context);
+            }
+          } else {
+            http.Response response = await http.post(Settings.SERVER_URL + url,
+                headers: headers, body: json.encode(data));
+            print(response.body);
+            updateResponse = json.decode(response.body);
+            if (updateResponse['status'] == 'Address updated Successfully!') {
+              await model.fetchCurrentOrder();
+              await model.getAddress();
+              Navigator.pop(context);
+            }
           }
         },
         child: Text(

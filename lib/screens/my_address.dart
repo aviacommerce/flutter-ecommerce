@@ -32,17 +32,17 @@ class _MyAddressPageState extends State<MyAddressPage> {
             child: Column(
           children: <Widget>[
             FlatButton(
-              child: Text(model.order.shipAddress != null
+              child: Text(model.shipAddress != null
                   ? 'EDIT ADDRESS'
                   : 'ADD ADDRESS'),
               onPressed: () {
                 MaterialPageRoute payment = MaterialPageRoute(
                     builder: (context) =>
-                        UpdateAddress(model.order.shipAddress));
+                        UpdateAddress(model.shipAddress, false));
                 Navigator.push(context, payment);
               },
             ),
-            addressContainer(),
+            model.shipAddress != null ? addressContainer() : Container(),
           ],
         )),
       );
@@ -63,7 +63,7 @@ class _MyAddressPageState extends State<MyAddressPage> {
   Widget addressContainer() {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-      if (model.order.shipAddress != null) {
+      if (model.shipAddress != null) {
         return Container(
           width: MediaQuery.of(context).size.width,
           child: Card(
@@ -78,21 +78,21 @@ class _MyAddressPageState extends State<MyAddressPage> {
                     height: 10,
                   ),
                   Text(
-                    model.order.shipAddress['full_name'],
+                    model.shipAddress.firstName +' ' +model.shipAddress.lastName,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.left,
                   ),
-                  textFieldContainer(model.order.shipAddress['address1']),
-                  textFieldContainer(model.order.shipAddress['address2']),
-                  textFieldContainer(model.order.shipAddress['city'] +
+                  textFieldContainer(model.shipAddress.address1),
+                  textFieldContainer(model.shipAddress.address2),
+                  textFieldContainer(model.shipAddress.city +
                       ' - ' +
-                      model.order.shipAddress['zipcode']),
-                  textFieldContainer(model.order.shipAddress['state']['name']),
+                      model.shipAddress.pincode),
+                  textFieldContainer(model.shipAddress.state),
                   textFieldContainer(
-                      'Mobile: ' + ' - ' + model.order.shipAddress['phone']),
+                      'Mobile: ' + ' - ' + model.shipAddress.mobile),
                 ],
               ),
             ),

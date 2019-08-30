@@ -43,7 +43,7 @@ class _AddressPageState extends State<AddressPage> {
               onPressed: () {
                 MaterialPageRoute payment = MaterialPageRoute(
                     builder: (context) =>
-                        UpdateAddress(model.order.shipAddress));
+                        UpdateAddress(model.order.shipAddress, true));
                 Navigator.push(context, payment);
               },
             ),
@@ -127,28 +127,27 @@ class _AddressPageState extends State<AddressPage> {
                     height: 10,
                   ),
                   Text(
-                    model.order.shipAddress['full_name'],
+                    model.order.shipAddress.firstName + ' ' + model.order.shipAddress.lastName,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.left,
                   ),
-                  textFieldContainer(model.order.shipAddress['address1']),
-                  textFieldContainer(model.order.shipAddress['address2']),
-                  textFieldContainer(model.order.shipAddress['city'] +
+                  textFieldContainer(model.order.shipAddress.address1),
+                  textFieldContainer(model.order.shipAddress.address2),
+                  textFieldContainer(model.order.shipAddress.city +
                       ' - ' +
-                      model.order.shipAddress['zipcode']),
-                  textFieldContainer(model.order.shipAddress['state']['name']),
+                      model.order.shipAddress.pincode),
+                  textFieldContainer(model.order.shipAddress.state),
                   textFieldContainer(
-                      'Mobile: ' + ' - ' + model.order.shipAddress['phone']),
+                      'Mobile: ' + ' - ' + model.order.shipAddress.mobile),
                 ],
               ),
             ),
           ),
         );
-      } else
-        return Container();
+      } else return Container();
     });
   }
 }

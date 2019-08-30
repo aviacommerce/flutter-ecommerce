@@ -12,6 +12,8 @@ import 'package:ofypets_mobile_app/widgets/product_container.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProductSearch extends StatefulWidget {
+  final String slug;
+  ProductSearch({this.slug});
   @override
   State<StatefulWidget> createState() {
     return _ProductSearchState();
@@ -66,6 +68,16 @@ class _ProductSearchState extends State<ProductSearch> {
     super.initState();
     _dropDownMenuItems = getDropDownMenuItems();
     _currentItem = _dropDownMenuItems[0].value;
+    if (widget.slug != null) {
+      print("SLUG AVAILABLE ${widget.slug}");
+      setState(() {
+        slug = widget.slug;
+        isSearched = true;
+        searchProducts = [];
+        currentPage = 1;
+      });
+      searchProduct();
+    }
     scrollController.addListener(() {
       if (scrollController.position.maxScrollExtent ==
           scrollController.offset) {
@@ -214,7 +226,7 @@ class _ProductSearchState extends State<ProductSearch> {
   Future<List<Product>> searchProduct([String sortBy]) async {
     Map<String, String> headers = await getHeaders();
     Map<String, dynamic> responseBody = Map();
-    print('SENDING REQUEST');
+    print('SENDING REQUEST $slug');
     setState(() {
       hasMore = false;
     });
@@ -225,6 +237,7 @@ class _ProductSearchState extends State<ProductSearch> {
               'api/v1/products?q[name_cont_all]=$slug&page=$currentPage&per_page=$perPage&q[s]=$sortBy&data_set=small',
           headers: headers);
     } else {
+      print("searching $slug");
       response = await http.get(
           Settings.SERVER_URL +
               'api/v1/products?q[name_cont_all]=$slug&page=$currentPage&per_page=$perPage&data_set=small',
@@ -232,6 +245,8 @@ class _ProductSearchState extends State<ProductSearch> {
     }
     currentPage++;
     responseBody = json.decode(response.body);
+    print("got response");
+    print(responseBody);
     responseBody['data'].forEach((searchObj) {
       searchProducts.add(Product(
           reviewProductId: searchObj['id'],
@@ -247,6 +262,9 @@ class _ProductSearchState extends State<ProductSearch> {
       hasMore = true;
       _isLoading = false;
     });
+
+    print(hasMore);
+    print(searchProducts.length);
 
     return searchProducts;
   }

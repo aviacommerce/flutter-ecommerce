@@ -9,6 +9,7 @@ import 'package:ofypets_mobile_app/models/order.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/models/variant.dart';
 import 'package:ofypets_mobile_app/models/payment_methods.dart';
+import 'package:ofypets_mobile_app/models/address.dart';
 import 'package:ofypets_mobile_app/screens/product_detail.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
@@ -16,6 +17,8 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 mixin CartModel on Model {
+  bool hi = false;
+
   List<LineItem> _lineItems = [];
   Order order;
   bool _isLoading = false;
@@ -33,6 +36,10 @@ mixin CartModel on Model {
 
   bool get isLoading {
     return _isLoading;
+  }
+
+  bool get hii {
+    return hi;
   }
 
   void setLoading(bool loading) {
@@ -240,6 +247,7 @@ mixin CartModel on Model {
     String url = '';
     LineItem lineItem;
     Variant variant;
+    Address shipAddress;
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String orderToken = prefs.getString('orderToken');
     final String spreeApiKey = prefs.getString('spreeApiKey');
@@ -272,6 +280,22 @@ mixin CartModel on Model {
           _lineItems.add(lineItem);
           notifyListeners();
         });
+        if (responseBody['ship_address'] != null) {
+          shipAddress = Address(
+            id: responseBody['ship_address']['id'],
+            firstName: responseBody['ship_address']['firstname'],
+            lastName: responseBody['ship_address']['lastname'],
+            state: responseBody['ship_address']['state']['name'],
+            address2: responseBody['ship_address']['address2'],
+            city: responseBody['ship_address']['city'],
+            address1: responseBody['ship_address']['address1'],
+            mobile: responseBody['ship_address']['phone'],
+            pincode: responseBody['ship_address']['zipcode'],
+            stateId: responseBody['ship_address']['state_id'],
+          );
+        } else {
+          shipAddress = null;
+        }
         order = Order(
             id: responseBody['id'],
             itemTotal: responseBody['item_total'],
@@ -281,7 +305,7 @@ mixin CartModel on Model {
             shipTotal: responseBody['display_ship_total'],
             totalQuantity: responseBody['total_quantity'],
             state: responseBody['state'],
-            shipAddress: responseBody['ship_address']);
+            shipAddress: shipAddress);
         _isLoading = false;
         prefs.setString('numberOfItems', _lineItems.length.toString());
         prefs.setString('orderToken', responseBody['token']);

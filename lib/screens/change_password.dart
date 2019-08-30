@@ -142,8 +142,10 @@ class _ChangePasswordState extends State<ChangePassword> {
       _newPasswordTextFieldController.text = '';
       _confirmTextFieldController.text = '';
     } else {
-      Scaffold.of(context)
-          .showSnackBar(SnackBar(content: Text("Failed to change password")));
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text("Failed to change password"),
+        duration: Duration(seconds: 1),
+      ));
     }
   }
 

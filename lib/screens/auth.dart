@@ -262,9 +262,11 @@ class _AuthenticationState extends State<Authentication>
     };
     if (successInformation['success']) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
+      print("SPREE API KEY ${responseData['spree_api_key']}");
       prefs.setInt('id', responseData['id']);
       prefs.setString('email', responseData['email']);
       prefs.setString('spreeApiKey', responseData['spree_api_key']);
+      model.getAddress();
       model.fetchCurrentOrder();
       model.loggedInUser();
       Navigator.of(context).pop();

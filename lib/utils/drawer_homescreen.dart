@@ -353,14 +353,14 @@ class _HomeDrawer extends State<HomeDrawer> {
               ),
             ),
           ),
-          ListTile(
-            leading: Icon(
-              Icons.share,
-            ),
-            title: Text(
-              'Share the App',
-            ),
-          ),
+          // ListTile(
+          //   leading: Icon(
+          //     Icons.share,
+          //   ),
+          //   title: Text(
+          //     'Share the App',
+          //   ),
+          // ),
         ],
       ),
     );

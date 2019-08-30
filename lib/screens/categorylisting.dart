@@ -107,6 +107,7 @@ class _CategoryListingState extends State<CategoryListing> {
               isChecked: false));
         });
       });
+      print("SUBCAT LENGTH +$_listViewData");
     }
     print(_listViewData);
     List<Widget> subCatList = [];
@@ -115,6 +116,7 @@ class _CategoryListingState extends State<CategoryListing> {
       subCatList.add(InkWell(
         onTap: () {
           setState(() {
+            productsByCategory = [];
             cat.isChecked = cat.isChecked ? false : true;
             subCatId = cat.id;
             Navigator.pop(context);
@@ -141,6 +143,11 @@ class _CategoryListingState extends State<CategoryListing> {
 
   @override
   Widget build(BuildContext context) {
+    print(level != 0 && subCategoryList.length == 0);
+    print("LEVEL -----> $level");
+    print("SUBCAT LENGTH -----> ${subCategoryList.length}");
+    print("CAT LENGTH -----> ${categoryList.length}");
+
     _deviceSize = MediaQuery.of(context).size;
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
@@ -313,24 +320,46 @@ class _CategoryListingState extends State<CategoryListing> {
   Widget body(int level) {
     switch (level) {
       case 0:
-        return GridView.builder(
-          gridDelegate:
-              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-          itemBuilder: (BuildContext context, int index) {
-            return getCategoryBox(index, level);
-          },
-          itemCount: categoryList.length,
-        );
+        return (categoryList.length == 0)
+            ? Padding(
+                padding: EdgeInsets.symmetric(vertical: 50.0),
+                child: Center(
+                  child: Text(
+                    'No Product Found',
+                    style: TextStyle(fontSize: 20.0),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              )
+            : GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2),
+                itemBuilder: (BuildContext context, int index) {
+                  return getCategoryBox(index, level);
+                },
+                itemCount: categoryList.length,
+              );
         break;
       case 1:
-        return GridView.builder(
-          gridDelegate:
-              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
-          itemBuilder: (BuildContext context, int index) {
-            return getCategoryBox(index, level);
-          },
-          itemCount: subCategoryList.length,
-        );
+        return (subCategoryList.length == 0)
+            ? Padding(
+                padding: EdgeInsets.symmetric(vertical: 50.0),
+                child: Center(
+                  child: Text(
+                    'No Product Found',
+                    style: TextStyle(fontSize: 20.0),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              )
+            : GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2),
+                itemBuilder: (BuildContext context, int index) {
+                  return getCategoryBox(index, level);
+                },
+                itemCount: subCategoryList.length,
+              );
         break;
       case 2:
         return Theme(
@@ -344,6 +373,7 @@ class _CategoryListingState extends State<CategoryListing> {
                       context, productsByCategory[index], index);
                 }
                 if (hasMore && productsByCategory.length == 0) {
+                  print("LENGTH 00000000");
                   return Padding(
                     padding: EdgeInsets.symmetric(vertical: 50.0),
                     child: Center(
@@ -500,6 +530,7 @@ class _CategoryListingState extends State<CategoryListing> {
 
     setState(() {
       hasMore = false;
+      productsByCategory = [];
     });
     var response;
     print(sortBy);
@@ -524,37 +555,60 @@ class _CategoryListingState extends State<CategoryListing> {
           optionValues = [];
           optionTypes = [];
           variant['option_values'].forEach((option) {
-            optionValues.add(OptionValue(
-              id: option['id'],
-              name: option['name'],
-              optionTypeId: option['option_type_id'],
-              optionTypeName: option['option_type_name'],
-              optionTypePresentation: option['option_type_presentation'],
-            ));
+            setState(() {
+              optionValues.add(OptionValue(
+                id: option['id'],
+                name: option['name'],
+                optionTypeId: option['option_type_id'],
+                optionTypeName: option['option_type_name'],
+                optionTypePresentation: option['option_type_presentation'],
+              ));
+            });
           });
 
-          variants.add(Product(
-              slug: variant['slug'],
-              id: variant['id'],
-              name: variant['name'],
-              description: variant['description'],
-              optionValues: optionValues,
-              displayPrice: variant['display_price'],
-              image: variant['images'][0]['product_url'],
-              isOrderable: variant['is_orderable'],
-              avgRating: double.parse(product['avg_rating']),
-              reviewsCount: product['reviews_count'].toString(),
-              reviewProductId: reviewProductId));
+          setState(() {
+            variants.add(Product(
+                slug: variant['slug'],
+                id: variant['id'],
+                name: variant['name'],
+                description: variant['description'],
+                optionValues: optionValues,
+                displayPrice: variant['display_price'],
+                image: variant['images'][0]['product_url'],
+                isOrderable: variant['is_orderable'],
+                avgRating: double.parse(product['avg_rating']),
+                reviewsCount: product['reviews_count'].toString(),
+                reviewProductId: reviewProductId));
+          });
         });
         product['option_types'].forEach((optionType) {
-          optionTypes.add(OptionType(
-              id: optionType['id'],
-              name: optionType['name'],
-              position: optionType['position'],
-              presentation: optionType['presentation']));
+          setState(() {
+            optionTypes.add(OptionType(
+                id: optionType['id'],
+                name: optionType['name'],
+                position: optionType['position'],
+                presentation: optionType['presentation']));
+          });
         });
 
-        productsByCategory.add(Product(
+        setState(() {
+          productsByCategory.add(Product(
+              slug: product['slug'],
+              taxonId: product['taxon_ids'].first,
+              id: product['id'],
+              name: product['name'],
+              displayPrice: product['display_price'],
+              avgRating: double.parse(product['avg_rating']),
+              reviewsCount: product['reviews_count'].toString(),
+              image: product['master']['images'][0]['product_url'],
+              variants: variants,
+              reviewProductId: reviewProductId,
+              hasVariants: product['has_variants'],
+              optionTypes: optionTypes));
+        });
+      } else {
+        setState(() {
+          productsByCategory.add(Product(
             slug: product['slug'],
             taxonId: product['taxon_ids'].first,
             id: product['id'],
@@ -563,25 +617,12 @@ class _CategoryListingState extends State<CategoryListing> {
             avgRating: double.parse(product['avg_rating']),
             reviewsCount: product['reviews_count'].toString(),
             image: product['master']['images'][0]['product_url'],
-            variants: variants,
-            reviewProductId: reviewProductId,
             hasVariants: product['has_variants'],
-            optionTypes: optionTypes));
-      } else {
-        productsByCategory.add(Product(
-          slug: product['slug'],
-          taxonId: product['taxon_ids'].first,
-          id: product['id'],
-          name: product['name'],
-          displayPrice: product['display_price'],
-          avgRating: double.parse(product['avg_rating']),
-          reviewsCount: product['reviews_count'].toString(),
-          image: product['master']['images'][0]['product_url'],
-          hasVariants: product['has_variants'],
-          isOrderable: product['master']['is_orderable'],
-          reviewProductId: reviewProductId,
-          description: product['description'],
-        ));
+            isOrderable: product['master']['is_orderable'],
+            reviewProductId: reviewProductId,
+            description: product['description'],
+          ));
+        });
       }
     });
     setState(() {

@@ -1,4 +1,5 @@
 import 'package:ofypets_mobile_app/models/line_item.dart';
+import 'package:ofypets_mobile_app/models/address.dart';
 
 class Order {
   final int id;
@@ -10,7 +11,7 @@ class Order {
   String shipTotal;
   String state;
   String completedAt, imageUrl, number;
-  Map<String, dynamic> shipAddress;
+  Address shipAddress;
 
   Order(
       {this.id,

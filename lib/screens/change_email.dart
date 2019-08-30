@@ -134,7 +134,7 @@ class _EmailEditState extends State<EmailEdit> {
     } else {
       String error = updateResponse['errors']['email'][0];
       Scaffold.of(context)
-          .showSnackBar(SnackBar(content: Text('Email ${error}')));
+          .showSnackBar(SnackBar(content: Text('Email ${error}'), duration: Duration(seconds: 1),));
     }
   }
 

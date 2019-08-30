@@ -7,6 +7,7 @@ import 'package:ofypets_mobile_app/screens/my_address.dart';
 import 'package:ofypets_mobile_app/screens/order_history.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:ofypets_mobile_app/models/address.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -137,6 +138,7 @@ class Account extends StatelessWidget {
         .get(Settings.SERVER_URL + 'logout.json', headers: headers)
         .then((response) {
       prefs.clear();
+      model.shipAddress = Address();
       model.loggedInUser();
       model.fetchCurrentOrder();
     });

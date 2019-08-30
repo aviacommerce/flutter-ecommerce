@@ -108,6 +108,7 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                                     Navigator.push(context, route);
                                   },
                                 ),
+                                duration: Duration(seconds: 3),
                               ));
                             } else {
                               Scaffold.of(context).showSnackBar(SnackBar(

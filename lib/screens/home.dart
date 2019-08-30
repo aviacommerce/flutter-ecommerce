@@ -15,6 +15,7 @@ import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
 import 'package:ofypets_mobile_app/widgets/category_box.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 import 'package:ofypets_mobile_app/widgets/todays_deals_card.dart';
+import 'package:ofypets_mobile_app/screens/search.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -253,6 +254,9 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       return GestureDetector(
           onTap: () {
+            MaterialPageRoute route =
+                MaterialPageRoute(builder: (context) => ProductSearch(slug: bannerLinks[index],));
+            Navigator.of(context).push(route);
             print(bannerLinks[index]);
           },
           child: Container(
