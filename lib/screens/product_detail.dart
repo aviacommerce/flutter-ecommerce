@@ -624,17 +624,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     strike: false)
                 : Container(),
             addToCartFlatButton(),
-            Container(
-                padding: EdgeInsets.only(left: 10.0, top: 8.0),
-                alignment: Alignment.centerLeft,
-                child: Text("Description", style: TextStyle(fontSize: 15.0))),
-            HtmlWidget(htmlDescription),
             Column(
               children: <Widget>[
                 Container(
                     width: _deviceSize.width,
                     color: Colors.white,
                     child: ListTile(
+                      contentPadding: EdgeInsets.only(left: 10.0),
                       title: Text('Similar Products',
                           style: TextStyle(
                               fontSize: 20,
@@ -663,6 +659,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       },
                     ),
                   ),
+            Container(
+                padding: EdgeInsets.only(left: 10.0, top: 8.0),
+                alignment: Alignment.centerLeft,
+                child: Text("Description", style: TextStyle(fontSize: 15.0))),
+            HtmlWidget(htmlDescription),
           ],
         ),
       );

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-
-import 'package:scoped_model/scoped_model.dart';
-
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/address.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class Cart extends StatefulWidget {
   @override
@@ -42,8 +40,11 @@ class _CartState extends State<Cart> {
               child: Container(
                   height: 136,
                   child: Column(children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10.0),
+                      child: itemTotalContainer(model),
+                    ),
                     proceedToCheckoutButton(),
-                    itemTotalContainer(model)
                   ]))));
     });
   }
@@ -80,7 +81,7 @@ class _CartState extends State<Cart> {
             ? Container()
             : model.order.itemTotal != '0.0'
                 ? Text(
-                    'SubTotal: ',
+                    'SubTotal: (${model.lineItems.length} items):',
                     style: TextStyle(fontSize: 20, color: Colors.green),
                   )
                 : Container(),
@@ -108,56 +109,64 @@ class _CartState extends State<Cart> {
 
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-      return Container(
-        padding: EdgeInsets.all(20),
-        child: FlatButton(
-          shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8)),
-          color: Colors.green,
-          child: Text(
-            model.order == null
-                ? 'BROWSE ITEMS'
-                : model.order.itemTotal == '0.0'
-                    ? 'BROWSE ITEMS'
-                    : 'PROCEED TO CHECKOUT',
-            style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.w300),
-          ),
-          onPressed: () async {
-            if (model.order != null) {
-              if (model.order.itemTotal != '0.0') {
-                if (model.isAuthenticated) {
-                  if (model.order.state == 'cart') {
-                    print('STATE IS CART, CHANGE');
-                    bool _stateischanged = await model.changeState();
-                    if (_stateischanged) {
-                      if (model.order.state == 'address') {
-                        print(
-                            'DELIVERY, CHANGING STATE BEFORE GOING TO ADDRESS');
-                        _stateischanged = await model.changeState();
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: 65.0,
+          padding: EdgeInsets.all(10),
+          child: FlatButton(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+            color: Colors.green,
+            child: Text(
+              model.order == null
+                  ? 'BROWSE ITEMS'
+                  : model.order.itemTotal == '0.0'
+                      ? 'BROWSE ITEMS'
+                      : 'PROCEED TO CHECKOUT',
+              style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w300),
+            ),
+            onPressed: () async {
+              if (model.order != null) {
+                if (model.order.itemTotal != '0.0') {
+                  if (model.isAuthenticated) {
+                    if (model.order.state == 'cart') {
+                      print('STATE IS CART, CHANGE');
+                      bool _stateischanged = await model.changeState();
+                      if (_stateischanged) {
+                        if (model.order.state == 'address') {
+                          print(
+                              'DELIVERY, CHANGING STATE BEFORE GOING TO ADDRESS');
+                          _stateischanged = await model.changeState();
+                        }
                       }
+                      setState(() {
+                        stateChanged = _stateischanged;
+                      });
                     }
-                    setState(() {
-                      stateChanged = _stateischanged;
-                    });
-                  }
-                  if (stateChanged) {
-                    // print('STATE IS CHANGED, FETCH CURRENT ORDER');
-                    // model.fetchCurrentOrder();
+                    if (stateChanged) {
+                      // print('STATE IS CHANGED, FETCH CURRENT ORDER');
+                      // model.fetchCurrentOrder();
 
-                    Navigator.push(context, addressRoute);
+                      Navigator.push(context, addressRoute);
+                    }
+                  } else {
+                    Navigator.push(context, authRoute);
                   }
                 } else {
-                  Navigator.push(context, authRoute);
+                  Navigator.popUntil(
+                      context, ModalRoute.withName(Navigator.defaultRouteName));
                 }
               } else {
                 Navigator.popUntil(
                     context, ModalRoute.withName(Navigator.defaultRouteName));
               }
-            } else {
-              Navigator.popUntil(
-                  context, ModalRoute.withName(Navigator.defaultRouteName));
-            }
-          },
+            },
+          ),
         ),
       );
     });
@@ -175,12 +184,13 @@ class _CartState extends State<Cart> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                   elevation: 3,
-                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                   child: Container(
                     color: Colors.white,
                     child: GestureDetector(
                       onTap: () {},
                       child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Stack(
                             children: <Widget>[
@@ -206,26 +216,53 @@ class _CartState extends State<Cart> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             mainAxisSize: MainAxisSize.min,
                             children: <Widget>[
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: <Widget>[
-                                  Container(
-                                    child: IconButton(
+                              Container(
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 10.0, top: 10.0),
+                                        child: RichText(
+                                          text: TextSpan(children: [
+                                            TextSpan(
+                                              text:
+                                                  '${model.lineItems[index].variant.name.split(' ')[0]} ',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                              text: model
+                                                  .lineItems[index].variant.name
+                                                  .substring(
+                                                      model.lineItems[index]
+                                                              .variant.name
+                                                              .split(' ')[0]
+                                                              .length +
+                                                          1,
+                                                      model.lineItems[index]
+                                                          .variant.name.length),
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.black),
+                                            ),
+                                          ]),
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
                                       color: Colors.grey,
-                                      icon: Icon(Icons.delete),
+                                      icon: Icon(Icons.clear),
                                       onPressed: () {
                                         model.removeProduct(
                                             model.lineItems[index].id);
                                       },
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Container(
-                                child: Text(
-                                  model.lineItems[index].variant.name,
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(fontSize: 15),
+                                  ],
                                 ),
                               ),
                               SizedBox(height: 10),

@@ -22,7 +22,7 @@ class ProductSearch extends StatefulWidget {
 
 class _ProductSearchState extends State<ProductSearch> {
   String slug = '';
-  TextEditingController _controller;
+  TextEditingController _controller = TextEditingController();
   // List<SearchProduct> searchProducts = [];
   List<Product> searchProducts = [];
   bool _isLoading = false;
@@ -32,6 +32,7 @@ class _ProductSearchState extends State<ProductSearch> {
   int subCatId = ZERO;
   bool isSearched = false;
   Size _deviceSize;
+  int totalCount = 0;
   static const int PAGE_SIZE = 20;
   final scrollController = ScrollController();
   bool hasMore = false;
@@ -95,145 +96,149 @@ class _ProductSearchState extends State<ProductSearch> {
       return Scaffold(
           key: _scaffoldKey,
           appBar: AppBar(
-            bottom: PreferredSize(
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    width: 30.0,
-                    child: IconButton(
-                        icon: Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        }),
-                  ),
-                  Container(
-                    width: MediaQuery.of(mainContext).size.width - 40.0,
-                    child: Stack(
-                      children: [
-                        Container(
-                          width: MediaQuery.of(mainContext).size.width,
-                          height: 70,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.rectangle,
-                            color: Colors.green,
-                          ),
-                          // margin: EdgeInsets.all(10),
-                        ),
-                        Container(
-                          width: MediaQuery.of(mainContext).size.width,
-                          height: 49,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(5)),
-                          margin: EdgeInsets.all(10),
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(left: 15),
-                          child: TextField(
-                            controller: _controller,
-                            onChanged: (value) {
-                              setState(() {
-                                slug = value;
-                              });
-                            },
-                            autofocus: true,
-                            decoration: InputDecoration(
-                                labelText: 'Find the best for your pet...',
-                                border: InputBorder.none,
-                                labelStyle: TextStyle(
-                                    fontWeight: FontWeight.w300, fontSize: 18)),
-                          ),
-                        ),
-                        Container(
-                          height: 50,
-                          margin: EdgeInsets.all(10),
-                          width: MediaQuery.of(context).size.width,
-                          alignment: Alignment.centerRight,
-                          child: IconButton(
-                            icon: Icon(Icons.search),
-                            onPressed: () {
-                              FocusScope.of(mainContext)
-                                  .requestFocus(new FocusNode());
-
-                              isSearched = true;
-                              searchProducts = [];
-                              currentPage = 1;
-                              searchProduct();
-                            },
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
+            elevation: 1.0,
+            backgroundColor: Colors.white,
+            leading: IconButton(
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: Colors.black,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                }),
+            title: Container(
+              padding: EdgeInsets.only(left: 15),
+              child: TextField(
+                controller: _controller,
+                onChanged: (value) {
+                  setState(() {
+                    slug = value;
+                  });
+                },
+                autofocus: true,
+                decoration: InputDecoration(
+                    hintText: 'Search',
+                    border: InputBorder.none,
+                    labelStyle:
+                        TextStyle(fontWeight: FontWeight.w300, fontSize: 18)),
               ),
-              preferredSize: Size.fromHeight(20),
             ),
+            actions: <Widget>[
+              Visibility(
+                visible: slug != null && slug.isNotEmpty,
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.clear,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _controller.clear();
+                      slug = '';
+                    });
+                  },
+                ),
+              ),
+              IconButton(
+                icon: const Icon(
+                  Icons.search,
+                  color: Colors.grey,
+                ),
+                onPressed: () {
+                  FocusScope.of(mainContext).requestFocus(new FocusNode());
+
+                  isSearched = true;
+                  searchProducts = [];
+                  currentPage = 1;
+                  searchProduct();
+                },
+              ),
+            ],
           ),
           endDrawer: filterDrawer(),
           body: Stack(
             children: <Widget>[
-              model.isLoading
-                  ? LinearProgressIndicator()
-                  : isSearched
-                      ? Theme(
-                          data: ThemeData(primarySwatch: Colors.green),
-                          child: ListView.builder(
-                              controller: scrollController,
-                              itemCount: searchProducts.length + 1,
-                              itemBuilder: (mainContext, index) {
-                                if (index < searchProducts.length) {
-                                  // return favoriteCard(
-                                  //     context, searchProducts[index], index);
-                                  return productContainer(
-                                      _scaffoldKey.currentContext,
-                                      searchProducts[index],
-                                      index);
-                                }
-                                if (hasMore && searchProducts.length == 0) {
-                                  return Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(vertical: 50.0),
-                                    child: Center(
-                                      child: Text(
-                                        'No Product Found',
-                                        style: TextStyle(fontSize: 20.0),
-                                        textAlign: TextAlign.center,
+              Padding(
+                padding: const EdgeInsets.only(top: 80.0),
+                child: model.isLoading
+                    ? LinearProgressIndicator()
+                    : isSearched
+                        ? Theme(
+                            data: ThemeData(primarySwatch: Colors.green),
+                            child: ListView.builder(
+                                controller: scrollController,
+                                itemCount: searchProducts.length + 1,
+                                itemBuilder: (mainContext, index) {
+                                  if (index < searchProducts.length) {
+                                    // return favoriteCard(
+                                    //     context, searchProducts[index], index);
+                                    return productContainer(
+                                        _scaffoldKey.currentContext,
+                                        searchProducts[index],
+                                        index);
+                                  }
+                                  if (hasMore && searchProducts.length == 0) {
+                                    return Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 50.0),
+                                      child: Center(
+                                        child: Text(
+                                          'No Product Found',
+                                          style: TextStyle(fontSize: 20.0),
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                }
-                                if (!hasMore || model.isLoading) {
-                                  return Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(vertical: 25.0),
-                                    child: Center(
-                                        child: CircularProgressIndicator(
-                                      backgroundColor: Colors.green,
-                                    )),
-                                  );
-                                } else {
-                                  return Container();
-                                }
-                              }),
-                        )
-                      : Container(),
-              Container(
-                padding: EdgeInsets.only(right: 20.0, top: 15.0),
-                alignment: Alignment.topRight,
-                child: FloatingActionButton(
-                  onPressed: () {
-                    _scaffoldKey.currentState.openEndDrawer();
-                  },
-                  child: Icon(
-                    Icons.filter_list,
-                    color: Colors.white,
+                                    );
+                                  }
+                                  if (!hasMore || model.isLoading) {
+                                    return Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 25.0),
+                                      child: Center(
+                                          child: CircularProgressIndicator(
+                                        backgroundColor: Colors.green,
+                                      )),
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
+                                }),
+                          )
+                        : Container(),
+              ),
+              Visibility(
+                  visible: searchProducts.length > 0 ? true : false,
+                  child: Material(
+                    elevation: 2.0,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      color: Colors.white,
+                      height: 50.0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 18.0, left: 16.0),
+                        child: Text(
+                          '$totalCount Results',
+                          textAlign: TextAlign.left,
+                          style: TextStyle(color: Colors.grey.shade700),
+                        ),
+                      ),
+                    ),
+                  )),
+              Visibility(
+                visible: searchProducts.length > 0 ? true : false,
+                child: Container(
+                  padding: EdgeInsets.only(right: 20.0, top: 20.0),
+                  alignment: Alignment.topRight,
+                  child: FloatingActionButton(
+                    onPressed: () {
+                      _scaffoldKey.currentState.openEndDrawer();
+                    },
+                    child: Icon(
+                      Icons.filter_list,
+                      color: Colors.white,
+                    ),
+                    backgroundColor: Colors.orange,
                   ),
-                  backgroundColor: Colors.orange,
                 ),
               ),
             ],
@@ -276,6 +281,7 @@ class _ProductSearchState extends State<ProductSearch> {
           avgRating: double.parse(searchObj['attributes']['avg_rating']),
           reviewsCount: searchObj['attributes']['reviews_count'].toString()));
     });
+    totalCount = responseBody['pagination']['total_count'];
     setState(() {
       hasMore = true;
       _isLoading = false;

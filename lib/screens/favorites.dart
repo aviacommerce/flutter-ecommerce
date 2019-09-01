@@ -1,14 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:scoped_model/scoped_model.dart';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
+import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/models/favorites.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/headers.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
+import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class FavoritesScreen extends StatefulWidget {
   @override
@@ -42,6 +44,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         key: _scaffoldKey,
         appBar: AppBar(
           title: Text('Favorites'),
+          actions: <Widget>[
+            Padding(
+                padding: EdgeInsets.only(
+                    right: MediaQuery.of(context).size.width * 0.01),
+                child: shoppingCartIconButton()),
+          ],
           bottom: _isLoading || model.isLoading
               ? PreferredSize(
                   child: LinearProgressIndicator(),
@@ -52,6 +60,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   preferredSize: Size.fromHeight(10),
                 ),
         ),
+        drawer: HomeDrawer(),
         body: Theme(
           data: ThemeData(primarySwatch: Colors.green),
           child: PagewiseListView(
@@ -91,7 +100,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             margin: EdgeInsets.all(10),
             child: Column(
               children: <Widget>[
-                Row(children: [
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Container(
                     padding: EdgeInsets.all(10),
                     height: 150,
@@ -105,67 +114,122 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   ),
                   Expanded(
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Container(
-                          child: Text(
-                            favorite.name,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(fontSize: 15),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                      right: 10.0, top: 10.0),
+                                  child: RichText(
+                                    text: TextSpan(children: [
+                                      TextSpan(
+                                        text: '${favorite.name.split(' ')[0]} ',
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16.0,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      TextSpan(
+                                        text: favorite.name.substring(
+                                            favorite.name.split(' ')[0].length +
+                                                1,
+                                            favorite.name.length),
+                                        style: TextStyle(
+                                            fontSize: 15, color: Colors.black),
+                                      ),
+                                    ]),
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                color: Colors.grey,
+                                icon: Icon(Icons.clear),
+                                onPressed: () async {
+                                  Map<String, String> headers =
+                                      await getHeaders();
+                                  _scaffoldKey.currentState
+                                      .showSnackBar(SnackBar(
+                                    content: Text(
+                                      'Removing from Favorites, please wait.',
+                                    ),
+                                    duration: Duration(seconds: 1),
+                                  ));
+                                  http
+                                      .delete(
+                                          Settings.SERVER_URL +
+                                              'favorite_products/${favorite.id}',
+                                          headers: headers)
+                                      .then((response) {
+                                    Map<dynamic, dynamic> responseBody =
+                                        json.decode(response.body);
+                                    if (responseBody['message'] != null) {
+                                      setState(() {
+                                        addItemtoDeleteList(favorite);
+                                      });
+                                      _scaffoldKey.currentState
+                                          .showSnackBar(SnackBar(
+                                        content: Text(responseBody['message']),
+                                        duration: Duration(seconds: 1),
+                                      ));
+                                    } else {
+                                      _scaffoldKey.currentState
+                                          .showSnackBar(SnackBar(
+                                        content:
+                                            Text('Oops! Something went wrong'),
+                                        duration: Duration(seconds: 1),
+                                      ));
+                                    }
+                                  });
+                                },
+                              ),
+                            ],
                           ),
                         ),
                         SizedBox(
-                          height: 10,
+                          height: 60,
                         ),
-                        Container(
-                          child: Text(
-                            favorite.currencySymbol + favorite.price,
-                            textAlign: TextAlign.left,
-                            style: TextStyle(fontSize: 15, color: Colors.red),
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              'Price',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                  fontSize: 15, color: Colors.grey.shade700),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(right: 10.0),
+                              child: Text(
+                                favorite.currencySymbol + favorite.price,
+                                textAlign: TextAlign.left,
+                                style:
+                                    TextStyle(fontSize: 15, color: Colors.red),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                  Container(
-                    child: IconButton(
-                      color: Colors.grey,
-                      icon: Icon(Icons.delete),
-                      onPressed: () async {
-                        Map<String, String> headers = await getHeaders();
-                        _scaffoldKey.currentState.showSnackBar(SnackBar(
-                          content: Text(
-                            'Removing from Favorites, please wait.',
-                          ),
-                          duration: Duration(seconds: 1),
-                        ));
-                        http
-                            .delete(
-                                Settings.SERVER_URL +
-                                    'favorite_products/${favorite.id}',
-                                headers: headers)
-                            .then((response) {
-                          Map<dynamic, dynamic> responseBody =
-                              json.decode(response.body);
-                          if (responseBody['message'] != null) {
-                            setState(() {
-                              addItemtoDeleteList(favorite);
-                            });
-                            _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              content: Text(responseBody['message']),
-                              duration: Duration(seconds: 1),
-                            ));
-                          } else {
-                            _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              content: Text('Oops! Something went wrong'),
-                              duration: Duration(seconds: 1),
-                            ));
-                          }
-                        });
-                      },
+                ]),
+                Divider(),
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  color: Colors.white,
+                  height: 50.0,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 15.0, right: 16.0),
+                    child: Text(
+                      'ADD TO CART',
+                      textAlign: TextAlign.right,
+                      style: TextStyle(color: Colors.green),
                     ),
                   ),
-                ])
+                ),
               ],
             ),
           ),
@@ -290,9 +354,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         Settings.SERVER_URL +
             'spree/user_favorite_products.json?page=$currentPage&per_page=$perPage&data_set=small',
         headers: headers);
+    print(Settings.SERVER_URL +
+        'spree/user_favorite_products.json?page=$currentPage&per_page=$perPage&data_set=small');
     currentPage++;
     responseBody = json.decode(response.body);
+
     responseBody['data'].forEach((favoriteObj) {
+      print(favoriteObj);
       setState(() {
         favoriteProducts.add(Favorite(
             id: favoriteObj['id'],
