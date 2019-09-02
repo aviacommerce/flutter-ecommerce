@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:ofypets_mobile_app/models/payment_methods.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/order_response.dart';
-import 'package:ofypets_mobile_app/utils/params.dart';
 import 'package:ofypets_mobile_app/screens/payubiz.dart';
-import 'package:ofypets_mobile_app/models/payment_methods.dart';
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
+import 'package:ofypets_mobile_app/utils/params.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PaymentScreen extends StatefulWidget {
   @override
@@ -22,9 +23,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
   int selectedPaymentId;
 
   @override
-  initState() {
+  void initState() {
     super.initState();
     // getPaymentMethods();
+    locator<ConnectivityManager>().initConnectivity(context);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
   }
 
 // In the State of a stateful widget:

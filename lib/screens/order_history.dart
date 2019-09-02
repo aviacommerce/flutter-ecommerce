@@ -6,8 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:ofypets_mobile_app/models/order.dart';
 import 'package:ofypets_mobile_app/screens/order_response.dart';
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
 
 class OrderList extends StatefulWidget {
   @override
@@ -56,6 +58,13 @@ class _OrderList extends State<OrderList> {
       }
     });
     return ordersList;
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
   }
 
   Widget build(BuildContext context) {

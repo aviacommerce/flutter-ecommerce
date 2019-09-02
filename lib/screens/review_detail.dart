@@ -6,8 +6,10 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/models/review.dart';
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ReviewDetailScreen extends StatefulWidget {
@@ -38,6 +40,15 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen>
   @override
   void initState() {
     super.initState();
+
+    locator<ConnectivityManager>().initConnectivity(context);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
   }
 
   @override

@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/forget_password.dart';
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,6 +33,14 @@ class _AuthenticationState extends State<Authentication>
     super.initState();
     _tabController =
         TabController(initialIndex: widget.index, vsync: this, length: 2);
+    locator<ConnectivityManager>().initConnectivity(context);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
   }
 
   @override

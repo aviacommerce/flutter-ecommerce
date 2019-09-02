@@ -13,8 +13,10 @@ import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
 import 'package:ofypets_mobile_app/screens/review_detail.dart';
 import 'package:ofypets_mobile_app/screens/search.dart';
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 import 'package:ofypets_mobile_app/widgets/similar_products_card.dart';
@@ -87,7 +89,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     }
     get_reviews();
     getSimilarProducts();
+    locator<ConnectivityManager>().initConnectivity(context);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
   }
 
   get_reviews() {
@@ -459,22 +469,80 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       return SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Container(
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      alignment: Alignment.center,
-                      height: 300,
-                      child: FadeInImage(
-                        image: NetworkImage(selectedProduct.image),
-                        placeholder: AssetImage(
-                            'images/placeholders/no-product-image.png'),
+            Stack(
+              children: <Widget>[
+                Container(
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Container(
+                          alignment: Alignment.center,
+                          height: 300,
+                          child: FadeInImage(
+                            image: NetworkImage(selectedProduct.image),
+                            placeholder: AssetImage(
+                                'images/placeholders/no-product-image.png'),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                Container(
+                  alignment: Alignment.topRight,
+                  child: IconButton(
+                    padding: EdgeInsets.all(10),
+                    alignment: Alignment.topRight,
+                    icon: Icon(Icons.favorite),
+                    color: Colors.orange,
+                    onPressed: () async {
+                      final SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      String authToken = prefs.getString('spreeApiKey');
+
+                      if (authToken == null) {
+                        _scaffoldKey.currentState.showSnackBar(SnackBar(
+                          content: Text(
+                            'Please Login to add to Favorites',
+                          ),
+                          action: SnackBarAction(
+                            label: 'LOGIN',
+                            onPressed: () {
+                              MaterialPageRoute route = MaterialPageRoute(
+                                  builder: (context) => Authentication(0));
+                              Navigator.push(context, route);
+                            },
+                          ),
+                        ));
+                      } else {
+                        _scaffoldKey.currentState.showSnackBar(SnackBar(
+                          content: Text(
+                            'Adding to Favorites, please wait.',
+                          ),
+                          duration: Duration(seconds: 1),
+                        ));
+                        Map<String, String> headers = await getHeaders();
+                        http
+                            .post(Settings.SERVER_URL + 'favorite_products',
+                                body: json.encode({
+                                  'id':
+                                      widget.product.reviewProductId.toString()
+                                }),
+                                headers: headers)
+                            .then((response) {
+                          Map<dynamic, dynamic> responseBody =
+                              json.decode(response.body);
+
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                            content: Text(responseBody['message']),
+                            duration: Duration(seconds: 1),
+                          ));
+                        });
+                      }
+                    },
+                  ),
+                ),
+              ],
             ),
             Divider(),
             Container(
@@ -495,57 +563,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     ),
                   ),
                   Expanded(
-                    child: IconButton(
-                      padding: EdgeInsets.all(10),
-                      alignment: Alignment.topRight,
-                      icon: Icon(Icons.favorite),
-                      color: Colors.orange,
-                      onPressed: () async {
-                        final SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
-                        String authToken = prefs.getString('spreeApiKey');
-
-                        if (authToken == null) {
-                          _scaffoldKey.currentState.showSnackBar(SnackBar(
-                            content: Text(
-                              'Please Login to add to Favorites',
-                            ),
-                            action: SnackBarAction(
-                              label: 'LOGIN',
-                              onPressed: () {
-                                MaterialPageRoute route = MaterialPageRoute(
-                                    builder: (context) => Authentication(0));
-                                Navigator.push(context, route);
-                              },
-                            ),
-                          ));
-                        } else {
-                          _scaffoldKey.currentState.showSnackBar(SnackBar(
-                            content: Text(
-                              'Adding to Favorites, please wait.',
-                            ),
-                            duration: Duration(seconds: 1),
-                          ));
-                          Map<String, String> headers = await getHeaders();
-                          http
-                              .post(Settings.SERVER_URL + 'favorite_products',
-                                  body: json.encode({
-                                    'id': widget.product.reviewProductId
-                                        .toString()
-                                  }),
-                                  headers: headers)
-                              .then((response) {
-                            Map<dynamic, dynamic> responseBody =
-                                json.decode(response.body);
-
-                            _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              content: Text(responseBody['message']),
-                              duration: Duration(seconds: 1),
-                            ));
-                          });
-                        }
-                      },
-                    ),
+                    child: Container(),
                   ),
                   ratingBar(selectedProduct.avgRating, 20),
                   Container(

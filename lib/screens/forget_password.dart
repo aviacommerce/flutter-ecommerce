@@ -1,7 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
 
 class ForgetPassword extends StatefulWidget {
   @override
@@ -15,6 +18,18 @@ class _ForgetPasswordState extends State<ForgetPassword>
   final Map<String, dynamic> _formData = {'email': null};
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoader = false;
+  @override
+  void initState() {
+    super.initState();
+    locator<ConnectivityManager>().initConnectivity(context);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,35 +41,31 @@ class _ForgetPasswordState extends State<ForgetPassword>
         length: 2,
         child: Scaffold(
           appBar: AppBar(
-            backgroundColor: Colors.green.shade300,
-            leading: IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () {
-                Navigator.of(context).pop();
-              }
-            ),
-            title: Text(
-              'ofypets',
-              style: TextStyle(fontFamily: 'HolyFat', fontSize: 50),
-            ),
-            bottom: PreferredSize(
-              preferredSize: Size(_deviceSize.width, 50),
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.all(10),
-                    child: Text("FORGET PASSWORD",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        fontSize: 20
-                      ),
-                    )
-                  )
-                ],
-              )
-            )
-          ),
+              backgroundColor: Colors.green,
+              leading: IconButton(
+                  icon: Icon(Icons.close),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  }),
+              title: Text(
+                'ofypets',
+                style: TextStyle(fontFamily: 'HolyFat', fontSize: 50),
+              ),
+              bottom: PreferredSize(
+                  preferredSize: Size(_deviceSize.width, 50),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                          margin: EdgeInsets.all(10),
+                          child: Text(
+                            "FORGET PASSWORD",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                fontSize: 20),
+                          ))
+                    ],
+                  ))),
           body: SingleChildScrollView(
             child: Container(
               width: targetWidth,
@@ -67,7 +78,9 @@ class _ForgetPasswordState extends State<ForgetPassword>
                     ),
                     TextFormField(
                       decoration: InputDecoration(
-                          labelText: 'E-Mail', filled: true, fillColor: Colors.white),
+                          labelText: 'E-Mail',
+                          filled: true,
+                          fillColor: Colors.white),
                       keyboardType: TextInputType.emailAddress,
                       validator: (String value) {
                         if (value.isEmpty ||
@@ -85,10 +98,10 @@ class _ForgetPasswordState extends State<ForgetPassword>
                     ),
                     _isLoader
                         ? CircularProgressIndicator(
-                            backgroundColor: Colors.green.shade300)
+                            backgroundColor: Colors.green)
                         : RaisedButton(
                             textColor: Colors.white,
-                            color: Colors.green.shade300,
+                            color: Colors.green,
                             child: Text('SEND MAIL'),
                             onPressed: () => _submitFogetPassword(),
                           ),

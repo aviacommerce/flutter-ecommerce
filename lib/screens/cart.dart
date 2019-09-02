@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/address.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class Cart extends StatefulWidget {
@@ -14,6 +16,19 @@ class Cart extends StatefulWidget {
 class _CartState extends State<Cart> {
   List<int> quantities = [];
   bool stateChanged = true;
+  @override
+  void initState() {
+    super.initState();
+
+    locator<ConnectivityManager>().initConnectivity(context);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,11 +64,6 @@ class _CartState extends State<Cart> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   Widget deleteButton(int index) {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
@@ -81,7 +91,7 @@ class _CartState extends State<Cart> {
             ? Container()
             : model.order.itemTotal != '0.0'
                 ? Text(
-                    'SubTotal: (${model.lineItems.length} items):',
+                    'SubTotal: (${model.order.totalQuantity} items):',
                     style: TextStyle(fontSize: 20, color: Colors.green),
                   )
                 : Container(),

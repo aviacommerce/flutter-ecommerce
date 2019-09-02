@@ -3,18 +3,19 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:http/http.dart' as http;
-import 'package:scoped_model/scoped_model.dart';
-
 import 'package:ofypets_mobile_app/models/brand.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/search.dart';
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:ofypets_mobile_app/widgets/product_container.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class BrandList extends StatefulWidget {
   @override
@@ -41,6 +42,14 @@ class _BrandListState extends State<BrandList> {
   void initState() {
     super.initState();
     getBrandsList();
+    locator<ConnectivityManager>().initConnectivity(context);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
   }
 
   @override
@@ -127,7 +136,9 @@ class _BrandListState extends State<BrandList> {
                                   : Container()
                             ],
                           ),
-                          _isLoading || model.isLoading ? LinearProgressIndicator() : Container()
+                          _isLoading || model.isLoading
+                              ? LinearProgressIndicator()
+                              : Container()
                         ]))),
               ),
               drawer: HomeDrawer(),

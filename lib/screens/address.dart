@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
-
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/payment.dart';
 import 'package:ofypets_mobile_app/screens/update_address.dart';
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:ofypets_mobile_app/widgets/order_details_card.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class AddressPage extends StatefulWidget {
   @override
@@ -16,6 +17,18 @@ class AddressPage extends StatefulWidget {
 class _AddressPageState extends State<AddressPage> {
   bool stateChanged = true;
   @override
+  void initState() {
+    super.initState();
+    locator<ConnectivityManager>().initConnectivity(context);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
+  }
+
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
@@ -127,7 +140,9 @@ class _AddressPageState extends State<AddressPage> {
                     height: 10,
                   ),
                   Text(
-                    model.order.shipAddress.firstName + ' ' + model.order.shipAddress.lastName,
+                    model.order.shipAddress.firstName +
+                        ' ' +
+                        model.order.shipAddress.lastName,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -147,7 +162,8 @@ class _AddressPageState extends State<AddressPage> {
             ),
           ),
         );
-      } else return Container();
+      } else
+        return Container();
     });
   }
 }

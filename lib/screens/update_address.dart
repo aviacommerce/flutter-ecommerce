@@ -1,13 +1,14 @@
+import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:flutter/cupertino.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:scoped_model/scoped_model.dart';
-
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/models/address.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
+import 'package:scoped_model/scoped_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UpdateAddress extends StatefulWidget {
   final bool order;
@@ -62,6 +63,14 @@ class _UpdateAddressState extends State<UpdateAddress> {
       _pincode = widget.shipAddress.pincode;
       _stateId = widget.shipAddress.stateId;
     }
+    locator<ConnectivityManager>().initConnectivity(context);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
   }
 
   @override

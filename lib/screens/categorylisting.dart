@@ -9,8 +9,10 @@ import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/search.dart';
 import 'package:ofypets_mobile_app/utils/color_list.dart';
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:ofypets_mobile_app/widgets/product_container.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -85,6 +87,14 @@ class _CategoryListingState extends State<CategoryListing> {
     header.add(
         textField(widget.categoryName, FontWeight.normal, 0, Colors.white));
     getCategory();
+    locator<ConnectivityManager>().initConnectivity(context);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
   }
 
   void getSubCatList(int categoryId, String catName) async {

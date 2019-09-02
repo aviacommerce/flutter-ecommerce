@@ -6,8 +6,10 @@ import 'package:ofypets_mobile_app/models/brand.dart';
 import 'package:ofypets_mobile_app/models/category.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:ofypets_mobile_app/widgets/product_container.dart';
 import 'package:scoped_model/scoped_model.dart';
 
@@ -86,6 +88,14 @@ class _ProductSearchState extends State<ProductSearch> {
       }
     });
     getBrandsList();
+    locator<ConnectivityManager>().initConnectivity(context);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
   }
 
   @override
@@ -135,6 +145,9 @@ class _ProductSearchState extends State<ProductSearch> {
                     setState(() {
                       _controller.clear();
                       slug = '';
+                      setState(() {
+                        searchProducts.clear();
+                      });
                     });
                   },
                 ),

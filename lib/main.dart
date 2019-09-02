@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/screens/home.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-import 'package:ofypets_mobile_app/screens/home.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-
-void main() => runApp(MyApp());
+void main() {
+  setupLocator();
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
   final MainModel _model = MainModel();

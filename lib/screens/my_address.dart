@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/update_address.dart';
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class MyAddressPage extends StatefulWidget {
@@ -12,6 +14,19 @@ class MyAddressPage extends StatefulWidget {
 
 class _MyAddressPageState extends State<MyAddressPage> {
   bool stateChanged = true;
+  @override
+  void initState() {
+    super.initState();
+    locator<ConnectivityManager>().initConnectivity(context);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
@@ -32,9 +47,8 @@ class _MyAddressPageState extends State<MyAddressPage> {
             child: Column(
           children: <Widget>[
             FlatButton(
-              child: Text(model.shipAddress != null
-                  ? 'EDIT ADDRESS'
-                  : 'ADD ADDRESS'),
+              child: Text(
+                  model.shipAddress != null ? 'EDIT ADDRESS' : 'ADD ADDRESS'),
               onPressed: () {
                 MaterialPageRoute payment = MaterialPageRoute(
                     builder: (context) =>
@@ -78,7 +92,9 @@ class _MyAddressPageState extends State<MyAddressPage> {
                     height: 10,
                   ),
                   Text(
-                    model.shipAddress.firstName +' ' +model.shipAddress.lastName,
+                    model.shipAddress.firstName +
+                        ' ' +
+                        model.shipAddress.lastName,
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,

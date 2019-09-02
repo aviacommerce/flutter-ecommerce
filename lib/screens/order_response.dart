@@ -1,12 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OrderResponse extends StatefulWidget {
   final String orderNumber;
@@ -28,6 +31,14 @@ class _OrderResponseState extends State<OrderResponse> {
   void initState() {
     super.initState();
     getOrderDetails();
+    locator<ConnectivityManager>().initConnectivity(context);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
   }
 
   getOrderDetails() async {
@@ -70,7 +81,7 @@ class _OrderResponseState extends State<OrderResponse> {
                         ModalRoute.withName(Navigator.defaultRouteName));
                   } else {
                     // Navigator.of(context).pop();
-                                        Navigator.popUntil(context,
+                    Navigator.popUntil(context,
                         ModalRoute.withName(Navigator.defaultRouteName));
                   }
                 },

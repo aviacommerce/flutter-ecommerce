@@ -10,12 +10,13 @@ import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/auth.dart';
 import 'package:ofypets_mobile_app/screens/search.dart';
+import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
+import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:ofypets_mobile_app/widgets/category_box.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 import 'package:ofypets_mobile_app/widgets/todays_deals_card.dart';
-import 'package:ofypets_mobile_app/screens/search.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -46,6 +47,14 @@ class _HomeScreenState extends State<HomeScreen> {
     getBanners();
     getCategories();
     getTodaysDeals();
+    locator<ConnectivityManager>().initConnectivity(context);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    locator<ConnectivityManager>().dispose();
   }
 
   @override
@@ -254,8 +263,10 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       return GestureDetector(
           onTap: () {
-            MaterialPageRoute route =
-                MaterialPageRoute(builder: (context) => ProductSearch(slug: bannerLinks[index],));
+            MaterialPageRoute route = MaterialPageRoute(
+                builder: (context) => ProductSearch(
+                      slug: bannerLinks[index],
+                    ));
             Navigator.of(context).push(route);
             print(bannerLinks[index]);
           },
