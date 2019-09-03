@@ -58,7 +58,7 @@ class _ForgetPasswordState extends State<ForgetPassword>
                       Container(
                           margin: EdgeInsets.all(10),
                           child: Text(
-                            "FORGET PASSWORD",
+                            "FORGOT PASSWORD",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -161,14 +161,15 @@ class _ForgetPasswordState extends State<ForgetPassword>
       showDialog(
           context: context,
           builder: (BuildContext context) {
-            return _alertDialog('Success!', successInformation['message']);
+            return _alertDialog(
+                'Success!', successInformation['message'], context);
           });
     } else {
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return _alertDialog(
-                'An Error Occurred!', successInformation['message']);
+                'An Error Occurred!', successInformation['message'], context);
           });
     }
     setState(() {
@@ -176,7 +177,7 @@ class _ForgetPasswordState extends State<ForgetPassword>
     });
   }
 
-  Widget _alertDialog(String boxTitle, String message) {
+  Widget _alertDialog(String boxTitle, String message, BuildContext context) {
     return AlertDialog(
       title: Text(boxTitle),
       content: Text(message),
@@ -186,7 +187,7 @@ class _ForgetPasswordState extends State<ForgetPassword>
               style: TextStyle(
                   fontWeight: FontWeight.bold, color: Colors.green.shade300)),
           onPressed: () {
-            //Navigator.of(context).pop();
+            Navigator.pop(context);
           },
         )
       ],
