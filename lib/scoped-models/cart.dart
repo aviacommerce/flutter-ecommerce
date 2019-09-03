@@ -61,8 +61,6 @@ mixin CartModel on Model {
         headers: headers);
 
     responseBody = json.decode(response.body);
-    print("PRODUCT DETAIL RESPONSE BODY");
-    print(responseBody);
 
     List<Product> variants = [];
     List<OptionValue> optionValues = [];
@@ -72,12 +70,9 @@ mixin CartModel on Model {
     variants = [];
     if (responseBody['data']['attributes']['has_variants']) {
       responseBody['data']['included']['variants'].forEach((variant) {
-        print(
-            "CURRENCY SYMBOL + ${variant['data']['attributes']['currency_symbol']}");
         optionValues = [];
         optionTypes = [];
         variant['data']['included']['option_values'].forEach((option) {
-          // setState(() {
           optionValues.add(OptionValue(
             id: option['data']['attributes']['id'],
             name: option['data']['attributes']['name'],
@@ -86,10 +81,9 @@ mixin CartModel on Model {
             optionTypePresentation: option['data']['attributes']
                 ['option_type_presentation'],
           ));
-          // });
         });
-        // setState(() {
         variants.add(Product(
+            favoritedByUser: responseBody['data']['attributes']['is_favorited_by_current_user'],
             id: variant['data']['attributes']['id'],
             name: variant['data']['attributes']['name'],
             description: variant['data']['attributes']['description'],
@@ -107,19 +101,16 @@ mixin CartModel on Model {
             reviewsCount:
                 responseBody['data']['attributes']['reviews_count'].toString(),
             reviewProductId: reviewProductId));
-        // });
       });
       responseBody['data']['included']['option_types'].forEach((optionType) {
-        // setState(() {
         optionTypes.add(OptionType(
             id: optionType['data']['attributes']['id'],
             name: optionType['data']['attributes']['name'],
             position: optionType['data']['attributes']['position'],
             presentation: optionType['data']['attributes']['presentation']));
-        // });
       });
-      // setState(() {
       tappedProduct = Product(
+        favoritedByUser: responseBody['data']['attributes']['is_favorited_by_current_user'],
         name: responseBody['data']['attributes']['name'],
         displayPrice: responseBody['data']['attributes']['display_price'],
         currencySymbol: responseBody['data']['attributes']['currency_symbol'],
@@ -137,10 +128,9 @@ mixin CartModel on Model {
         optionTypes: optionTypes,
         taxonId: responseBody['data']['attributes']['taxon_ids'].first,
       );
-      // });
     } else {
-      // setState(() {
       tappedProduct = Product(
+        favoritedByUser: responseBody['data']['attributes']['is_favorited_by_current_user'],
         id: responseBody['data']['included']['id'],
         name: responseBody['data']['attributes']['name'],
         displayPrice: responseBody['data']['attributes']['display_price'],
@@ -160,14 +150,12 @@ mixin CartModel on Model {
         description: responseBody['data']['attributes']['description'],
         taxonId: responseBody['data']['attributes']['taxon_ids'].first,
       );
-      // });
     }
 
     MaterialPageRoute route = MaterialPageRoute(
         builder: (context) => ProductDetailScreen(tappedProduct));
     if (isSimilarListing) Navigator.pop(context);
     Navigator.push(context, route);
-    // setLoading(false);
     _isLoading = false;
     notifyListeners();
   }

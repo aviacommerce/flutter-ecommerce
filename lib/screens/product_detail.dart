@@ -35,6 +35,7 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen>
     with SingleTickerProviderStateMixin {
+  bool _isFavorite = false;
   bool discount = true;
   bool _isLoading = true;
   TabController _tabController;
@@ -58,6 +59,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       if (widget.product.hasVariants) {
         _hasVariants = widget.product.hasVariants;
         selectedProduct = widget.product.variants.first;
+        _isFavorite = widget.product.variants.first.favoritedByUser;
         discount = (double.parse(widget.product.variants.first.costPrice) -
                     double.parse(widget.product.variants.first.price)) >
                 0
@@ -67,6 +69,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             ? widget.product.variants.first.description
             : '';
       } else {
+        _isFavorite = widget.product.favoritedByUser;
         selectedProduct = widget.product;
         discount = (double.parse(widget.product.costPrice) -
                     double.parse(widget.product.price)) >
@@ -78,6 +81,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             : '';
       }
     } else {
+      _isFavorite = widget.product.favoritedByUser;
       selectedProduct = widget.product;
       discount = (double.parse(widget.product.costPrice) -
                   double.parse(widget.product.price)) >
@@ -563,7 +567,91 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     ),
                   ),
                   Expanded(
-                    child: Container(),
+                    child: IconButton(
+                      padding: EdgeInsets.all(10),
+                      alignment: Alignment.topRight,
+                      icon: Icon(Icons.favorite),
+                      color: _isFavorite ? Colors.orange : Colors.grey,
+                      onPressed: () async {
+                        final SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        String authToken = prefs.getString('spreeApiKey');
+                        Map<String, String> headers = await getHeaders();
+
+                        if (!_isFavorite) {
+                          if (authToken == null) {
+                            _scaffoldKey.currentState.showSnackBar(SnackBar(
+                              content: Text(
+                                'Please Login to add to Favorites',
+                              ),
+                              action: SnackBarAction(
+                                label: 'LOGIN',
+                                onPressed: () {
+                                  MaterialPageRoute route = MaterialPageRoute(
+                                      builder: (context) => Authentication(0));
+                                  Navigator.push(context, route);
+                                },
+                              ),
+                            ));
+                          } else {
+                            _scaffoldKey.currentState.showSnackBar(SnackBar(
+                              content: Text(
+                                'Adding to Favorites, please wait.',
+                              ),
+                              duration: Duration(seconds: 1),
+                            ));
+                            http
+                                .post(Settings.SERVER_URL + 'favorite_products',
+                                    body: json.encode({
+                                      'id': widget.product.reviewProductId
+                                          .toString()
+                                    }),
+                                    headers: headers)
+                                .then((response) {
+                              Map<dynamic, dynamic> responseBody =
+                                  json.decode(response.body);
+                              setState(() {
+                                _isFavorite = true;
+                              });
+                              _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                content: Text('Product marked as favorite!'),
+                                duration: Duration(seconds: 1),
+                              ));
+                            });
+                          }
+                        } else {
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                            content: Text(
+                              'Removing from Favorites, please wait.',
+                            ),
+                            duration: Duration(seconds: 1),
+                          ));
+                          http
+                              .delete(
+                                  Settings.SERVER_URL +
+                                      'favorite_products/${widget.product.reviewProductId}',
+                                  headers: headers)
+                              .then((response) {
+                            Map<dynamic, dynamic> responseBody =
+                                json.decode(response.body);
+                            if (responseBody['message'] != null) {
+                              setState(() {
+                                _isFavorite = false;
+                              });
+                              _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                content: Text(responseBody['message']),
+                                duration: Duration(seconds: 1),
+                              ));
+                            } else {
+                              _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                content: Text('Oops! Something went wrong'),
+                                duration: Duration(seconds: 1),
+                              ));
+                            }
+                          });
+                        }
+                      },
+                    ),
                   ),
                   ratingBar(selectedProduct.avgRating, 20),
                   Container(

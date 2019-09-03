@@ -21,6 +21,7 @@ class Product {
   final List<OptionType> optionTypes;
   String description;
   final int reviewProductId;
+  final bool favoritedByUser;
 
   Product(
       {this.taxonId,
@@ -41,5 +42,6 @@ class Product {
       this.optionValues,
       this.reviewProductId,
       this.optionTypes,
-      this.currencySymbol});
+      this.currencySymbol,
+      this.favoritedByUser});
 }

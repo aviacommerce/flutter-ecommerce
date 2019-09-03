@@ -23,6 +23,7 @@ class UpdateAddress extends StatefulWidget {
 class _UpdateAddressState extends State<UpdateAddress> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  bool _isLoading = false;
   String _firstName = '';
   String _lastName = '';
   String selectedState = '';
@@ -39,20 +40,10 @@ class _UpdateAddressState extends State<UpdateAddress> {
   static List<Map<String, dynamic>> states = [];
   @override
   void initState() {
-    print(widget.shipAddress);
     getStates();
     // getUserInfo();
     super.initState();
     if (widget.shipAddress != null) {
-      // selectedState = widget.shipAddress['state']['name'];
-      // _firstName = widget.shipAddress['firstname'];
-      // _lastName = widget.shipAddress['lastname'];
-      // _address2 = widget.shipAddress['address2'];
-      // _city = widget.shipAddress['city'];
-      // _address1 = widget.shipAddress['address1'];
-      // _mobile = widget.shipAddress['phone'];
-      // _pincode = widget.shipAddress['zipcode'];
-      // _stateId = widget.shipAddress['state_id'];
       selectedState = widget.shipAddress.state;
       _firstName = widget.shipAddress.firstName;
       _lastName = widget.shipAddress.lastName;
@@ -79,6 +70,15 @@ class _UpdateAddressState extends State<UpdateAddress> {
         appBar: AppBar(
           title: Text(
               widget.shipAddress != null ? 'Update Address' : 'Add Address'),
+          bottom: _isLoading
+              ? PreferredSize(
+                  child: LinearProgressIndicator(),
+                  preferredSize: Size.fromHeight(10),
+                )
+              : PreferredSize(
+                  child: Container(),
+                  preferredSize: Size.fromHeight(10),
+                ),
         ),
         body: Card(
           elevation: 5,
@@ -326,9 +326,13 @@ class _UpdateAddressState extends State<UpdateAddress> {
     statesResponse['states'].forEach((state) {
       setState(() {
         states.add(state);
-        selectedState = states.first['name'];
       });
     });
+    if (widget.shipAddress == null) {
+      setState(() {
+        selectedState = states.first['name'];
+      });
+    }
   }
 
   void containerForSheet<Map>({BuildContext context, Widget child}) {
@@ -342,7 +346,6 @@ class _UpdateAddressState extends State<UpdateAddress> {
         } else {
           selectedState = value.toString();
           states.forEach((state) {
-            print(state);
             if (state.containsValue(value.toString())) {
               _stateId = state['id'];
             }
@@ -359,7 +362,12 @@ class _UpdateAddressState extends State<UpdateAddress> {
         color: Colors.green,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         onPressed: () async {
+          setState(() {
+            _isLoading = true;
+          });
           Map<dynamic, dynamic> updateResponse;
+          Map<dynamic, dynamic> orderUpdateResponse;
+
           if (!_formKey.currentState.validate()) {
             return;
           }
@@ -388,59 +396,65 @@ class _UpdateAddressState extends State<UpdateAddress> {
             "country_id": '105'
           };
 
-          if (widget.order) {
-            print("ORDER ADDRESS");
-            if (widget.shipAddress != null) {
-              print("SHIP ADDRESS ID ${widget.shipAddress.id}");
-              print("ORDER NUMBER ${prefs.getString('orderNumber')}");
+          String profileAddressUrl = "address/update_address";
+          Map<String, dynamic> profileAddressData = {
+            "user": {"email": prefs.getString('email'), "ship_address": address}
+          };
 
-              url =
-                  'api/v1/orders/${prefs.getString('orderNumber')}/addresses/${widget.shipAddress.id}';
-              data = {"address_params": address};
-            } else {
-              url =
-                  'api/v1/checkouts/${prefs.getString('orderNumber')}.json?order_token=${prefs.getString('orderToken')}';
-              data = {
-                "order": {
-                  "bill_address_attributes": address,
-                  "ship_address_attributes": address
-                }
-              };
-            }
-          } else {
-            print("PROFILE ADDRESS");
-            url = "address/update_address";
-            data = {
-              "user": {
-                "email": prefs.getString('email'),
-                "ship_address": address
-              }
-            };
-          }
-
-          print("UPDATE ADDRESS RESPONSE $updateResponse");
-          if (widget.order) {
-            print("HEADERS $headers");
-            print("URL $url");
-            print("DATA $data");
-            http.Response response = await http.put(Settings.SERVER_URL + url,
-                headers: headers, body: json.encode(data));
-            print(response.body);
+          if (!widget.order && widget.shipAddress == null) {
+            url = "address/create_address";
+            http.Response response = await http.post(Settings.SERVER_URL + url,
+                headers: headers, body: json.encode(profileAddressData));
             updateResponse = json.decode(response.body);
-            if (updateResponse.containsKey('id')) {
+            if (updateResponse['status'] == 'Address added Successfully!') {
               await model.fetchCurrentOrder();
               await model.getAddress();
-              Navigator.pop(context);
+              // Navigator.pop(context);
+              setState(() {
+                _isLoading = false;
+              });
+              _showSuccessDialog(context);
             }
           } else {
-            http.Response response = await http.post(Settings.SERVER_URL + url,
-                headers: headers, body: json.encode(data));
-            print(response.body);
+            if (widget.order) {
+              if (widget.shipAddress != null) {
+                url =
+                    'api/v1/orders/${prefs.getString('orderNumber')}/addresses/${widget.shipAddress.id}';
+                data = {"address_params": address};
+              } else {
+                url =
+                    'api/v1/checkouts/${prefs.getString('orderNumber')}.json?order_token=${prefs.getString('orderToken')}';
+                data = {
+                  "order": {
+                    "bill_address_attributes": address,
+                    "ship_address_attributes": address
+                  }
+                };
+              }
+            }
+
+            if (widget.order) {
+              http.Response response = await http.put(Settings.SERVER_URL + url,
+                  headers: headers, body: json.encode(data));
+              orderUpdateResponse = json.decode(response.body);
+              updateResponse = json.decode(response.body);
+              if (updateResponse.containsKey('id')) {
+                await model.fetchCurrentOrder();
+              }
+            }
+            http.Response response = await http.post(
+                Settings.SERVER_URL + profileAddressUrl,
+                headers: headers,
+                body: json.encode(profileAddressData));
             updateResponse = json.decode(response.body);
             if (updateResponse['status'] == 'Address updated Successfully!') {
               await model.fetchCurrentOrder();
               await model.getAddress();
-              Navigator.pop(context);
+              // Navigator.pop(context);
+              setState(() {
+                _isLoading = false;
+              });
+              _showSuccessDialog(context);
             }
           }
         },
@@ -450,5 +464,28 @@ class _UpdateAddressState extends State<UpdateAddress> {
         ),
       );
     });
+  }
+
+  void _showSuccessDialog(context) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Address Update"),
+            content: new Text("Address updated successfully."),
+            actions: <Widget>[
+              new FlatButton(
+                child: Text(
+                  "OK",
+                  style: TextStyle(color: Colors.black),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
   }
 }
