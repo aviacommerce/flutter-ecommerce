@@ -1,4 +1,4 @@
-# ofypets_mobile_app
+# Flutter Ecommerce App
 
 A new Flutter project.
 
