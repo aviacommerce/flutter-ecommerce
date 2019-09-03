@@ -198,12 +198,12 @@ class _AuthenticationState extends State<Authentication>
   Widget _buildPasswordTextField() {
     return TextFormField(
       decoration: InputDecoration(
-          labelText: 'Password', filled: true, fillColor: Colors.white),
+          labelText: 'Password(Atleast 6 Characters)', filled: true, fillColor: Colors.white),
       obscureText: true,
       controller: _passwordTextController,
       validator: (String value) {
         if (value.isEmpty || value.length < 6) {
-          return 'Password invalid';
+          return 'Password must be atleast 6 characters';
         }
       },
       onSaved: (String value) {
@@ -283,7 +283,7 @@ class _AuthenticationState extends State<Authentication>
           context: context,
           builder: (BuildContext context) {
             return _alertDialog(
-                'An Error Occurred!', successInformation['message']);
+                'An Error Occurred!', successInformation['message'], context);
           });
     }
     setState(() {
@@ -336,14 +336,14 @@ class _AuthenticationState extends State<Authentication>
       showDialog(
           context: context,
           builder: (BuildContext context) {
-            return _alertDialog('Success!', successInformation['message']);
+            return _alertDialog('Success!', successInformation['message'], context);
           });
     } else {
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return _alertDialog(
-                'An Error Occurred!', successInformation['message']);
+                'An Error Occurred!', successInformation['message'], context);
           });
     }
     setState(() {
@@ -351,7 +351,7 @@ class _AuthenticationState extends State<Authentication>
     });
   }
 
-  Widget _alertDialog(String boxTitle, String message) {
+  Widget _alertDialog(String boxTitle, String message, BuildContext context) {
     return AlertDialog(
       title: Text(boxTitle),
       content: Text(message),
