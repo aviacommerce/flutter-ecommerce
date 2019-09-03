@@ -232,10 +232,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 ]),
                 Divider(),
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
                     Scaffold.of(context).showSnackBar(processSnackbar);
-
-                    model.addProduct(variantId: favorite.productId, quantity: 1);
+                    int productId = await getProductDetail(favorite.slug);
+                    model.addProduct(variantId: productId, quantity: 1);
                     if (!model.isLoading) {
                       Scaffold.of(context).showSnackBar(completeSnackbar);
                     }
@@ -300,10 +300,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
     responseBody['data'].forEach((favoriteObj) {
       print(favoriteObj);
-      setState(() async {
+      setState(()  {
         favoriteProducts.add(Favorite(
-            productId:
-                await getProductDetail(favoriteObj['attributes']['slug']),
             id: favoriteObj['id'],
             name: favoriteObj['attributes']['name'],
             image: favoriteObj['attributes']['product_url'],
