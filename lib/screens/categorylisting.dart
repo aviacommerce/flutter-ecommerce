@@ -543,7 +543,6 @@ class _CategoryListingState extends State<CategoryListing> {
 
     setState(() {
       hasMore = false;
-      productsByCategory = [];
     });
     var response;
     print(sortBy);
