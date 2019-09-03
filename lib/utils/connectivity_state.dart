@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
@@ -85,7 +86,29 @@ class ConnectivityManager {
   }
 }
 
-class ConnectivityPage extends StatelessWidget {
+class ConnectivityPage extends StatefulWidget {
+  @override
+  _ConnectivityPageState createState() => _ConnectivityPageState();
+}
+
+class _ConnectivityPageState extends State<ConnectivityPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    BackButtonInterceptor.add(myInterceptor);
+  }
+
+  @override
+  void dispose() {
+    BackButtonInterceptor.removeAll();
+    super.dispose();
+  }
+
+  bool myInterceptor(bool stopDefaultButtonEvent) {
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
