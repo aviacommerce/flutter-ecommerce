@@ -152,6 +152,8 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen>
                             validator: (value) {
                               if (value.isEmpty) {
                                 return 'Enter Title';
+                              } else if(value.length > 80) {
+                                return 'Title cannot be greater than 80 characters.';
                               }
                               return null;
                             },
@@ -176,6 +178,8 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen>
                             validator: (value) {
                               if (value.isEmpty) {
                                 return 'Enter Review';
+                              } else if (value.length > 1000) {
+                                return "Review can't be greater than 1000 characters.";
                               }
                               return null;
                             },
