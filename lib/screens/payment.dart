@@ -61,34 +61,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   return paymentMethodsRadioButton(index);
                 },
               ),
-        // : SingleChildScrollView(
-        //     child: Column(
-        //       children: <Widget>[
-        //         RadioListTile<dynamic>(
-        //           title: Text(paymentMethods.first.name),
-        //           value: paymentMethods.first.id,
-        //           groupValue: _character,
-        //           onChanged: (value) {
-        //             setState(() {
-        //               _character = value;
-        //             });
-        //           },
-        //           activeColor: Colors.green,
-        //         ),
-        //         RadioListTile<dynamic>(
-        //           title: Text(paymentMethods[1].name),
-        //           value: paymentMethods[1].id,
-        //           groupValue: _character,
-        //           onChanged: (value) {
-        //             setState(() {
-        //               _character = value;
-        //             });
-        //           },
-        //           activeColor: Colors.green,
-        //         )
-        //       ],
-        //     ),
-        //   ),
         bottomNavigationBar: !_isLoading ? paymentButton(context) : Container(),
       );
     });
@@ -110,33 +82,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
       );
     });
   }
-
-  // getPaymentMethods() async {
-  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   Map<String, String> headers = await getHeaders();
-  //   Map<dynamic, dynamic> responseBody;
-
-  //   http.Response response = await http.get(
-  //       Settings.SERVER_URL +
-  //           'api/v1/orders/${prefs.getString('orderNumber')}/payments/new?order_token=${prefs.getString('orderToken')}',
-  //       headers: headers);
-  //   responseBody = json.decode(response.body);
-  //   print('PAYMENT RESPONSE');
-  //   print(responseBody);
-
-  //   responseBody['payment_methods'].forEach((paymentObj) {
-  //     setState(() {
-  //       paymentMethods
-  //           .add(PaymentMethod(id: paymentObj['id'], name: paymentObj['name']));
-  //     });
-  //   });
-  //   print(paymentMethods.first.id);
-  //   print(paymentMethods[1].id);
-  //   setState(() {
-  //     _isLoading = false;
-  //     _character = paymentMethods.first.id;
-  //   });
-  // }
 
   Widget paymentButton(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
