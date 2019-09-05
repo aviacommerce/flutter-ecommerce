@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:ofypets_mobile_app/models/order.dart';
@@ -27,13 +26,26 @@ class _OrderList extends State<OrderList> {
   static const int PAGE_SIZE = 20;
   List<Order> ordersList = [];
   Map<dynamic, dynamic> responseBody;
+  final scrollController = ScrollController();
+  bool hasMore = false;
   void initState() {
     super.initState();
+    locator<ConnectivityManager>().initConnectivity(context);
+    getOrdersLists();
+    scrollController.addListener(() {
+      if (scrollController.position.maxScrollExtent ==
+          scrollController.offset) {
+        getOrdersLists();
+      }
+    });
   }
 
   Size _deviceSize;
 
   Future<List<Order>> getOrdersLists() async {
+    setState(() {
+      hasMore = false;
+    });
     ordersList = [];
     Map<String, String> headers = await getHeaders();
     final response = (await http.get(
@@ -47,15 +59,16 @@ class _OrderList extends State<OrderList> {
     orderListResponse = json.decode(response);
     responseBody['orders'].forEach((order) {
       if (order["completed_at"] != null) {
-        setState(() {
-          ordersList.add(Order(
-              completedAt: order["completed_at"],
-              imageUrl: order["line_items"][0]["variant"]["images"][0]
-                  ["small_url"],
-              displayTotal: order["display_total"],
-              number: order["number"]));
-        });
+        ordersList.add(Order(
+            completedAt: order["completed_at"],
+            imageUrl: order["line_items"][0]["variant"]["images"][0]
+                ["small_url"],
+            displayTotal: order["display_total"],
+            number: order["number"]));
       }
+    });
+    setState(() {
+      hasMore = true;
     });
     return ordersList;
   }
@@ -71,14 +84,43 @@ class _OrderList extends State<OrderList> {
     _deviceSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(title: Text('Order History')),
-      body: Theme(
+      body: Padding(
+          padding: const EdgeInsets.only(top: 3.0),
+          child: Theme(
+            data: ThemeData(primarySwatch: Colors.green),
+            child: ListView.builder(
+                controller: scrollController,
+                itemCount: ordersList.length + 1,
+                itemBuilder: (mainContext, index) {
+                  if (index < ordersList.length) {
+                    // return favoriteCard(
+                    //     context, searchProducts[index], index);
+                    return orderItem(context, ordersList[index], index);
+                  }
+                  if (hasMore && ordersList.length == 0) {
+                    return noProductFoundWidget();
+                  }
+                  if (!hasMore) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 0.0),
+                      child: Center(
+                          child: CircularProgressIndicator(
+                        backgroundColor: Colors.green,
+                      )),
+                    );
+                  } else {
+                    return Container();
+                  }
+                }),
+          )),
+      /*Theme(
         data: ThemeData(primarySwatch: Colors.green),
         child: PagewiseListView(
           pageSize: PAGE_SIZE,
           itemBuilder: orderItem,
           pageFuture: (pageIndex) => getOrdersLists(),
         ),
-      ),
+      ),*/
     );
   }
 
@@ -108,6 +150,70 @@ class _OrderList extends State<OrderList> {
         ),
       );
     }
+  }
+
+  Widget noProductFoundWidget() {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      child: Stack(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 220.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                SizedBox(
+                  height: 10.0,
+                ),
+                Text(
+                  'No Previous Orders',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25.0),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    'We will save items you buy here for fast and\neasy shopping',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black, fontSize: 16.0),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 200,
+            right: 0,
+            left: 0,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: 40.0,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                child: RaisedButton(
+                    color: Colors.green,
+                    onPressed: () {
+                      // Navigator.pop(context);
+                      Navigator.popUntil(context,
+                          ModalRoute.withName(Navigator.defaultRouteName));
+                    },
+                    child: Text(
+                      'START SHOPPING',
+                      style: TextStyle(color: Colors.white),
+                    )),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   Widget orderVariantImage(imageUrl) {

@@ -27,14 +27,18 @@ class ConnectivityManager {
         _connectivityState = ConnectivityState.offline;
         // showFlushBar(context, ConnectivityState.offline);
         //showInternetOffScreen(context);
-        Navigator.of(context).push(new MaterialPageRoute<Null>(
-            builder: (BuildContext context) {
-              return new ConnectivityPage();
-            },
-            fullscreenDialog: true));
+        pushInternetOffScreen(context);
       }
-      isPageAdded = true;
     });
+  }
+
+  void pushInternetOffScreen(BuildContext context) {
+    Navigator.of(context).push(new MaterialPageRoute<Null>(
+        builder: (BuildContext context) {
+          return new ConnectivityPage();
+        },
+        fullscreenDialog: true));
+    isPageAdded = true;
   }
 
   void showInternetOffScreen(BuildContext context) {

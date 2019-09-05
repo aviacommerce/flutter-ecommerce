@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/product_detail.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/widgets/snackbar.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -24,20 +23,22 @@ class _AddToCartState extends State<AddToCart> {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return FlatButton(
-        onPressed: () async {
-          print('selectedProductIndex');
-          print(widget.index);
-          setState(() {
-            selectedIndex = widget.index;
-          });
-          if (widget.product.isOrderable) {
-            Scaffold.of(context).showSnackBar(processSnackbar);
-            model.addProduct(variantId: widget.product.id, quantity: 1);
-            if (!model.isLoading) {
-              Scaffold.of(context).showSnackBar(completeSnackbar);
-            }
-          }
-        },
+        onPressed: widget.product.isOrderable
+            ? () async {
+                print('selectedProductIndex');
+                print(widget.index);
+                setState(() {
+                  selectedIndex = widget.index;
+                });
+                if (widget.product.isOrderable) {
+                  Scaffold.of(context).showSnackBar(processSnackbar);
+                  model.addProduct(variantId: widget.product.id, quantity: 1);
+                  if (!model.isLoading) {
+                    Scaffold.of(context).showSnackBar(completeSnackbar);
+                  }
+                }
+              }
+            : () {},
         child: !model.isLoading
             ? buttonContent(widget.index, widget.product)
             : widget.index == selectedIndex

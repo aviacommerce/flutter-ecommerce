@@ -79,8 +79,9 @@ class _CategoryListingState extends State<CategoryListing> {
     _dropDownMenuItems = getDropDownMenuItems();
     _currentItem = _dropDownMenuItems[0].value;
     scrollController.addListener(() {
-      if (scrollController.position.maxScrollExtent ==
-          scrollController.offset) {
+      if (scrollController.offset >=
+              scrollController.position.maxScrollExtent &&
+          !scrollController.position.outOfRange) {
         getProductsByCategory(0);
       }
     });
@@ -450,11 +451,13 @@ class _CategoryListingState extends State<CategoryListing> {
           if (level == 0) {
             getSubCategory(categoryList[index].id);
             setState(() {
-              header.add(Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Icon(
-                Icons.arrow_forward_ios,
-                color: Colors.white,
-                size: 16,
-              )));
+              header.add(Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white,
+                    size: 16,
+                  )));
               header.add(textField(categoryList[index].name, FontWeight.normal,
                   1, Colors.white));
             });
@@ -462,11 +465,13 @@ class _CategoryListingState extends State<CategoryListing> {
             subCatId = subCategoryList[index].id;
             loadProductsByCategory();
             setState(() {
-              header.add(Padding(padding: EdgeInsets.symmetric(horizontal: 12), child: Icon(
-                Icons.arrow_forward_ios,
-                color: Colors.white,
-                size: 16,
-              )));
+              header.add(Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                  child: Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.white,
+                    size: 16,
+                  )));
               header.add(textField(subCategoryList[index].name,
                   FontWeight.normal, 2, Colors.white));
             });
@@ -565,7 +570,8 @@ class _CategoryListingState extends State<CategoryListing> {
               'api/v1/taxons/products?id=$subCatId&page=$currentPage&per_page=$perPage&data_set=small'))
           .body;
     }
-
+    print(Settings.SERVER_URL +
+        'api/v1/taxons/products?id=$subCatId&page=$currentPage&per_page=$perPage&q[s]=$sortBy&data_set=small');
     currentPage++;
     responseBody = json.decode(response);
     print(responseBody);
@@ -654,7 +660,7 @@ class _CategoryListingState extends State<CategoryListing> {
 
   void loadProductsByCategory([String sortBy]) {
     setState(() {
-      currentPage = ZERO;
+      currentPage = ONE;
       productsByCategory = [];
 
       sortBy != null

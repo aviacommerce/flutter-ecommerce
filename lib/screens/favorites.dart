@@ -1,13 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_pagewise/flutter_pagewise.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:ofypets_mobile_app/models/favorites.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/models/option_type.dart';
 import 'package:ofypets_mobile_app/models/option_value.dart';
+import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
@@ -15,7 +13,6 @@ import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
 import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
-import 'package:ofypets_mobile_app/widgets/snackbar.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class FavoritesScreen extends StatefulWidget {
@@ -35,11 +32,20 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   int currentPage = ONE;
   int subCatId = ZERO;
   static const int PAGE_SIZE = 20;
+  final scrollController = ScrollController();
 
+  bool hasMore = false;
   @override
   void initState() {
     super.initState();
     locator<ConnectivityManager>().initConnectivity(context);
+    getPaginatedFavorites();
+    scrollController.addListener(() {
+      if (scrollController.position.maxScrollExtent ==
+          scrollController.offset) {
+        getPaginatedFavorites();
+      }
+    });
   }
 
   @override
@@ -75,18 +81,108 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 ),
         ),
         drawer: HomeDrawer(),
-        body: Theme(
-          data: ThemeData(primarySwatch: Colors.green),
-          child: PagewiseListView(
-            pageSize: PAGE_SIZE,
-            itemBuilder: favoriteCardPaginated,
-            pageFuture: (pageIndex) {
-              return getPaginatedFavorites();
-            },
-          ),
-        ),
+        body: Padding(
+            padding: const EdgeInsets.only(top: 3.0),
+            child: model.isLoading
+                ? LinearProgressIndicator()
+                : Theme(
+                    data: ThemeData(primarySwatch: Colors.green),
+                    child: ListView.builder(
+                        controller: scrollController,
+                        itemCount: favoriteProducts.length + 1,
+                        itemBuilder: (mainContext, index) {
+                          if (index < favoriteProducts.length) {
+                            // return favoriteCard(
+                            //     context, searchProducts[index], index);
+                            return favoriteCardPaginated(
+                                _scaffoldKey.currentContext,
+                                favoriteProducts[index],
+                                index);
+                          }
+                          if (hasMore && favoriteProducts.length == 0) {
+                            return noProductFoundWidget();
+                          }
+                          if (!hasMore || _isLoading) {
+                            return Padding(
+                              padding: EdgeInsets.symmetric(vertical: 0.0),
+                              child: Center(
+                                  child: CircularProgressIndicator(
+                                backgroundColor: Colors.green,
+                              )),
+                            );
+                          } else {
+                            return Container();
+                          }
+                        }),
+                  )),
       );
     });
+  }
+
+  Widget noProductFoundWidget() {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      child: Stack(
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.only(top: 220.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Icon(
+                  Icons.favorite_border,
+                  size: 80.0,
+                  color: Colors.grey,
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Text(
+                  'Welcome to Favorites',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25.0),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                Text(
+                  'Shape, organize and shop all you\npet\'s favorite in one spot',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.black, fontSize: 16.0),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 200,
+            right: 0,
+            left: 0,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: 40.0,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                child: RaisedButton(
+                    color: Colors.green,
+                    onPressed: () {
+                      // Navigator.pop(context);
+                      Navigator.popUntil(context,
+                          ModalRoute.withName(Navigator.defaultRouteName));
+                    },
+                    child: Text(
+                      'START SHOPPING',
+                      style: TextStyle(color: Colors.white),
+                    )),
+              ),
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   Widget favoriteCardPaginated(
@@ -230,30 +326,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     ),
                   ),
                 ]),
-                Divider(),
-                InkWell(
-                  onTap: () async {
-                    Scaffold.of(context).showSnackBar(processSnackbar);
-                    int productId = await getProductDetail(favorite.slug);
-                    model.addProduct(variantId: productId, quantity: 1);
-                    if (!model.isLoading) {
-                      Scaffold.of(context).showSnackBar(completeSnackbar);
-                    }
-                  },
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    color: Colors.white,
-                    height: 50.0,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 15.0, right: 16.0),
-                      child: Text(
-                        'ADD TO CART',
-                        textAlign: TextAlign.right,
-                        style: TextStyle(color: Colors.green),
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
@@ -289,6 +361,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   Future<List<Favorite>> getPaginatedFavorites() async {
+    setState(() {
+      hasMore = false;
+    });
+
     Map<String, String> headers = await getHeaders();
     Map<String, dynamic> responseBody = Map();
     http.Response response = await http.get(
@@ -297,19 +373,21 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         headers: headers);
     currentPage++;
     responseBody = json.decode(response.body);
-
+    print(responseBody['data']);
     responseBody['data'].forEach((favoriteObj) {
-      print(favoriteObj);
-      setState(()  {
-        favoriteProducts.add(Favorite(
-            id: favoriteObj['id'],
-            name: favoriteObj['attributes']['name'],
-            image: favoriteObj['attributes']['product_url'],
-            price: favoriteObj['attributes']['price'],
-            currencySymbol: favoriteObj['attributes']['currency_symbol'],
-            slug: favoriteObj['attributes']['slug']));
-      });
+      favoriteProducts.add(Favorite(
+          id: favoriteObj['id'],
+          name: favoriteObj['attributes']['name'],
+          image: favoriteObj['attributes']['product_url'],
+          price: favoriteObj['attributes']['price'],
+          currencySymbol: favoriteObj['attributes']['currency_symbol'],
+          slug: favoriteObj['attributes']['slug']));
     });
+    setState(() {
+      hasMore = true;
+      _isLoading = false;
+    });
+
     return favoriteProducts;
   }
 }
