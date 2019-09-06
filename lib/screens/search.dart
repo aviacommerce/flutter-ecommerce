@@ -125,6 +125,13 @@ class _ProductSearchState extends State<ProductSearch> {
                     slug = value;
                   });
                 },
+                onSubmitted: (value) {
+                  isSearched = true;
+                  searchProducts = [];
+                  currentPage = 1;
+                  searchProduct();
+                  // print("ENTER PRESSED ------> $value");
+                },
                 autofocus: true,
                 decoration: InputDecoration(
                     hintText: 'Search',

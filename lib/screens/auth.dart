@@ -65,12 +65,12 @@ class _AuthenticationState extends State<Authentication>
                   padding: EdgeInsets.all(12.0),
                   child: Text(
                     "SIGN IN",
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 14),
                   ),
                 ),
                 Text(
                   "CREATE ACCOUNT",
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 14),
                 )
               ],
             ),
@@ -105,18 +105,24 @@ class _AuthenticationState extends State<Authentication>
                   height: 20.0,
                 ),
                 _buildEmailTextField(),
+                SizedBox(
+                  height: 20.0,
+                ),
                 _buildPasswordTextField(),
                 SizedBox(
                   height: 20.0,
                 ),
                 _isLoader
                     ? CircularProgressIndicator(backgroundColor: Colors.green)
-                    : RaisedButton(
+                    : Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.all(15),
+                      child: FlatButton(
                         textColor: Colors.white,
-                        color: Colors.green,
-                        child: Text('LOGIN'),
-                        onPressed: () => _submitLogin(model),
-                      ),
+                        color: Colors.deepOrange,
+                        child: Text('SIGN IN'),
+                        onPressed: () => _submitForm(),
+                      )),
                 SizedBox(
                   height: 20.0,
                 ),
@@ -154,19 +160,28 @@ class _AuthenticationState extends State<Authentication>
                 height: 20.0,
               ),
               _buildEmailTextField(),
+              SizedBox(
+                height: 20.0,
+              ),
               _buildPasswordTextField(),
+              SizedBox(
+                height: 20.0,
+              ),
               _buildPasswordConfirmTextField(),
               SizedBox(
                 height: 20.0,
               ),
               _isLoader
                   ? CircularProgressIndicator(backgroundColor: Colors.green)
-                  : RaisedButton(
-                      textColor: Colors.white,
-                      color: Colors.green,
-                      child: Text('SIGNUP'),
-                      onPressed: () => _submitForm(),
-                    ),
+                  : Container(
+                      width: MediaQuery.of(context).size.width,
+                      padding: EdgeInsets.all(15),
+                      child: FlatButton(
+                        textColor: Colors.white,
+                        color: Colors.deepOrange,
+                        child: Text('CREATE ACCOUNT'),
+                        onPressed: () => _submitForm(),
+                      )),
               SizedBox(
                 height: 20.0,
               ),
@@ -178,7 +193,9 @@ class _AuthenticationState extends State<Authentication>
   }
 
   Widget _buildEmailTextField() {
-    return TextFormField(
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      child: TextFormField(
       decoration: InputDecoration(
           labelText: 'E-Mail', filled: true, fillColor: Colors.white),
       keyboardType: TextInputType.emailAddress,
@@ -192,13 +209,17 @@ class _AuthenticationState extends State<Authentication>
       onSaved: (String value) {
         _formData['email'] = value;
       },
-    );
+    ));
   }
 
   Widget _buildPasswordTextField() {
-    return TextFormField(
+    return Padding( 
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      child: TextFormField(
       decoration: InputDecoration(
-          labelText: 'Password(Atleast 6 Characters)', filled: true, fillColor: Colors.white),
+          labelText: 'Password (Atleast 6 Characters)',
+          filled: true,
+          fillColor: Colors.white),
       obscureText: true,
       controller: _passwordTextController,
       validator: (String value) {
@@ -209,11 +230,13 @@ class _AuthenticationState extends State<Authentication>
       onSaved: (String value) {
         _formData['password'] = value;
       },
-    );
+    ));
   }
 
   Widget _buildPasswordConfirmTextField() {
-    return TextFormField(
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      child: TextFormField(
       decoration: InputDecoration(
           labelText: 'Confirm Password', filled: true, fillColor: Colors.white),
       obscureText: true,
@@ -222,7 +245,7 @@ class _AuthenticationState extends State<Authentication>
           return 'Passwords do not match.';
         }
       },
-    );
+    ));
   }
 
   void _submitLogin(MainModel model) async {
@@ -336,7 +359,8 @@ class _AuthenticationState extends State<Authentication>
       showDialog(
           context: context,
           builder: (BuildContext context) {
-            return _alertDialog('Success!', successInformation['message'], context);
+            return _alertDialog(
+                'Success!', successInformation['message'], context);
           });
     } else {
       showDialog(

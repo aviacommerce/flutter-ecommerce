@@ -22,6 +22,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.0"
+  back_button_interceptor:
+    dependency: "direct main"
+    description:
+      name: back_button_interceptor
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.1.1"
   boolean_selector:
     dependency: transitive
     description:
@@ -126,10 +133,12 @@ packages:
   flutter_webview_plugin:
     dependency: "direct main"
     description:
-      name: flutter_webview_plugin
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.5"
+      path: "."
+      ref: HEAD
+      resolved-ref: b9dfe40cc6c66f69fe55bd224ccf81110e631094
+      url: "https://github.com/sakina1403/flutter_webview_plugin.git"
+    source: git
+    version: "0.3.7"
   flutter_widget_from_html_core:
     dependency: "direct main"
     description:

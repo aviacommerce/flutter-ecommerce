@@ -498,54 +498,88 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     padding: EdgeInsets.all(10),
                     alignment: Alignment.topRight,
                     icon: Icon(Icons.favorite),
-                    color: Colors.orange,
+                    color: _isFavorite ? Colors.orange : Colors.grey,
                     onPressed: () async {
                       final SharedPreferences prefs =
                           await SharedPreferences.getInstance();
                       String authToken = prefs.getString('spreeApiKey');
+                      Map<String, String> headers = await getHeaders();
 
-                      if (authToken == null) {
-                        _scaffoldKey.currentState.showSnackBar(SnackBar(
-                          content: Text(
-                            'Please Login to add to Favorites',
-                          ),
-                          action: SnackBarAction(
-                            label: 'LOGIN',
-                            onPressed: () {
-                              MaterialPageRoute route = MaterialPageRoute(
-                                  builder: (context) => Authentication(0));
-                              Navigator.push(context, route);
-                            },
-                          ),
-                        ));
+                      if (!_isFavorite) {
+                        if (authToken == null) {
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                            content: Text(
+                              'Please Login to add to Favorites',
+                            ),
+                            action: SnackBarAction(
+                              label: 'LOGIN',
+                              onPressed: () {
+                                MaterialPageRoute route = MaterialPageRoute(
+                                    builder: (context) => Authentication(0));
+                                Navigator.push(context, route);
+                              },
+                            ),
+                          ));
+                        } else {
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(
+                            content: Text(
+                              'Adding to Favorites, please wait.',
+                            ),
+                            duration: Duration(seconds: 1),
+                          ));
+                          http
+                              .post(Settings.SERVER_URL + 'favorite_products',
+                                  body: json.encode({
+                                    'id': widget.product.reviewProductId
+                                        .toString()
+                                  }),
+                                  headers: headers)
+                              .then((response) {
+                            Map<dynamic, dynamic> responseBody =
+                                json.decode(response.body);
+                            setState(() {
+                              _isFavorite = true;
+                            });
+                            _scaffoldKey.currentState.showSnackBar(SnackBar(
+                              content: Text('Product marked as favorite!'),
+                              duration: Duration(seconds: 1),
+                            ));
+                          });
+                        }
                       } else {
                         _scaffoldKey.currentState.showSnackBar(SnackBar(
                           content: Text(
-                            'Adding to Favorites, please wait.',
+                            'Removing from Favorites, please wait.',
                           ),
                           duration: Duration(seconds: 1),
                         ));
-                        Map<String, String> headers = await getHeaders();
                         http
-                            .post(Settings.SERVER_URL + 'favorite_products',
-                                body: json.encode({
-                                  'id':
-                                      widget.product.reviewProductId.toString()
-                                }),
+                            .delete(
+                                Settings.SERVER_URL +
+                                    'favorite_products/${widget.product.reviewProductId}',
                                 headers: headers)
                             .then((response) {
                           Map<dynamic, dynamic> responseBody =
                               json.decode(response.body);
-
-                          _scaffoldKey.currentState.showSnackBar(SnackBar(
-                            content: Text(responseBody['message']),
-                            duration: Duration(seconds: 1),
-                          ));
+                          if (responseBody['message'] != null) {
+                            setState(() {
+                              _isFavorite = false;
+                            });
+                            _scaffoldKey.currentState.showSnackBar(SnackBar(
+                              content: Text(responseBody['message']),
+                              duration: Duration(seconds: 1),
+                            ));
+                          } else {
+                            _scaffoldKey.currentState.showSnackBar(SnackBar(
+                              content: Text('Oops! Something went wrong'),
+                              duration: Duration(seconds: 1),
+                            ));
+                          }
                         });
                       }
                     },
                   ),
-                ),
+                )
               ],
             ),
             Divider(),
@@ -564,93 +598,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                           fontWeight: FontWeight.normal,
                           color: Colors.green,
                           fontFamily: fontFamily),
-                    ),
-                  ),
-                  Expanded(
-                    child: IconButton(
-                      padding: EdgeInsets.all(10),
-                      alignment: Alignment.topRight,
-                      icon: Icon(Icons.favorite),
-                      color: _isFavorite ? Colors.orange : Colors.grey,
-                      onPressed: () async {
-                        final SharedPreferences prefs =
-                            await SharedPreferences.getInstance();
-                        String authToken = prefs.getString('spreeApiKey');
-                        Map<String, String> headers = await getHeaders();
-
-                        if (!_isFavorite) {
-                          if (authToken == null) {
-                            _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              content: Text(
-                                'Please Login to add to Favorites',
-                              ),
-                              action: SnackBarAction(
-                                label: 'LOGIN',
-                                onPressed: () {
-                                  MaterialPageRoute route = MaterialPageRoute(
-                                      builder: (context) => Authentication(0));
-                                  Navigator.push(context, route);
-                                },
-                              ),
-                            ));
-                          } else {
-                            _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              content: Text(
-                                'Adding to Favorites, please wait.',
-                              ),
-                              duration: Duration(seconds: 1),
-                            ));
-                            http
-                                .post(Settings.SERVER_URL + 'favorite_products',
-                                    body: json.encode({
-                                      'id': widget.product.reviewProductId
-                                          .toString()
-                                    }),
-                                    headers: headers)
-                                .then((response) {
-                              Map<dynamic, dynamic> responseBody =
-                                  json.decode(response.body);
-                              setState(() {
-                                _isFavorite = true;
-                              });
-                              _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                content: Text('Product marked as favorite!'),
-                                duration: Duration(seconds: 1),
-                              ));
-                            });
-                          }
-                        } else {
-                          _scaffoldKey.currentState.showSnackBar(SnackBar(
-                            content: Text(
-                              'Removing from Favorites, please wait.',
-                            ),
-                            duration: Duration(seconds: 1),
-                          ));
-                          http
-                              .delete(
-                                  Settings.SERVER_URL +
-                                      'favorite_products/${widget.product.reviewProductId}',
-                                  headers: headers)
-                              .then((response) {
-                            Map<dynamic, dynamic> responseBody =
-                                json.decode(response.body);
-                            if (responseBody['message'] != null) {
-                              setState(() {
-                                _isFavorite = false;
-                              });
-                              _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                content: Text(responseBody['message']),
-                                duration: Duration(seconds: 1),
-                              ));
-                            } else {
-                              _scaffoldKey.currentState.showSnackBar(SnackBar(
-                                content: Text('Oops! Something went wrong'),
-                                duration: Duration(seconds: 1),
-                              ));
-                            }
-                          });
-                        }
-                      },
                     ),
                   ),
                   ratingBar(selectedProduct.avgRating, 20),

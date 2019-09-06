@@ -2,6 +2,7 @@ import 'package:ofypets_mobile_app/models/line_item.dart';
 import 'package:ofypets_mobile_app/models/address.dart';
 
 class Order {
+  final String total;
   final int id;
   final String itemTotal;
   final String displayTotal;
@@ -12,9 +13,11 @@ class Order {
   String state;
   String completedAt, imageUrl, number;
   Address shipAddress;
+  final String paymentState, shipState, paymentMethod;
 
   Order(
-      {this.id,
+      {this.total,
+      this.id,
       this.completedAt,
       this.imageUrl,
       this.number,
@@ -25,5 +28,7 @@ class Order {
       this.shipTotal,
       this.totalQuantity,
       this.state,
-      this.shipAddress});
+      this.shipAddress,
+      this.paymentMethod,
+      this.paymentState, this.shipState});
 }

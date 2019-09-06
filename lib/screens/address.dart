@@ -83,28 +83,8 @@ class _AddressPageState extends State<AddressPage> {
             style: TextStyle(
                 fontSize: 20, color: Colors.white, fontWeight: FontWeight.w300),
           ),
-          onPressed: () async {
-            if (model.order.state == 'delivery' ||
-                model.order.state == 'address') {
-              // print('STATE IS DELIVERY/ADDRESS, CHANGE STATE');
-              bool _stateischanged = await model.changeState();
-              if (_stateischanged) {
-                if (model.order.state == 'delivery') {
-                  _stateischanged = await model.changeState();
-                }
-              }
-              setState(() {
-                stateChanged = _stateischanged;
-              });
-            }
-            if (stateChanged) {
-              print('STATE IS CHANGED, FETCH CURRENT ORDER');
-              model.fetchCurrentOrder();
-              model.getPaymentMethods();
-              MaterialPageRoute payment =
-                  MaterialPageRoute(builder: (context) => PaymentScreen());
-              Navigator.push(context, payment);
-            }
+          onPressed: () {
+            model.order.shipAddress != null ? pushPaymentScreen(model) : null;
           },
         ),
       );
@@ -120,6 +100,29 @@ class _AddressPageState extends State<AddressPage> {
         ),
       ),
     );
+  }
+
+  pushPaymentScreen(MainModel model) async {
+    if (model.order.state == 'delivery' || model.order.state == 'address') {
+      // print('STATE IS DELIVERY/ADDRESS, CHANGE STATE');
+      bool _stateischanged = await model.changeState();
+      if (_stateischanged) {
+        if (model.order.state == 'delivery') {
+          _stateischanged = await model.changeState();
+        }
+      }
+      setState(() {
+        stateChanged = _stateischanged;
+      });
+    }
+    if (stateChanged) {
+      print('STATE IS CHANGED, FETCH CURRENT ORDER');
+      model.fetchCurrentOrder();
+      model.getPaymentMethods();
+      MaterialPageRoute payment =
+          MaterialPageRoute(builder: (context) => PaymentScreen());
+      Navigator.push(context, payment);
+    }
   }
 
   Widget addressContainer() {

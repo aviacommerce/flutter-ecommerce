@@ -83,7 +83,8 @@ mixin CartModel on Model {
           ));
         });
         variants.add(Product(
-            favoritedByUser: responseBody['data']['attributes']['is_favorited_by_current_user'],
+            favoritedByUser: responseBody['data']['attributes']
+                ['is_favorited_by_current_user'],
             id: variant['data']['attributes']['id'],
             name: variant['data']['attributes']['name'],
             description: variant['data']['attributes']['description'],
@@ -110,7 +111,8 @@ mixin CartModel on Model {
             presentation: optionType['data']['attributes']['presentation']));
       });
       tappedProduct = Product(
-        favoritedByUser: responseBody['data']['attributes']['is_favorited_by_current_user'],
+        favoritedByUser: responseBody['data']['attributes']
+            ['is_favorited_by_current_user'],
         name: responseBody['data']['attributes']['name'],
         displayPrice: responseBody['data']['attributes']['display_price'],
         currencySymbol: responseBody['data']['attributes']['currency_symbol'],
@@ -130,7 +132,8 @@ mixin CartModel on Model {
       );
     } else {
       tappedProduct = Product(
-        favoritedByUser: responseBody['data']['attributes']['is_favorited_by_current_user'],
+        favoritedByUser: responseBody['data']['attributes']
+            ['is_favorited_by_current_user'],
         id: responseBody['data']['included']['id'],
         name: responseBody['data']['attributes']['name'],
         displayPrice: responseBody['data']['attributes']['display_price'],
@@ -287,6 +290,7 @@ mixin CartModel on Model {
           shipAddress = null;
         }
         order = Order(
+            total: responseBody['total'],
             id: responseBody['id'],
             itemTotal: responseBody['item_total'],
             displaySubTotal: responseBody['display_item_total'],
@@ -321,8 +325,11 @@ mixin CartModel on Model {
         headers: headers);
 
     responseBody = json.decode(response.body);
-
+    print("ORDER STATE CHANGED -------> ${json.decode(response.body)}");
+    print(
+        "ORDER STATE PAYMENTS ARRAY ------> ${json.decode(response.body)['payments']}");
     order = Order(
+        total: responseBody['total'],
         id: responseBody['id'],
         itemTotal: responseBody['item_total'],
         displaySubTotal: responseBody['display_item_total'],
@@ -344,11 +351,13 @@ mixin CartModel on Model {
     notifyListeners();
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String, String> headers = await getHeaders();
+    print("ITEMTOTAL--------> ${order.itemTotal}");
 
+    print("DISPLAYTOTAL--------> ${order.displayTotal}");
     Map<String, dynamic> paymentPayload = {
       'payment': {
         'payment_method_id': paymentMethodId,
-        'amount': order.itemTotal
+        'amount': order.total,
       }
     };
     http.Response response = await http.post(
@@ -374,6 +383,7 @@ mixin CartModel on Model {
             'api/v1/orders/${prefs.getString('orderNumber')}/payments/new?order_token=${prefs.getString('orderToken')}',
         headers: headers);
     responseBody = json.decode(response.body);
+    print("GET PAYMENT METHODS RESPONSE -------> $responseBody");
     responseBody['payment_methods'].forEach((paymentMethodObj) {
       if (paymentMethodObj['name'] == 'Payubiz' ||
           paymentMethodObj['name'] == 'COD') {

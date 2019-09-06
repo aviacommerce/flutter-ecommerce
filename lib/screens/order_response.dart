@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
@@ -10,6 +11,8 @@ import 'package:ofypets_mobile_app/utils/headers.dart';
 import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ofypets_mobile_app/utils/params.dart';
+import 'package:ofypets_mobile_app/screens/payubiz.dart';
 
 class OrderResponse extends StatefulWidget {
   final String orderNumber;
@@ -26,6 +29,8 @@ class _OrderResponseState extends State<OrderResponse> {
   Size _deviceSize;
   Map<dynamic, dynamic> responseBody;
   var formatter = new DateFormat('dd-MMM-yyyy hh:mm a');
+  bool _isLoading = false;
+  bool retryButton = false;
 
   @override
   void initState() {
@@ -42,22 +47,38 @@ class _OrderResponseState extends State<OrderResponse> {
   }
 
   getOrderDetails() async {
+    print("---------GETTING ORDER RESPONSE-------");
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-
+    print("ORDER NUMBER ${widget.orderNumber}");
     if (widget.orderNumber != null) {
       Map<String, String> headers = await getHeaders();
       await http
           .get(Settings.SERVER_URL + '/api/v1/orders/${widget.orderNumber}',
               headers: headers)
           .then((response) {
+        print("RESPONSE BODY ------- ${json.decode(response.body)}");
+        // print("PAYMENTS ARRAY _________>>>>>>> ${json.decode(response.body)["payments"]}");
         setState(() {
           responseBody = json.decode(response.body);
         });
       });
     } else {
+      print("DETAIL ORDER ------- ${widget.detailOrder}");
       setState(() {
         responseBody = widget.detailOrder;
       });
+    }
+    print("PAYMENTS ARRAY -------> ${responseBody['payments']}");
+    print("CHECK RETRY BUTTON");
+    if (responseBody["payments"].length > 0) {
+      print("PAYMENT LENGTH >0");
+      if (responseBody["payments"][0]["payment_method"]["name"] == 'Payubiz' &&
+          responseBody["payment_state"] != 'paid') {
+        print("------PAID----");
+        retryButton = true;
+      } else {
+        retryButton = false;
+      }
     }
   }
 
@@ -74,15 +95,14 @@ class _OrderResponseState extends State<OrderResponse> {
             appBar: new AppBar(
               leading: IconButton(
                 icon: Icon(Icons.close),
-                onPressed: () async {
-                  if (widget.orderNumber != null) {
-                    await model.clearData();
-                    Navigator.popUntil(context,
-                        ModalRoute.withName(Navigator.defaultRouteName));
+                onPressed: () {
+                  if (widget.detailOrder != null) {
+                    print("ORDER EXISTS------");
+                    model.clearData();
+                    // Navigator.pushReplacementNamed(context, '/home');
+                    Navigator.pop(context);
                   } else {
-                    // Navigator.of(context).pop();
-                    Navigator.popUntil(context,
-                        ModalRoute.withName(Navigator.defaultRouteName));
+                    Navigator.pushReplacementNamed(context, '/home');
                   }
                 },
               ),
@@ -169,6 +189,35 @@ class _OrderResponseState extends State<OrderResponse> {
                                                 fontWeight: FontWeight.w800))),
                                   ],
                                 ),
+                                SizedBox(height: 10),
+                                new Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Expanded(child: new Text('Payment Status')),
+                                    getPaymentStatus(responseBody),
+                                  ],
+                                ),
+                                SizedBox(height: 10),
+                                new Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Expanded(child: new Text('Shipping')),
+                                    Expanded(
+                                        child: responseBody["shipment_state"] !=
+                                                null
+                                            ? new Text(
+                                                responseBody["shipment_state"],
+                                                style: new TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w800))
+                                            : new Text('N/A',
+                                                style: new TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w800))),
+                                  ],
+                                ),
                                 Divider(),
                                 new Row(
                                   mainAxisAlignment:
@@ -182,6 +231,40 @@ class _OrderResponseState extends State<OrderResponse> {
                                                 fontWeight: FontWeight.w800))),
                                   ],
                                 ),
+                                retryButton
+                                    ? new Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: <Widget>[
+                                          Expanded(
+                                            child: new FlatButton(
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            2)),
+                                                color: Colors.green,
+                                                onPressed: () {
+                                                  if (!_isLoading) {
+                                                    retryPayment(responseBody);
+                                                  }
+                                                },
+                                                child: !_isLoading
+                                                    ? new Text(
+                                                        'Retry Payment (Payubiz)',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      )
+                                                    : CupertinoActivityIndicator()),
+                                          ),
+                                          // Expanded(
+                                          //     child: new Text(
+                                          //         (responseBody["display_total"]),
+                                          //         style: new TextStyle(
+                                          //             fontWeight: FontWeight.w800))),
+                                        ],
+                                      )
+                                    : Container(),
                                 SizedBox(height: 5),
                               ],
                             ),
@@ -208,10 +291,13 @@ class _OrderResponseState extends State<OrderResponse> {
                                     ','),
                                 SizedBox(height: 5),
                                 new Text(
-                                    '${responseBody["ship_address"]["address2"]}, ${responseBody["ship_address"]["city"]}'),
+                                    '${responseBody["ship_address"]["address2"]}, ${responseBody["ship_address"]["city"]},'),
                                 SizedBox(height: 5),
                                 new Text(
-                                    '${responseBody["ship_address"]["city"]} - ${responseBody["ship_address"]["zipcode"]}, ${responseBody["ship_address"]["state"]["name"]}'),
+                                    '${responseBody["ship_address"]["zipcode"]},'),
+                                SizedBox(height: 5),
+                                new Text(
+                                    '${responseBody["ship_address"]["state"]["name"]}'),
                                 SizedBox(height: 5),
                                 new Text(
                                     '${responseBody["ship_address"]["phone"]}',
@@ -291,5 +377,43 @@ class _OrderResponseState extends State<OrderResponse> {
           )
         });
     return list;
+  }
+
+  getPaymentStatus(responseBody) {
+    String payMethod = responseBody["payments"] != null
+        ? responseBody["payments"][0]["payment_method"]["name"]
+        : '';
+    String payState = responseBody["payment_state"];
+      if (payState == 'balance_due') {
+        return Expanded(
+            child: new Text('Balance due',
+                style: new TextStyle(fontWeight: FontWeight.w800)));
+      } else if (payState == 'paid') {
+        return Expanded(
+            child: new Text('Paid',
+                style: new TextStyle(fontWeight: FontWeight.w800)));
+      } else if (payState == 'void') {
+        return Expanded(
+            child: new Text('Void',
+                style: new TextStyle(fontWeight: FontWeight.w800)));
+      }
+  }
+
+  retryPayment(responseBody) async {
+    setState(() {
+      _isLoading = true;
+    });
+    String orderNumber = responseBody["number"];
+    String url = await getParams(orderNumber: orderNumber);
+    print("URL RECEIEVED -> $url");
+    setState(() {
+      _isLoading = false;
+    });
+    MaterialPageRoute payment = MaterialPageRoute(
+        builder: (context) => PayubizScreen(
+              url,
+              orderNumber: orderNumber,
+            ));
+    Navigator.push(context, payment);
   }
 }

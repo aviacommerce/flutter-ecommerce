@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 
 import 'dart:io';
 
-getParams() async {
+getParams({String orderNumber}) async {
   print("GETTTING PARAMS");
   Map<String, dynamic> urlResponse;
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -22,7 +22,7 @@ getParams() async {
     'params': {
       'surl': surl,
       'furl': furl,
-      'order_number': prefs.getString('orderNumber'),
+      'order_number': orderNumber!=null ? orderNumber : prefs.getString('orderNumber'),
       'ismobileview': true
     }
   };

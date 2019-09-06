@@ -32,7 +32,7 @@ class Account extends StatelessWidget {
           ListTile(
             title: Text(
               "Order History",
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle( ),
             ),
             onTap: () {
               navigate_option("order_history", context, model);
@@ -41,14 +41,14 @@ class Account extends StatelessWidget {
           // ListTile(
           //   title: Text(
           //     "Addresses",
-          //     style: TextStyle(fontWeight: FontWeight.w600),
+          //     style: TextStyle( ),
           //   ),
           //   onTap: () {},
           // ),
           ListTile(
             title: Text(
               "Change Email",
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle( ),
             ),
             onTap: () {
               navigate_option("email_edit", context, model);
@@ -57,7 +57,7 @@ class Account extends StatelessWidget {
           ListTile(
             title: Text(
               "Change Password",
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle( ),
             ),
             onTap: () {
               navigate_option("change_password", context, model);
@@ -66,7 +66,7 @@ class Account extends StatelessWidget {
           ListTile(
             title: Text(
               "My Addresses",
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle( ),
             ),
             onTap: () {
               navigate_option("change_address", context, model);
@@ -85,7 +85,7 @@ class Account extends StatelessWidget {
           return ListTile(
             title: Text(
               'Sign Out',
-              style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+              style: TextStyle(color: Colors.red,  ),
             ),
             onTap: () {
               _showDialog(context, model);

@@ -451,29 +451,55 @@ class _CategoryListingState extends State<CategoryListing> {
           if (level == 0) {
             getSubCategory(categoryList[index].id);
             setState(() {
-              header.add(Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.white,
-                    size: 16,
-                  )));
-              header.add(textField(categoryList[index].name, FontWeight.normal,
-                  1, Colors.white));
+              header.add(Row(
+                children: <Widget>[
+                  Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.white,
+                        size: 16,
+                      )),
+                  textField(categoryList[index].name, FontWeight.normal, 1,
+                      Colors.white)
+                ],
+              ));
+              // header.add(Padding(
+              //     padding: EdgeInsets.symmetric(horizontal: 12),
+              //     child: Icon(
+              //       Icons.arrow_forward_ios,
+              //       color: Colors.white,
+              //       size: 16,
+              //     )));
+              // header.add(textField(categoryList[index].name, FontWeight.normal,
+              //     1, Colors.white));
             });
           } else {
             subCatId = subCategoryList[index].id;
             loadProductsByCategory();
             setState(() {
-              header.add(Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  child: Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.white,
-                    size: 16,
-                  )));
-              header.add(textField(subCategoryList[index].name,
-                  FontWeight.normal, 2, Colors.white));
+              header.add(Row(
+                children: <Widget>[
+                  Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.white,
+                        size: 16,
+                      )),
+                  textField(subCategoryList[index].name, FontWeight.normal, 2,
+                      Colors.white)
+                ],
+              ));
+              // header.add(Padding(
+              //     padding: EdgeInsets.symmetric(horizontal: 12),
+              //     child: Icon(
+              //       Icons.arrow_forward_ios,
+              //       color: Colors.white,
+              //       size: 16,
+              //     )));
+              // header.add(textField(subCategoryList[index].name,
+              //     FontWeight.normal, 2, Colors.white));
             });
           }
         },
@@ -498,11 +524,6 @@ class _CategoryListingState extends State<CategoryListing> {
   void adjustHeaders(String catName, String subCatName) {
     setState(() {
       header.removeLast();
-      header.removeLast();
-      header
-          .add(textField(' > ' + catName, FontWeight.normal, 1, Colors.white));
-      header.add(
-          textField(' > ' + subCatName, FontWeight.normal, 2, Colors.white));
     });
   }
 

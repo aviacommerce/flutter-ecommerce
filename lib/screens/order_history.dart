@@ -59,12 +59,17 @@ class _OrderList extends State<OrderList> {
     orderListResponse = json.decode(response);
     responseBody['orders'].forEach((order) {
       if (order["completed_at"] != null) {
-        ordersList.add(Order(
-            completedAt: order["completed_at"],
-            imageUrl: order["line_items"][0]["variant"]["images"][0]
-                ["small_url"],
-            displayTotal: order["display_total"],
-            number: order["number"]));
+        setState(() {
+          ordersList.add(Order(
+              completedAt: order["completed_at"],
+              imageUrl: order["line_items"][0]["variant"]["images"][0]
+                  ["small_url"],
+              displayTotal: order["display_total"],
+              number: order["number"],
+              paymentMethod: order["payments"][0]["payment_method"]["name"],
+              paymentState: order["payment_state"],
+              shipState: order["shipment_state"]));
+        });
       }
     });
     setState(() {
@@ -139,12 +144,11 @@ class _OrderList extends State<OrderList> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   ListTile(
-                    leading: orderVariantImage(order.imageUrl),
-                    title: Text('${order.number}'),
-                    subtitle: Text((formatter.format(DateTime.parse(
-                        (order.completedAt.split('+05:30')[0]))))),
-                    trailing: Text('${order.displayTotal}'),
-                  ),
+                      leading: orderVariantImage(order.imageUrl),
+                      title: Text('${order.number}'),
+                      subtitle: Text((formatter.format(DateTime.parse(
+                          (order.completedAt.split('+05:30')[0]))))),
+                      trailing: trailingSpace(order)),
                 ]),
           ),
         ),
@@ -219,7 +223,8 @@ class _OrderList extends State<OrderList> {
   Widget orderVariantImage(imageUrl) {
     return FadeInImage(
       image: NetworkImage(imageUrl),
-      placeholder: AssetImage('images/placeholders/no-product-image.png'),
+      placeholder: AssetImage('images/placeholders/no-product-image.png',),
+      width: 35,
     );
   }
 
@@ -228,5 +233,33 @@ class _OrderList extends State<OrderList> {
         builder: (context) =>
             OrderResponse(orderNumber: null, detailOrder: detailOrder));
     Navigator.push(context, orderResponse);
+  }
+
+  trailingSpace(detailOrder) {
+    return new Container(
+      margin: EdgeInsets.all(5),
+      child: new Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text('${detailOrder.displayTotal}'),
+            getOrderStatus(detailOrder)
+          ]),
+    );
+  }
+
+  getOrderStatus(detailOrder) {
+    if (detailOrder.paymentState == 'balance_due' &&
+        detailOrder.shipState == 'shipped') {
+      return Text('Shipped', style: TextStyle(color: Colors.green));
+    } else if (detailOrder.paymentState == 'balance_due') {
+      return Text('Pending', style: TextStyle(color: Colors.blue));
+    } else if (detailOrder.paymentState == 'void') {
+      return Text('Canceled', style: TextStyle(color: Colors.red));
+    } else if (detailOrder.paymentState == 'paid' &&
+        detailOrder.shipState == 'shipped') {
+      return Text('Completed', style: TextStyle(color: Colors.grey));
+    } else {
+      return Text('Processing', style: TextStyle(color: Colors.amber));
+    }
   }
 }

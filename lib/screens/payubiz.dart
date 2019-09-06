@@ -6,7 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class PayubizScreen extends StatefulWidget {
   String url;
-  PayubizScreen(this.url);
+  String orderNumber;
+  PayubizScreen(this.url, {this.orderNumber});
   @override
   State<StatefulWidget> createState() {
     return _PayubizScreenState();
@@ -26,7 +27,8 @@ class _PayubizScreenState extends State<PayubizScreen> {
     String orderNumber = prefs.getString('orderNumber');
     MaterialPageRoute payment = MaterialPageRoute(
         builder: (context) => OrderResponse(
-              orderNumber: orderNumber,
+              orderNumber:
+                  widget.orderNumber != null ? widget.orderNumber : orderNumber,
               success: success,
             ));
     Navigator.pushAndRemoveUntil(
@@ -55,13 +57,13 @@ class _PayubizScreenState extends State<PayubizScreen> {
       },
       child: Scaffold(
           appBar: AppBar(
-            leading: IconButton(
-              color: Colors.black,
-              icon: Icon(Icons.arrow_back_ios),
-              onPressed: () {
-                pushSuccessPage(false);
-              },
-            ),
+            // leading: IconButton(
+            //   color: Colors.black,
+            //   icon: Icon(Icons.arrow_back_ios),
+            //   onPressed: () {
+            //     pushSuccessPage(false);
+            //   },
+            // ),
             title: Text(
               'Payubiz',
               style: TextStyle(

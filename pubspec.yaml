@@ -11,7 +11,7 @@ description: A new Flutter project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.9+18
+version: 1.0.12+21
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -38,7 +38,9 @@ dependencies:
   flutter_widget_from_html_core: ^0.2.0
   flutter_launcher_icons: ^0.7.2
   flutter_pagewise: ^1.2.3
-  flutter_webview_plugin: ^0.3.5
+  flutter_webview_plugin: 
+    git:
+      url: https://github.com/sakina1403/flutter_webview_plugin.git
 
 dev_dependencies:
   flutter_test:

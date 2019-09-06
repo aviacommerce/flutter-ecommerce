@@ -36,6 +36,10 @@ class _MyAppState extends State<MyApp> {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
+        initialRoute: '/home',
+        routes: {
+          '/home' : (context) => HomeScreen()
+        },
         theme: ThemeData(
           primarySwatch: Colors.green,
           accentColor: Colors.white,

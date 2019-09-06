@@ -70,7 +70,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     right: MediaQuery.of(context).size.width * 0.01),
                 child: shoppingCartIconButton()),
           ],
-          bottom: _isLoading || model.isLoading
+          bottom: _isLoading 
               ? PreferredSize(
                   child: LinearProgressIndicator(),
                   preferredSize: Size.fromHeight(10),
