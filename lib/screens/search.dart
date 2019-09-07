@@ -179,13 +179,20 @@ class _ProductSearchState extends State<ProductSearch> {
           body: Stack(
             children: <Widget>[
               Padding(
-                padding: const EdgeInsets.only(top: 80.0),
+                padding: const EdgeInsets.only(top: 90.0),
                 child: model.isLoading
                     ? LinearProgressIndicator()
                     : isSearched
                         ? Theme(
                             data: ThemeData(primarySwatch: Colors.green),
-                            child: ListView.builder(
+                            child: ListView.separated(
+                                separatorBuilder: (context, index) {
+                                  return Divider(
+                                    indent: 150.0,
+                                    color: Colors.grey.shade400,
+                                    height: 1.0,
+                                  );
+                                },
                                 controller: scrollController,
                                 itemCount: searchProducts.length + 1,
                                 itemBuilder: (mainContext, index) {
@@ -323,7 +330,7 @@ class _ProductSearchState extends State<ProductSearch> {
             child: Container(
                 alignment: Alignment.centerLeft,
                 color: Colors.orange,
-                height: 180.0,
+                height: 150.0,
                 child: ListTile(
                   title: Row(
                     children: <Widget>[
@@ -335,6 +342,7 @@ class _ProductSearchState extends State<ProductSearch> {
                             fontSize: 18.0),
                       ),
                       DropdownButton(
+                        underline: Container(),
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 15.0,
@@ -359,6 +367,7 @@ class _ProductSearchState extends State<ProductSearch> {
                   padding: EdgeInsets.all(8.0),
                   separatorBuilder: (context, index) => Divider(
                     color: Colors.grey,
+                    height: 1.0,
                   ),
                   itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(

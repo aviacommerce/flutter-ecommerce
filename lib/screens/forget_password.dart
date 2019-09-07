@@ -40,75 +40,75 @@ class _ForgetPasswordState extends State<ForgetPassword>
       home: DefaultTabController(
         length: 2,
         child: Scaffold(
+          backgroundColor: Colors.white,
           appBar: AppBar(
-              backgroundColor: Colors.green,
-              leading: IconButton(
-                  icon: Icon(Icons.close),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  }),
-              title: Text(
-                'ofypets',
-                style: TextStyle(fontFamily: 'HolyFat', fontSize: 50),
-              ),
-              bottom: PreferredSize(
-                  preferredSize: Size(_deviceSize.width, 50),
+            backgroundColor: Colors.green,
+            leading: IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                }),
+            title: Text(
+              'FORGOT PASSWORD',
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+              child: Container(
+                width: targetWidth,
+                child: Form(
+                  key: _formKey,
                   child: Column(
                     children: <Widget>[
-                      Container(
-                          margin: EdgeInsets.all(10),
-                          child: Text(
-                            "FORGOT PASSWORD",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                fontSize: 20),
-                          ))
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      Text(
+                        'Please enter the email address used to create your account',
+                        style: TextStyle(fontSize: 16.0),
+                      ),
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      TextFormField(
+                        decoration: InputDecoration(
+                            labelText: 'Email',
+                            contentPadding: EdgeInsets.all(0.0)),
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (String value) {
+                          if (value.isEmpty ||
+                              !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                                  .hasMatch(value)) {
+                            return 'Please enter a valid email';
+                          }
+                          return null;
+                        },
+                        onSaved: (String value) {
+                          _formData['email'] = value;
+                        },
+                      ),
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      _isLoader
+                          ? CircularProgressIndicator(
+                              backgroundColor: Colors.green)
+                          : Container(
+                              width: MediaQuery.of(context).size.width,
+                              child: RaisedButton(
+                                textColor: Colors.white,
+                                color: Colors.deepOrange,
+                                child: Text('RESET PASSWORD'),
+                                onPressed: () => _submitFogetPassword(),
+                              ),
+                            ),
+                      SizedBox(
+                        height: 20.0,
+                      ),
                     ],
-                  ))),
-          body: SingleChildScrollView(
-            child: Container(
-              width: targetWidth,
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: <Widget>[
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    TextFormField(
-                      decoration: InputDecoration(
-                          labelText: 'E-Mail',
-                          filled: true,
-                          fillColor: Colors.white),
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (String value) {
-                        if (value.isEmpty ||
-                            !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-                                .hasMatch(value)) {
-                          return 'Please enter a valid email';
-                        }
-                      },
-                      onSaved: (String value) {
-                        _formData['email'] = value;
-                      },
-                    ),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                    _isLoader
-                        ? CircularProgressIndicator(
-                            backgroundColor: Colors.green)
-                        : RaisedButton(
-                            textColor: Colors.white,
-                            color: Colors.green,
-                            child: Text('SEND MAIL'),
-                            onPressed: () => _submitFogetPassword(),
-                          ),
-                    SizedBox(
-                      height: 20.0,
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),

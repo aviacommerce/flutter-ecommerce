@@ -42,6 +42,7 @@ class _CategoryListingState extends State<CategoryListing> {
   int currentPage = ONE;
   int subCatId = ZERO;
   int currentIndex = -1;
+  int totalCount = 0;
   Map<int, List<Widget>> subCatListForFilter = Map();
   final scrollController = ScrollController();
   bool hasMore = false, isFilterDataLoading = false;
@@ -251,64 +252,83 @@ class _CategoryListingState extends State<CategoryListing> {
             child: Container(
                 alignment: Alignment.centerLeft,
                 color: Colors.orange,
-                height: 180.0,
-                child: ListTile(
-                  title: Row(
-                    children: <Widget>[
-                      Text(
-                        'Sort By:  ',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 18.0),
+                height: 150.0,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    ListTile(
+                      title: Row(
+                        children: <Widget>[
+                          Text(
+                            'Sort By:  ',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                fontSize: 18.0),
+                          ),
+                          DropdownButton(
+                            underline: Container(),
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15.0,
+                                fontWeight: FontWeight.bold),
+                            value: _currentItem,
+                            icon: Icon(
+                              Icons.arrow_drop_down,
+                              color: Colors.white,
+                            ),
+                            items: _dropDownMenuItems,
+                            onChanged: changedDropDownItem,
+                          )
+                        ],
                       ),
-                      DropdownButton(
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 15.0,
-                            fontWeight: FontWeight.bold),
-                        value: _currentItem,
-                        icon: Icon(
-                          Icons.arrow_drop_down,
-                          color: Colors.white,
-                        ),
-                        items: _dropDownMenuItems,
-                        onChanged: changedDropDownItem,
-                      )
-                    ],
-                  ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0, left: 16.0),
+                      child: Text(
+                        '$totalCount Results',
+                        textAlign: TextAlign.left,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
                 )),
           ),
-          Expanded(
-            child: Theme(
-                data: ThemeData(primarySwatch: Colors.green),
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.all(8.0),
-                  separatorBuilder: (context, index) => Divider(
-                    color: Colors.grey,
-                  ),
-                  itemBuilder: (BuildContext context, int index) {
-                    return ExpansionTile(
-                        onExpansionChanged: (value) {
-                          if (value) {
-                            // widget.getSubCat(index);
-                            currentIndex = index;
-                            getSubCatList(categoryList[index].id,
-                                categoryList[index].name);
-                          }
-                        },
-                        title: Text(categoryList[index].name),
-                        children: subCatListForFilter[index] != null
-                            ? subCatListForFilter[index]
-                            : isFilterDataLoading
-                                ? progressBar()
-                                : subCatListForFilter[index] != null
-                                    ? subCatListForFilter[index]
-                                    : emptyWidget());
-                  },
-                  itemCount: categoryList != null ? categoryList.length : 0,
-                )),
+          Theme(
+              data: ThemeData(primarySwatch: Colors.green),
+              child: ListView.separated(
+                shrinkWrap: true,
+                padding: EdgeInsets.all(8.0),
+                separatorBuilder: (context, index) => Divider(
+                  height: 1.0,
+                  color: Colors.grey,
+                ),
+                itemBuilder: (BuildContext context, int index) {
+                  return ExpansionTile(
+                      onExpansionChanged: (value) {
+                        if (value) {
+                          // widget.getSubCat(index);
+                          currentIndex = index;
+                          getSubCatList(
+                              categoryList[index].id, categoryList[index].name);
+                        }
+                      },
+                      title: Text(categoryList[index].name),
+                      children: subCatListForFilter[index] != null
+                          ? subCatListForFilter[index]
+                          : isFilterDataLoading
+                              ? progressBar()
+                              : subCatListForFilter[index] != null
+                                  ? subCatListForFilter[index]
+                                  : emptyWidget());
+                },
+                itemCount: categoryList != null ? categoryList.length : 0,
+              )),
+          Divider(
+            height: 1.0,
+            color: Colors.grey,
+            indent: 10.0,
           ),
         ],
       ),
@@ -378,39 +398,49 @@ class _CategoryListingState extends State<CategoryListing> {
       case 2:
         return Theme(
           data: ThemeData(primarySwatch: Colors.green),
-          child: ListView.builder(
-              controller: scrollController,
-              itemCount: productsByCategory.length + 1,
-              itemBuilder: (context, index) {
-                if (index < productsByCategory.length) {
-                  return productContainer(
-                      context, productsByCategory[index], index);
-                }
-                if (hasMore && productsByCategory.length == 0) {
-                  print("LENGTH 00000000");
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 50.0),
-                    child: Center(
-                      child: Text(
-                        'No Product Found',
-                        style: TextStyle(fontSize: 20.0),
-                        textAlign: TextAlign.center,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 50.0),
+            child: ListView.separated(
+                separatorBuilder: (context, index) {
+                  return Divider(
+                    indent: 150.0,
+                    color: Colors.grey.shade400,
+                    height: 1.0,
+                  );
+                },
+                controller: scrollController,
+                itemCount: productsByCategory.length + 1,
+                itemBuilder: (context, index) {
+                  if (index < productsByCategory.length) {
+                    return productContainer(
+                        context, productsByCategory[index], index);
+                  }
+                  if (hasMore && productsByCategory.length == 0) {
+                    print("LENGTH 00000000");
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 50.0),
+                      child: Center(
+                        child: Text(
+                          'No Product Found',
+                          style: TextStyle(fontSize: 20.0),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    ),
-                  );
-                }
-                if (!hasMore) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 25.0),
-                    child: Center(
-                        child: CircularProgressIndicator(
-                      backgroundColor: Colors.green,
-                    )),
-                  );
-                } else {
-                  return Container();
-                }
-              }),
+                    );
+                  }
+                  if (!hasMore) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(vertical: 25.0),
+                      child: Center(
+                          child: CircularProgressIndicator(
+                        backgroundColor: Colors.green,
+                      )),
+                    );
+                  } else {
+                    return Container();
+                  }
+                }),
+          ),
         );
         break;
       default:
@@ -505,11 +535,11 @@ class _CategoryListingState extends State<CategoryListing> {
         },
         child: Container(
           alignment: Alignment.center,
-          margin: EdgeInsets.all(10.0),
-          padding: EdgeInsets.all(10),
+          margin: EdgeInsets.all(5),
+          padding: EdgeInsets.all(5),
           width: _deviceSize.width * 0.4,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(5),
             color: colorList[index],
           ),
           child: Text(
@@ -596,6 +626,7 @@ class _CategoryListingState extends State<CategoryListing> {
     currentPage++;
     responseBody = json.decode(response);
     print(responseBody);
+    totalCount = responseBody['total_count'];
     responseBody['products'].forEach((product) {
       int reviewProductId = product["id"];
       variants = [];
@@ -674,6 +705,7 @@ class _CategoryListingState extends State<CategoryListing> {
         });
       }
     });
+
     setState(() {
       hasMore = true;
     });

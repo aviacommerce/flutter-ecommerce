@@ -65,12 +65,12 @@ class _AuthenticationState extends State<Authentication>
                   padding: EdgeInsets.all(12.0),
                   child: Text(
                     "SIGN IN",
-                    style: TextStyle(fontSize: 14),
+                    style: TextStyle(fontSize: 13),
                   ),
                 ),
                 Text(
                   "CREATE ACCOUNT",
-                  style: TextStyle(fontSize: 14),
+                  style: TextStyle(fontSize: 13),
                 )
               ],
             ),
@@ -102,7 +102,7 @@ class _AuthenticationState extends State<Authentication>
             child: Column(
               children: <Widget>[
                 SizedBox(
-                  height: 20.0,
+                  height: 30.0,
                 ),
                 _buildEmailTextField(),
                 SizedBox(
@@ -115,14 +115,14 @@ class _AuthenticationState extends State<Authentication>
                 _isLoader
                     ? CircularProgressIndicator(backgroundColor: Colors.green)
                     : Container(
-                      width: MediaQuery.of(context).size.width,
-                      padding: EdgeInsets.all(15),
-                      child: FlatButton(
-                        textColor: Colors.white,
-                        color: Colors.deepOrange,
-                        child: Text('SIGN IN'),
-                        onPressed: () => _submitForm(),
-                      )),
+                        width: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.all(15),
+                        child: FlatButton(
+                          textColor: Colors.white,
+                          color: Colors.deepOrange,
+                          child: Text('SIGN IN'),
+                          onPressed: () => _submitLogin(model),
+                        )),
                 SizedBox(
                   height: 20.0,
                 ),
@@ -194,58 +194,70 @@ class _AuthenticationState extends State<Authentication>
 
   Widget _buildEmailTextField() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: TextFormField(
-      decoration: InputDecoration(
-          labelText: 'E-Mail', filled: true, fillColor: Colors.white),
-      keyboardType: TextInputType.emailAddress,
-      validator: (String value) {
-        if (value.isEmpty ||
-            !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-                .hasMatch(value)) {
-          return 'Please enter a valid email';
-        }
-      },
-      onSaved: (String value) {
-        _formData['email'] = value;
-      },
-    ));
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        child: TextFormField(
+          decoration: InputDecoration(
+            labelText: 'Email',
+            contentPadding: EdgeInsets.all(0.0),
+          ),
+          keyboardType: TextInputType.emailAddress,
+          validator: (String value) {
+            if (value.isEmpty ||
+                !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                    .hasMatch(value)) {
+              return 'Please enter a valid email';
+            }
+            return null;
+          },
+          onSaved: (String value) {
+            _formData['email'] = value;
+          },
+        ));
   }
 
   Widget _buildPasswordTextField() {
-    return Padding( 
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: TextFormField(
-      decoration: InputDecoration(
-          labelText: 'Password (Atleast 6 Characters)',
-          filled: true,
-          fillColor: Colors.white),
-      obscureText: true,
-      controller: _passwordTextController,
-      validator: (String value) {
-        if (value.isEmpty || value.length < 6) {
-          return 'Password must be atleast 6 characters';
-        }
-      },
-      onSaved: (String value) {
-        _formData['password'] = value;
-      },
-    ));
+    return Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15.0),
+        child: Theme(
+          data: ThemeData(hintColor: Colors.grey.shade700),
+          child: TextFormField(
+            decoration: InputDecoration(
+                labelText: 'Password (Atleast 6 Characters)',
+                contentPadding: EdgeInsets.all(0.0)),
+            obscureText: true,
+            controller: _passwordTextController,
+            validator: (String value) {
+              if (value.isEmpty || value.length < 6) {
+                return 'Password must be atleast 6 characters';
+              }
+              return null;
+            },
+            onSaved: (String value) {
+              _formData['password'] = value;
+            },
+          ),
+        ));
   }
 
   Widget _buildPasswordConfirmTextField() {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: TextFormField(
-      decoration: InputDecoration(
-          labelText: 'Confirm Password', filled: true, fillColor: Colors.white),
-      obscureText: true,
-      validator: (String value) {
-        if (_passwordTextController.text != value) {
-          return 'Passwords do not match.';
-        }
-      },
-    ));
+        padding: EdgeInsets.symmetric(horizontal: 15),
+        child: Theme(
+          data: ThemeData(hintColor: Colors.grey.shade700),
+          child: TextFormField(
+            decoration: InputDecoration(
+              labelText: 'Confirm Password',
+              contentPadding: EdgeInsets.all(0.0),
+            ),
+            obscureText: true,
+            validator: (String value) {
+              if (_passwordTextController.text != value) {
+                return 'Passwords do not match.';
+              }
+              return null;
+            },
+          ),
+        ));
   }
 
   void _submitLogin(MainModel model) async {

@@ -164,6 +164,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             shoppingCartIconButton()
           ],
           bottom: TabBar(
+            indicatorWeight: 4.0,
             controller: _tabController,
             tabs: <Widget>[
               Tab(
@@ -223,22 +224,25 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               children: <Widget>[
                 Expanded(
                     flex: 1,
-                    child: Column(
-                      children: <Widget>[
-                        Container(
-                          padding: const EdgeInsets.all(10.0),
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle, color: Colors.orange),
-                          child: Text(
-                            rating.toStringAsFixed(1),
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 17.0,
-                                fontWeight: FontWeight.w300),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 5.0),
+                      child: Column(
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.all(20.0),
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle, color: Colors.orange),
+                            child: Text(
+                              rating.toStringAsFixed(1),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 17.0,
+                                  fontWeight: FontWeight.w300),
+                            ),
                           ),
-                        ),
-                        ratingBar(rating, 14)
-                      ],
+                          ratingBar(rating, 14)
+                        ],
+                      ),
                     )),
                 Expanded(
                   flex: 3,
@@ -248,6 +252,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       Text("${total_reviews} Customer Reviews",
                           style: TextStyle(
                               fontSize: 12.0, fontWeight: FontWeight.w400)),
+                      SizedBox(
+                        height: 6.0,
+                      ),
                       Text(
                           "Recommended by ${recommended_percent}% of reviewers",
                           style: TextStyle(
@@ -256,6 +263,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   ),
                 )
               ],
+            ),
+            Divider(
+              height: 1.0,
+              indent: 100.0,
             ),
             SizedBox(
               height: 15,
@@ -286,7 +297,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     // Scaffold.of(context).showSnackBar(LoginErroSnackbar);
                     _scaffoldKey.currentState.showSnackBar(SnackBar(
                       content: Text(
-                        'Please Login Review',
+                        'Please Login to add to Favorites',
                       ),
                       action: SnackBarAction(
                         label: 'LOGIN',
@@ -342,7 +353,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             child: Column(
               children: <Widget>[
                 Container(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(15.0),
                   decoration: BoxDecoration(
                       shape: BoxShape.circle, color: Colors.orange),
                   child: Text(
@@ -495,7 +506,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 Container(
                   alignment: Alignment.topRight,
                   child: IconButton(
-                    padding: EdgeInsets.all(10),
+                    padding: EdgeInsets.only(top: 40, right: 15.0),
                     alignment: Alignment.topRight,
                     icon: Icon(Icons.favorite),
                     color: _isFavorite ? Colors.orange : Colors.grey,
@@ -583,28 +594,35 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               ],
             ),
             Divider(),
-            Container(
-              width: _deviceSize.width,
-              alignment: Alignment.centerRight,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: Text(
-                      'By ${selectedProduct.name.split(' ')[0]}',
-                      style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.green,
-                          fontFamily: fontFamily),
+            Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: Container(
+                width: _deviceSize.width,
+                alignment: Alignment.centerRight,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.only(left: 10.0),
+                      child: Text(
+                        'By ${selectedProduct.name.split(' ')[0]}',
+                        style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.green,
+                            fontFamily: fontFamily),
+                      ),
                     ),
-                  ),
-                  ratingBar(selectedProduct.avgRating, 20),
-                  Container(
-                      margin: EdgeInsets.only(right: 10),
-                      child: Text(selectedProduct.reviewsCount)),
-                ],
+                    Row(
+                      children: <Widget>[
+                        ratingBar(selectedProduct.avgRating, 20),
+                        Container(
+                            margin: EdgeInsets.only(right: 10),
+                            child: Text(selectedProduct.reviewsCount)),
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
             Container(
@@ -620,6 +638,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               ),
             ),
             variantRow(),
+            Divider(),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Expanded(
                   child: Container(
@@ -653,6 +672,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 },
               ),
             ]),
+            Divider(),
             discount
                 ? buildPriceRow('M.R.P',
                     '${selectedProduct.currencySymbol} ${selectedProduct.costPrice}',
@@ -660,23 +680,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 : Container(),
             buildPriceRow('Price', selectedProduct.displayPrice, strike: false),
             discount
-                ? buildPriceRow(
-                    'You Save:',
-                    '${selectedProduct.currencySymbol}' +
-                        (double.parse(selectedProduct.costPrice) -
-                                double.parse(selectedProduct.price))
-                            .toString() +
-                        '(' +
-                        (((double.parse(selectedProduct.costPrice) -
-                                        double.parse(selectedProduct.price)) /
-                                    double.parse(selectedProduct.costPrice)) *
-                                100)
-                            .round()
-                            .toString() +
-                        '%)',
-                    strike: false)
+                ? Column(
+                    children: <Widget>[
+                      Divider(),
+                      buildPriceRow(
+                          'You Save:',
+                          '${selectedProduct.currencySymbol}' +
+                              (double.parse(selectedProduct.costPrice) -
+                                      double.parse(selectedProduct.price))
+                                  .toString() +
+                              '(' +
+                              (((double.parse(selectedProduct.costPrice) -
+                                              double.parse(
+                                                  selectedProduct.price)) /
+                                          double.parse(
+                                              selectedProduct.costPrice)) *
+                                      100)
+                                  .round()
+                                  .toString() +
+                              '%)',
+                          strike: false),
+                    ],
+                  )
                 : Container(),
+            SizedBox(
+              height: 4.0,
+            ),
             addToCartFlatButton(),
+            SizedBox(
+              height: 12.0,
+            ),
+            Divider(),
             Column(
               children: <Widget>[
                 Container(
@@ -713,9 +747,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     ),
                   ),
             Container(
-                padding: EdgeInsets.only(left: 10.0, top: 8.0),
+                padding: EdgeInsets.only(left: 10.0, top: 20.0),
                 alignment: Alignment.centerLeft,
-                child: Text("Description", style: TextStyle(fontSize: 15.0))),
+                child: Text("Description",
+                    style: TextStyle(
+                        fontSize: 15.0, fontWeight: FontWeight.bold))),
             HtmlWidget(htmlDescription),
           ],
         ),
@@ -801,7 +837,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                         builder: (context) =>
                             ReviewDetailScreen(selectedProduct)));
                   } else {
-                    Scaffold.of(context).showSnackBar(LoginErroSnackbar);
+                    Scaffold.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                        'Please Login to add to Favorites',
+                      ),
+                      action: SnackBarAction(
+                        label: 'LOGIN',
+                        onPressed: () {
+                          MaterialPageRoute route = MaterialPageRoute(
+                              builder: (context) => Authentication(0));
+                          Navigator.push(context, route);
+                        },
+                      ),
+                    ));
                   }
                 },
                 backgroundColor: Colors.orange);

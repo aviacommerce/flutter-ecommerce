@@ -14,10 +14,9 @@ Widget categoryBox(int index, BuildContext context, Size _deviceSize,
           Navigator.push(context, route);
         },
         child: Container(
-            margin: EdgeInsets.all(10.0),
-            width: _deviceSize.width * 0.4,
+            margin: EdgeInsets.all(5.0),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(5),
               color: colorList[index],
             ),
             child: Stack(children: [
@@ -54,10 +53,10 @@ Widget categoryBox(int index, BuildContext context, Size _deviceSize,
         Navigator.push(context, route);
       },
       child: Container(
-          margin: EdgeInsets.all(10.0),
+          margin: EdgeInsets.all(5.0),
           width: _deviceSize.width * 0.4,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(5),
             color: colorList[index],
           ),
           child: Stack(children: [

@@ -1,15 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/models/product.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/auth.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/headers.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 Widget productContainer(BuildContext myContext, Product product, int index) {
   return ScopedModelDescendant<MainModel>(
@@ -18,8 +11,8 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
         onTap: () {
           model.getProductDetail(product.slug, myContext);
         },
-        child: Card(
-          margin: EdgeInsets.all(10),
+        child: Container(
+          padding: EdgeInsets.only(top: 15.0),
           color: Colors.white,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,7 +94,7 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                       padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
                       alignment: Alignment.topLeft,
                       child: Text(
-                        'More Options Available',
+                        'More Choices Available',
                         style: TextStyle(
                             fontWeight: FontWeight.w300, fontSize: 14),
                         textAlign: TextAlign.center,
