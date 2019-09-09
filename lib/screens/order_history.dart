@@ -46,7 +46,7 @@ class _OrderList extends State<OrderList> {
     setState(() {
       hasMore = false;
     });
-    ordersList = [];
+
     Map<String, String> headers = await getHeaders();
     final response = (await http.get(
             Settings.SERVER_URL +
@@ -223,7 +223,9 @@ class _OrderList extends State<OrderList> {
   Widget orderVariantImage(imageUrl) {
     return FadeInImage(
       image: NetworkImage(imageUrl),
-      placeholder: AssetImage('images/placeholders/no-product-image.png',),
+      placeholder: AssetImage(
+        'images/placeholders/no-product-image.png',
+      ),
       width: 35,
     );
   }

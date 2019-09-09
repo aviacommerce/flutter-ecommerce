@@ -52,6 +52,7 @@ class _CategoryListingState extends State<CategoryListing> {
       new GlobalKey<ScaffoldState>(); // ADD THIS LINE
   Map<dynamic, dynamic> responseBody;
   List<Category> _listViewData = [];
+  String sortBy = '';
   List<DropdownMenuItem<String>> _dropDownMenuItems;
   String _currentItem;
   List filterItems = [
@@ -77,6 +78,7 @@ class _CategoryListingState extends State<CategoryListing> {
   @override
   void initState() {
     super.initState();
+    sortBy = '';
     _dropDownMenuItems = getDropDownMenuItems();
     _currentItem = _dropDownMenuItems[0].value;
     scrollController.addListener(() {
@@ -617,7 +619,7 @@ class _CategoryListingState extends State<CategoryListing> {
     });
   }
 
-  void getProductsByCategory(int id, [String sortBy]) async {
+  void getProductsByCategory(int id) async {
     List<Product> variants = [];
     List<OptionValue> optionValues = [];
     List<OptionType> optionTypes = [];
@@ -627,7 +629,7 @@ class _CategoryListingState extends State<CategoryListing> {
     });
     var response;
     print(sortBy);
-    if (sortBy != null) {
+    if (sortBy != null && sortBy.length > 0) {
       response = (await http.get(Settings.SERVER_URL +
               'api/v1/taxons/products?id=$subCatId&page=$currentPage&per_page=$perPage&q[s]=$sortBy&data_set=small'))
           .body;
@@ -730,10 +732,8 @@ class _CategoryListingState extends State<CategoryListing> {
     setState(() {
       currentPage = ONE;
       productsByCategory = [];
-
-      sortBy != null
-          ? getProductsByCategory(0, sortBy)
-          : getProductsByCategory(0);
+      this.sortBy = sortBy;
+      getProductsByCategory(0);
       level = 2;
       _isLoading = false;
     });

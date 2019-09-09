@@ -19,7 +19,7 @@ class _CartState extends State<Cart> {
   @override
   void initState() {
     super.initState();
-  
+
     locator<ConnectivityManager>().initConnectivity(context);
   }
 
@@ -86,10 +86,7 @@ class _CartState extends State<Cart> {
   Widget itemTotalContainer(MainModel model) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        cartData(true),
-        cartData(false)
-      ],
+      children: <Widget>[cartData(true), cartData(false)],
     );
   }
 
@@ -105,6 +102,7 @@ class _CartState extends State<Cart> {
                     ? 'SubTotal: (${model.order.totalQuantity} items):'
                     : model.order.displaySubTotal;
       }
+
       return getText() == null
           ? Text('')
           : Text(
@@ -165,7 +163,9 @@ class _CartState extends State<Cart> {
                       // print('STATE IS CHANGED, FETCH CURRENT ORDER');
                       // model.fetchCurrentOrder();
                       MaterialPageRoute addressRoute = MaterialPageRoute(
-                          builder: (context) => AddressPage());
+                          builder: (context) => AddressPage(
+                                lineItems: model.lineItems,
+                              ));
                       Navigator.push(context, addressRoute);
                     }
                   } else {
