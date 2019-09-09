@@ -297,7 +297,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     // Scaffold.of(context).showSnackBar(LoginErroSnackbar);
                     _scaffoldKey.currentState.showSnackBar(SnackBar(
                       content: Text(
-                        'Please Login to add to Favorites',
+                        'Please Login to write review.',
                       ),
                       action: SnackBarAction(
                         label: 'LOGIN',
@@ -392,9 +392,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                             fontWeight: FontWeight.w400,
                             color: Colors.grey)),
                   ),
-                  Text(review.review,
-                      style: TextStyle(
-                          fontSize: 15.0, fontWeight: FontWeight.w300))
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: Text(review.review,
+                        style: TextStyle(
+                            fontSize: 15.0, fontWeight: FontWeight.w300)),
+                  )
                 ],
               ),
             ),
@@ -839,7 +842,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   } else {
                     Scaffold.of(context).showSnackBar(SnackBar(
                       content: Text(
-                        'Please Login to add to Favorites',
+                        'Please Login to write review.',
                       ),
                       action: SnackBarAction(
                         label: 'LOGIN',

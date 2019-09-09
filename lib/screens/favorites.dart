@@ -70,7 +70,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     right: MediaQuery.of(context).size.width * 0.01),
                 child: shoppingCartIconButton()),
           ],
-          bottom: _isLoading 
+          bottom: _isLoading
               ? PreferredSize(
                   child: LinearProgressIndicator(),
                   preferredSize: Size.fromHeight(10),
@@ -207,102 +207,100 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             elevation: 2,
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-            margin: EdgeInsets.all(10),
-            child: Column(
-              children: <Widget>[
-                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Container(
-                    padding: EdgeInsets.all(10),
-                    height: 150,
-                    width: 150,
-                    color: Colors.white,
-                    child: FadeInImage(
-                      image: NetworkImage(favorite.image),
-                      placeholder: AssetImage(
-                          'images/placeholders/no-product-image.png'),
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Container(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      right: 10.0, top: 10.0),
-                                  child: RichText(
-                                    text: TextSpan(children: [
-                                      TextSpan(
-                                        text: '${favorite.name.split(' ')[0]} ',
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 16.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      TextSpan(
-                                        text: favorite.name.substring(
-                                            favorite.name.split(' ')[0].length +
-                                                1,
-                                            favorite.name.length),
-                                        style: TextStyle(
-                                            fontSize: 15, color: Colors.black),
-                                      ),
-                                    ]),
-                                  ),
+            margin: EdgeInsets.all(4),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                padding: EdgeInsets.all(10),
+                height: 150,
+                width: 150,
+                color: Colors.white,
+                child: FadeInImage(
+                  image: NetworkImage(favorite.image),
+                  placeholder:
+                      AssetImage('images/placeholders/no-product-image.png'),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  height: 150.0,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    right: 10.0, top: 10.0),
+                                child: RichText(
+                                  text: TextSpan(children: [
+                                    TextSpan(
+                                      text: '${favorite.name.split(' ')[0]} ',
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16.0,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    TextSpan(
+                                      text: favorite.name.substring(
+                                          favorite.name.split(' ')[0].length +
+                                              1,
+                                          favorite.name.length),
+                                      style: TextStyle(
+                                          fontSize: 15, color: Colors.black),
+                                    ),
+                                  ]),
                                 ),
                               ),
-                              IconButton(
-                                color: Colors.grey,
-                                icon: Icon(Icons.clear),
-                                onPressed: () async {
-                                  Map<String, String> headers =
-                                      await getHeaders();
-                                  _scaffoldKey.currentState
-                                      .showSnackBar(SnackBar(
-                                    content: Text(
-                                      'Removing from Favorites, please wait.',
-                                    ),
-                                    duration: Duration(seconds: 1),
-                                  ));
-                                  http
-                                      .delete(
-                                          Settings.SERVER_URL +
-                                              'favorite_products/${favorite.id}',
-                                          headers: headers)
-                                      .then((response) {
-                                    Map<dynamic, dynamic> responseBody =
-                                        json.decode(response.body);
-                                    if (responseBody['message'] != null) {
-                                      setState(() {
-                                        addItemtoDeleteList(favorite);
-                                      });
-                                      _scaffoldKey.currentState
-                                          .showSnackBar(SnackBar(
-                                        content: Text(responseBody['message']),
-                                        duration: Duration(seconds: 1),
-                                      ));
-                                    } else {
-                                      _scaffoldKey.currentState
-                                          .showSnackBar(SnackBar(
-                                        content:
-                                            Text('Oops! Something went wrong'),
-                                        duration: Duration(seconds: 1),
-                                      ));
-                                    }
-                                  });
-                                },
-                              ),
-                            ],
-                          ),
+                            ),
+                            IconButton(
+                              color: Colors.grey,
+                              icon: Icon(Icons.clear),
+                              onPressed: () async {
+                                Map<String, String> headers =
+                                    await getHeaders();
+                                _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                  content: Text(
+                                    'Removing from Favorites, please wait.',
+                                  ),
+                                  duration: Duration(seconds: 1),
+                                ));
+                                http
+                                    .delete(
+                                        Settings.SERVER_URL +
+                                            'favorite_products/${favorite.id}',
+                                        headers: headers)
+                                    .then((response) {
+                                  Map<dynamic, dynamic> responseBody =
+                                      json.decode(response.body);
+                                  if (responseBody['message'] != null) {
+                                    setState(() {
+                                      addItemtoDeleteList(favorite);
+                                    });
+                                    _scaffoldKey.currentState
+                                        .showSnackBar(SnackBar(
+                                      content: Text(responseBody['message']),
+                                      duration: Duration(seconds: 1),
+                                    ));
+                                  } else {
+                                    _scaffoldKey.currentState
+                                        .showSnackBar(SnackBar(
+                                      content:
+                                          Text('Oops! Something went wrong'),
+                                      duration: Duration(seconds: 1),
+                                    ));
+                                  }
+                                });
+                              },
+                            ),
+                          ],
                         ),
-                        SizedBox(
-                          height: 60,
-                        ),
-                        Row(
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 16.0),
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Text(
@@ -322,12 +320,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ]),
-              ],
-            ),
+                ),
+              ),
+            ]),
           ),
         );
       });

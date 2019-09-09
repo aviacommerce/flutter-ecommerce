@@ -92,9 +92,9 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                   Container(
                       width: 150,
                       padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                      alignment: Alignment.topLeft,
+                      alignment: Alignment.center,
                       child: Text(
-                        'More Choices Available',
+                        'More Choices\nAvailable',
                         style: TextStyle(
                             fontWeight: FontWeight.w300, fontSize: 14),
                         textAlign: TextAlign.center,
@@ -106,12 +106,9 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
               ),
               Expanded(
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Padding(
-                      padding: const EdgeInsets.only(right: 5.0, top: 10.0),
+                      padding: const EdgeInsets.only(right: 5.0, top: 0.0),
                       child: RichText(
                         text: TextSpan(children: [
                           TextSpan(

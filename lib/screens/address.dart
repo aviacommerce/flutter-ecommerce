@@ -76,12 +76,12 @@ class _AddressPageState extends State<AddressPage> {
       return Container(
         padding: EdgeInsets.all(20),
         child: FlatButton(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
           color: Colors.green,
           child: Text(
-            'CONTINUE TO PAYMENT',
+            'PLACE ORDER',
             style: TextStyle(
-                fontSize: 20, color: Colors.white, fontWeight: FontWeight.w300),
+                fontSize: 18, color: Colors.white, fontWeight: FontWeight.w300),
           ),
           onPressed: () {
             model.order.shipAddress != null ? pushPaymentScreen(model) : null;

@@ -19,7 +19,7 @@ class _CartState extends State<Cart> {
   @override
   void initState() {
     super.initState();
-
+  
     locator<ConnectivityManager>().initConnectivity(context);
   }
 
@@ -50,10 +50,10 @@ class _CartState extends State<Cart> {
                       child: Container(),
                       preferredSize: Size.fromHeight(10),
                     )),
-          body: body(),
+          body: !model.isLoading || model.order != null ? body() : Container(),
           bottomNavigationBar: BottomAppBar(
               child: Container(
-                  height: 136,
+                  height: 100,
                   child: Column(children: [
                     Padding(
                       padding: const EdgeInsets.only(top: 10.0),
@@ -87,43 +87,46 @@ class _CartState extends State<Cart> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
-        model.order == null
-            ? Container()
-            : model.order.itemTotal != '0.0'
-                ? Text(
-                    'SubTotal: (${model.order.totalQuantity} items):',
-                    style: TextStyle(fontSize: 20, color: Colors.green),
-                  )
-                : Container(),
-        Container(
-          child: Text(
-            model.order == null
-                ? 'No Items in Cart'
-                : model.order.itemTotal != '0.0'
-                    ? model.order.displaySubTotal
-                    : 'No Items in Cart',
-            style: TextStyle(
-                fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold),
-          ),
-        )
+        cartData(true),
+        cartData(false)
       ],
     );
   }
 
+  Widget cartData(bool total) {
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      String getText() {
+        return model.order == null
+            ? ''
+            : model.order.itemTotal == '0.0'
+                ? ''
+                : total
+                    ? 'SubTotal: (${model.order.totalQuantity} items):'
+                    : model.order.displaySubTotal;
+      }
+      return getText() == null
+          ? Text('')
+          : Text(
+              getText(),
+              style: total
+                  ? TextStyle(fontSize: 20, color: Colors.green)
+                  : TextStyle(
+                      fontSize: 20,
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold),
+            );
+    });
+  }
+
   Widget proceedToCheckoutButton() {
-    MaterialPageRoute addressRoute =
-        MaterialPageRoute(builder: (context) => AddressPage());
-
-    MaterialPageRoute authRoute =
-        MaterialPageRoute(builder: (context) => Authentication(0));
-
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.only(left: 10.0, right: 10.0),
         child: Container(
           width: MediaQuery.of(context).size.width,
-          height: 65.0,
+          height: 58.0,
           padding: EdgeInsets.all(10),
           child: FlatButton(
             shape:
@@ -136,7 +139,7 @@ class _CartState extends State<Cart> {
                       ? 'BROWSE ITEMS'
                       : 'PROCEED TO CHECKOUT',
               style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 15,
                   color: Colors.white,
                   fontWeight: FontWeight.w300),
             ),
@@ -161,10 +164,13 @@ class _CartState extends State<Cart> {
                     if (stateChanged) {
                       // print('STATE IS CHANGED, FETCH CURRENT ORDER');
                       // model.fetchCurrentOrder();
-
+                      MaterialPageRoute addressRoute = MaterialPageRoute(
+                          builder: (context) => AddressPage());
                       Navigator.push(context, addressRoute);
                     }
                   } else {
+                    MaterialPageRoute authRoute = MaterialPageRoute(
+                        builder: (context) => Authentication(0));
                     Navigator.push(context, authRoute);
                   }
                 } else {
@@ -194,7 +200,7 @@ class _CartState extends State<Cart> {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                   elevation: 3,
-                  margin: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                  margin: EdgeInsets.all(4.0),
                   child: Container(
                     color: Colors.white,
                     child: GestureDetector(

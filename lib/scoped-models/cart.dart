@@ -235,6 +235,8 @@ mixin CartModel on Model {
   }
 
   fetchCurrentOrder() async {
+    _isLoading = true;
+    notifyListeners();
     Map<dynamic, dynamic> responseBody;
     Map<String, String> headers = await getHeaders();
     String url = '';

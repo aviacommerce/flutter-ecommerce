@@ -136,14 +136,19 @@ class _CategoryListingState extends State<CategoryListing> {
             loadProductsByCategory();
           });
         },
-        child: ListTile(
-          title: Text(cat.name),
-          /*trailing: cat.isChecked
-              ? Icon(
-                  Icons.radio_button_checked,
-                  color: Colors.green,
-                )
-              : Icon(Icons.radio_button_unchecked),*/
+        child: Column(
+          children: <Widget>[
+            ListTile(
+              title: Text(cat.name),
+              /*trailing: cat.isChecked
+                ? Icon(
+                    Icons.radio_button_checked,
+                    color: Colors.green,
+                  )
+                : Icon(Icons.radio_button_unchecked),*/
+            ),
+            Divider(),
+          ],
         ),
       ));
     }
@@ -295,36 +300,38 @@ class _CategoryListingState extends State<CategoryListing> {
                   ],
                 )),
           ),
-          Theme(
-              data: ThemeData(primarySwatch: Colors.green),
-              child: ListView.separated(
-                shrinkWrap: true,
-                padding: EdgeInsets.all(8.0),
-                separatorBuilder: (context, index) => Divider(
-                  height: 1.0,
-                  color: Colors.grey,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  return ExpansionTile(
-                      onExpansionChanged: (value) {
-                        if (value) {
-                          // widget.getSubCat(index);
-                          currentIndex = index;
-                          getSubCatList(
-                              categoryList[index].id, categoryList[index].name);
-                        }
-                      },
-                      title: Text(categoryList[index].name),
-                      children: subCatListForFilter[index] != null
-                          ? subCatListForFilter[index]
-                          : isFilterDataLoading
-                              ? progressBar()
-                              : subCatListForFilter[index] != null
-                                  ? subCatListForFilter[index]
-                                  : emptyWidget());
-                },
-                itemCount: categoryList != null ? categoryList.length : 0,
-              )),
+          Expanded(
+            child: Theme(
+                data: ThemeData(primarySwatch: Colors.green),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.all(8.0),
+                  separatorBuilder: (context, index) => Divider(
+                    height: 1.0,
+                    color: Colors.grey,
+                  ),
+                  itemBuilder: (BuildContext context, int index) {
+                    return ExpansionTile(
+                        onExpansionChanged: (value) {
+                          if (value) {
+                            // widget.getSubCat(index);
+                            currentIndex = index;
+                            getSubCatList(categoryList[index].id,
+                                categoryList[index].name);
+                          }
+                        },
+                        title: Text(categoryList[index].name),
+                        children: subCatListForFilter[index] != null
+                            ? subCatListForFilter[index]
+                            : isFilterDataLoading
+                                ? progressBar()
+                                : subCatListForFilter[index] != null
+                                    ? subCatListForFilter[index]
+                                    : emptyWidget());
+                  },
+                  itemCount: categoryList != null ? categoryList.length : 0,
+                )),
+          ),
           Divider(
             height: 1.0,
             color: Colors.grey,
@@ -365,14 +372,18 @@ class _CategoryListingState extends State<CategoryListing> {
                   ),
                 ),
               )
-            : GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2),
-                itemBuilder: (BuildContext context, int index) {
-                  return getCategoryBox(index, level);
-                },
-                itemCount: categoryList.length,
+            : Padding(
+                padding: EdgeInsets.only(top: 10.0),
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2),
+                  itemBuilder: (BuildContext context, int index) {
+                    return getCategoryBox(index, level);
+                  },
+                  itemCount: categoryList.length,
+                ),
               );
+
         break;
       case 1:
         return (subCategoryList.length == 0)
@@ -386,14 +397,18 @@ class _CategoryListingState extends State<CategoryListing> {
                   ),
                 ),
               )
-            : GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2),
-                itemBuilder: (BuildContext context, int index) {
-                  return getCategoryBox(index, level);
-                },
-                itemCount: subCategoryList.length,
+            : Padding(
+                padding: EdgeInsets.only(top: 10.0),
+                child: GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2),
+                  itemBuilder: (BuildContext context, int index) {
+                    return getCategoryBox(index, level);
+                  },
+                  itemCount: subCategoryList.length,
+                ),
               );
+
         break;
       case 2:
         return Theme(
