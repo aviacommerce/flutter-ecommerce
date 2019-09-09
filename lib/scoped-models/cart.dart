@@ -235,7 +235,7 @@ mixin CartModel on Model {
   }
 
   fetchCurrentOrder() async {
-    _isLoading = true;
+    // _isLoading = true;
     notifyListeners();
     Map<dynamic, dynamic> responseBody;
     Map<String, String> headers = await getHeaders();
@@ -255,7 +255,7 @@ mixin CartModel on Model {
     }
 
     if (url != '') {
-      _lineItems = [];
+      _lineItems.clear();
       http.get(Settings.SERVER_URL + url, headers: headers).then((response) {
         responseBody = json.decode(response.body);
         responseBody['line_items'].forEach((lineItem) {

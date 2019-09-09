@@ -121,6 +121,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
         labelText: label,
       ),
       onSaved: (String value) {
+        print("SETTING FIRST NAME-----> $value");
         setState(() {
           _firstName = value;
         });
@@ -140,6 +141,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
       ),
       initialValue: _lastName,
       onSaved: (String value) {
+        print("SETTING LAST NAME ------> $value");
         setState(() {
           _lastName = value;
         });
@@ -362,17 +364,17 @@ class _UpdateAddressState extends State<UpdateAddress> {
         color: Colors.green,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         onPressed: () async {
-          setState(() {
-            _isLoading = true;
-          });
           Map<dynamic, dynamic> updateResponse;
           Map<dynamic, dynamic> orderUpdateResponse;
 
           if (!_formKey.currentState.validate()) {
             return;
           }
+          setState(() {
+            _isLoading = true;
+          });
           _formKey.currentState.save();
-
+          print("FORM STATE -----> ${_formKey.currentState.toString()}");
           // getUserInfo();
           final SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -395,6 +397,9 @@ class _UpdateAddressState extends State<UpdateAddress> {
             "state_id": _stateId,
             "country_id": '105'
           };
+
+          print("FIRST NAME BEING SENT ---> $_firstName");
+          print("LAST NAME BEING SENT ---> $_lastName");
 
           String profileAddressUrl = "address/update_address";
           Map<String, dynamic> profileAddressData = {

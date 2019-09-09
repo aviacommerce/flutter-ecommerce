@@ -181,7 +181,7 @@ class _ProductSearchState extends State<ProductSearch> {
               Padding(
                 padding: const EdgeInsets.only(top: 90.0),
                 child: model.isLoading
-                    ? LinearProgressIndicator()
+                    ? LinearProgressIndicator(backgroundColor: Colors.white)
                     : isSearched
                         ? Theme(
                             data: ThemeData(primarySwatch: Colors.green),
