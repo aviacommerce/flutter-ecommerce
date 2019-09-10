@@ -56,15 +56,16 @@ class _HomeDrawer extends State<HomeDrawer> {
         if (model.isAuthenticated) {
           return ListTile(
             leading: Icon(
-              Icons.reply,
-              color: Colors.green,
+              Icons.call_made,
+              color: Colors.grey,
             ),
             title: Text(
-              'Logout',
-              style: TextStyle(color: Colors.green),
+              'Sign Out',
+              style: TextStyle(color: Colors.grey),
             ),
             onTap: () {
-              logoutUser(model);
+              // logoutUser(model);
+              _showDialog(context, model);
             },
           );
         } else {
@@ -248,6 +249,38 @@ class _HomeDrawer extends State<HomeDrawer> {
     });
   }
 
+    void _showDialog(context, model) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Sign Out"),
+            content: new Text("Are you sure you want to sign out?"),
+            actions: <Widget>[
+              new FlatButton(
+                child: Text(
+                  "Cancel",
+                  style: TextStyle(color: Colors.black),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              new FlatButton(
+                child: Text(
+                  "OK",
+                  style: TextStyle(color: Colors.black),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  logoutUser(model);
+                },
+              )
+            ],
+          );
+        });
+  }
+
   logoutUser(MainModel model) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     String user_id = prefs.getInt('id').toString();
@@ -306,7 +339,7 @@ class _HomeDrawer extends State<HomeDrawer> {
           ),
           favoritesLineTile(),
           accountListTile(),
-          Divider(),
+          Divider(color: Colors.grey,),
           ListTile(
             title: Text(
               '24/7 Help',
@@ -353,14 +386,8 @@ class _HomeDrawer extends State<HomeDrawer> {
               ),
             ),
           ),
-          // ListTile(
-          //   leading: Icon(
-          //     Icons.share,
-          //   ),
-          //   title: Text(
-          //     'Share the App',
-          //   ),
-          // ),
+          Divider(color: Colors.grey,),
+          logOutButton()
         ],
       ),
     );

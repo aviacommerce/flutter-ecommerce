@@ -827,7 +827,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       }
                     : () {},
                 backgroundColor:
-                    selectedProduct.isOrderable ? Colors.orange : Colors.grey,
+                    selectedProduct.isOrderable ? Colors.deepOrange : Colors.grey,
               )
             : FloatingActionButton(
                 child: Icon(

@@ -8,10 +8,31 @@ import 'package:ofypets_mobile_app/screens/order_history.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
 import 'package:ofypets_mobile_app/models/address.dart';
+import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
+import 'package:ofypets_mobile_app/screens/retun_policy.dart';
+
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class Account extends StatelessWidget {
+class Account extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _AccountState();
+  }
+}
+
+class _AccountState extends State<Account> {
+  var formatter = new DateFormat('MMM dd, yyyy');
+  String createdAtString = '';
+  TextStyle _textStyle = TextStyle(fontWeight: FontWeight.w500);
+  @override
+  void initState() {
+    super.initState();
+    getDate();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +42,16 @@ class Account extends StatelessWidget {
       body: Container(
         child: accountOptions(),
       ),
+      drawer: HomeDrawer(),
     );
+  }
+
+  getDate() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String createdAt = prefs.getString('createdAt');
+    setState(() {
+      createdAtString = formatter.format(DateTime.parse(createdAt));
+    });
   }
 
   Widget accountOptions() {
@@ -29,26 +59,41 @@ class Account extends StatelessWidget {
         builder: (BuildContext context, Widget child, MainModel model) {
       return ListView(
         children: <Widget>[
+          Container(
+            color: Colors.grey.shade100,
+            child: ListTile(
+              title: Text(
+                "Customer since $createdAtString",
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600),
+              ),
+              onTap: () {},
+            ),
+          ),
           ListTile(
             title: Text(
               "Order History",
-              style: TextStyle( ),
+              style: _textStyle,
             ),
             onTap: () {
               navigate_option("order_history", context, model);
             },
           ),
-          // ListTile(
-          //   title: Text(
-          //     "Addresses",
-          //     style: TextStyle( ),
-          //   ),
-          //   onTap: () {},
-          // ),
+          ListTile(
+            title: Text(
+              "Addresses",
+              style: _textStyle,
+            ),
+            onTap: () {
+              navigate_option("change_address", context, model);
+            },
+          ),
           ListTile(
             title: Text(
               "Change Email",
-              style: TextStyle( ),
+              style: _textStyle,
             ),
             onTap: () {
               navigate_option("email_edit", context, model);
@@ -57,22 +102,58 @@ class Account extends StatelessWidget {
           ListTile(
             title: Text(
               "Change Password",
-              style: TextStyle( ),
+              style: _textStyle,
             ),
             onTap: () {
               navigate_option("change_password", context, model);
             },
           ),
-          ListTile(
-            title: Text(
-              "My Addresses",
-              style: TextStyle( ),
+          Container(
+            color: Colors.grey.shade100,
+            child: ListTile(
+              title: Text(
+                "24/7 Help & Info",
+                style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600),
+              ),
+              onTap: () {},
             ),
-            onTap: () {
-              navigate_option("change_address", context, model);
-            },
           ),
-          logOutButton()
+          InkWell(
+            onTap: () {
+              _callMe('917-6031-568');
+            },
+            child: ListTile(
+              title: Text(
+                'Call: 917-6031-568',
+              ),
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              _sendMail('support@ofypets.com');
+            },
+            child: ListTile(
+              title: Text(
+                'Email: support@ofypets.com',
+              ),
+            ),
+          ),
+          InkWell(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return ReturnPolicy();
+              }));
+            },
+            child: ListTile(
+              title: Text(
+                'Return Policy',
+              ),
+            ),
+          ),
+          logOutButton(),
         ],
       );
     });
@@ -85,7 +166,9 @@ class Account extends StatelessWidget {
           return ListTile(
             title: Text(
               'Sign Out',
-              style: TextStyle(color: Colors.red,  ),
+              style: TextStyle(
+                color: Colors.red,
+              ),
             ),
             onTap: () {
               _showDialog(context, model);
@@ -175,6 +258,25 @@ class Account extends StatelessWidget {
               MaterialPageRoute(builder: (context) => MyAddressPage());
           Navigator.push(context, orderList);
         }
+    }
+  }
+
+  _sendMail(String email) async {
+    // Android and iOS
+    final uri = 'mailto:$email?subject=&body=';
+    if (await canLaunch(uri)) {
+      await launch(uri);
+    } else {
+      throw 'Could not launch $uri';
+    }
+  }
+
+  _callMe(String phone) async {
+    final uri = 'tel:$phone';
+    if (await canLaunch(uri)) {
+      await launch(uri);
+    } else {
+      throw 'Could not launch $uri';
     }
   }
 }

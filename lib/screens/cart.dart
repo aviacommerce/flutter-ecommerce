@@ -99,7 +99,7 @@ class _CartState extends State<Cart> {
             : model.order.itemTotal == '0.0'
                 ? ''
                 : total
-                    ? 'SubTotal: (${model.order.totalQuantity} items):'
+                    ? 'Cart SubTotal: (${model.order.totalQuantity} items): '
                     : model.order.displaySubTotal;
       }
 
@@ -108,9 +108,12 @@ class _CartState extends State<Cart> {
           : Text(
               getText(),
               style: total
-                  ? TextStyle(fontSize: 20, color: Colors.green)
+                  ? TextStyle(
+                      fontSize: 15,
+                      color: Colors.grey,
+                      fontWeight: FontWeight.bold)
                   : TextStyle(
-                      fontSize: 20,
+                      fontSize: 16.5,
                       color: Colors.red,
                       fontWeight: FontWeight.bold),
             );
@@ -129,7 +132,7 @@ class _CartState extends State<Cart> {
           child: FlatButton(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-            color: Colors.green,
+            color: Colors.deepOrange,
             child: Text(
               model.order == null
                   ? 'BROWSE ITEMS'

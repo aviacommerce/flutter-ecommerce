@@ -66,47 +66,58 @@ class _UpdateAddressState extends State<UpdateAddress> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text(
-              widget.shipAddress != null ? 'Update Address' : 'Add Address'),
-          bottom: _isLoading
-              ? PreferredSize(
-                  child: LinearProgressIndicator(),
-                  preferredSize: Size.fromHeight(10),
-                )
-              : PreferredSize(
-                  child: Container(),
-                  preferredSize: Size.fromHeight(10),
-                ),
-        ),
-        body: Card(
-          elevation: 5,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          margin: EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              padding: EdgeInsets.all(20),
-              children: <Widget>[
-                buildFirstNameField('First Name *'),
-                buildLastNameField('Last Name *'),
-                buildPinCodeField('Pincode *'),
-                buildTownField('Locality/Town *'),
-                buildCityField('City/District *'),
-                buildStateField('State *'),
-                buildAddressField('Address *'),
-                buildMobileField('Mobile No. *'),
-                SizedBox(height: 20),
-                sendButton(),
-                SizedBox(
-                  height: 250,
-                )
-              ],
-            ),
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text(
+                widget.shipAddress != null ? 'Update Address' : 'Add Address'),
+            bottom: _isLoading
+                ? PreferredSize(
+                    child: LinearProgressIndicator(),
+                    preferredSize: Size.fromHeight(10),
+                  )
+                : PreferredSize(
+                    child: Container(),
+                    preferredSize: Size.fromHeight(10),
+                  ),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.check),
+                onPressed: () {
+                  submitAddress(model);
+                },
+              )
+            ],
           ),
-        ));
+          body: Card(
+            elevation: 5,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: EdgeInsets.all(20),
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                padding: EdgeInsets.all(20),
+                children: <Widget>[
+                  buildFirstNameField('First Name *'),
+                  buildLastNameField('Last Name *'),
+                  buildPinCodeField('Pincode *'),
+                  buildTownField('Locality/Town *'),
+                  buildCityField('City/District *'),
+                  buildStateField('State *'),
+                  buildAddressField('Address *'),
+                  buildMobileField('Mobile No. *'),
+                  SizedBox(height: 20),
+                  sendButton(),
+                  SizedBox(
+                    height: 250,
+                  )
+                ],
+              ),
+            ),
+          ));
+    });
   }
 
   Widget buildFirstNameField(String label) {
@@ -357,111 +368,114 @@ class _UpdateAddressState extends State<UpdateAddress> {
     });
   }
 
+  submitAddress(MainModel model) async {
+    Map<dynamic, dynamic> updateResponse;
+    Map<dynamic, dynamic> orderUpdateResponse;
+
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+    _formKey.currentState.save();
+    setState(() {
+      _isLoading = true;
+    });
+    // getUserInfo();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    headers = {
+      'Content-Type': 'application/json',
+      'token-type': 'Bearer',
+      'ng-api': 'true',
+      'auth-token': prefs.getString('spreeApiKey'),
+      'Guest-Order-Token': prefs.getString('orderToken')
+    };
+    address = {
+      "firstname": _firstName,
+      "lastname": _lastName,
+      "address2": _address2,
+      "city": _city,
+      "address1": _address1,
+      "phone": _mobile,
+      "zipcode": _pincode,
+      "state_name": selectedState,
+      "state_id": _stateId,
+      "country_id": '105'
+    };
+
+    print("FIRST NAME BEING SENT ---> $_firstName");
+    print("LAST NAME BEING SENT ---> $_lastName");
+
+    String profileAddressUrl = "address/update_address";
+    Map<String, dynamic> profileAddressData = {
+      "user": {"email": prefs.getString('email'), "ship_address": address}
+    };
+
+    if (!widget.order && widget.shipAddress == null) {
+      url = "address/create_address";
+      http.Response response = await http.post(Settings.SERVER_URL + url,
+          headers: headers, body: json.encode(profileAddressData));
+      updateResponse = json.decode(response.body);
+      if (updateResponse['status'] == 'Address added Successfully!') {
+        await model.fetchCurrentOrder();
+        await model.getAddress();
+        // Navigator.pop(context);
+        setState(() {
+          _isLoading = false;
+        });
+        _showSuccessDialog(context);
+      }
+    } else {
+      if (widget.order) {
+        if (widget.shipAddress != null) {
+          url =
+              'api/v1/orders/${prefs.getString('orderNumber')}/addresses/${widget.shipAddress.id}';
+          data = {"address_params": address};
+        } else {
+          url =
+              'api/v1/checkouts/${prefs.getString('orderNumber')}.json?order_token=${prefs.getString('orderToken')}';
+          data = {
+            "order": {
+              "bill_address_attributes": address,
+              "ship_address_attributes": address
+            }
+          };
+        }
+      }
+
+      if (widget.order) {
+        http.Response response = await http.put(Settings.SERVER_URL + url,
+            headers: headers, body: json.encode(data));
+        orderUpdateResponse = json.decode(response.body);
+        updateResponse = json.decode(response.body);
+        if (updateResponse.containsKey('id')) {
+          await model.fetchCurrentOrder();
+        }
+      }
+      http.Response response = await http.post(
+          Settings.SERVER_URL + profileAddressUrl,
+          headers: headers,
+          body: json.encode(profileAddressData));
+      updateResponse = json.decode(response.body);
+      if (updateResponse['status'] == 'Address updated Successfully!') {
+        await model.fetchCurrentOrder();
+        await model.getAddress();
+        // Navigator.pop(context);
+        setState(() {
+          _isLoading = false;
+        });
+        _showSuccessDialog(context);
+      }
+    }
+  }
+
   Widget sendButton() {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return FlatButton(
         color: Colors.green,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        onPressed: () async {
-          Map<dynamic, dynamic> updateResponse;
-          Map<dynamic, dynamic> orderUpdateResponse;
-
-          if (!_formKey.currentState.validate()) {
-            return;
-          }
-          setState(() {
-            _isLoading = true;
-          });
-          _formKey.currentState.save();
-          print("FORM STATE -----> ${_formKey.currentState.toString()}");
-          // getUserInfo();
-          final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-          headers = {
-            'Content-Type': 'application/json',
-            'token-type': 'Bearer',
-            'ng-api': 'true',
-            'auth-token': prefs.getString('spreeApiKey'),
-            'Guest-Order-Token': prefs.getString('orderToken')
-          };
-          address = {
-            "firstname": _firstName,
-            "lastname": _lastName,
-            "address2": _address2,
-            "city": _city,
-            "address1": _address1,
-            "phone": _mobile,
-            "zipcode": _pincode,
-            "state_name": selectedState,
-            "state_id": _stateId,
-            "country_id": '105'
-          };
-
-          print("FIRST NAME BEING SENT ---> $_firstName");
-          print("LAST NAME BEING SENT ---> $_lastName");
-
-          String profileAddressUrl = "address/update_address";
-          Map<String, dynamic> profileAddressData = {
-            "user": {"email": prefs.getString('email'), "ship_address": address}
-          };
-
-          if (!widget.order && widget.shipAddress == null) {
-            url = "address/create_address";
-            http.Response response = await http.post(Settings.SERVER_URL + url,
-                headers: headers, body: json.encode(profileAddressData));
-            updateResponse = json.decode(response.body);
-            if (updateResponse['status'] == 'Address added Successfully!') {
-              await model.fetchCurrentOrder();
-              await model.getAddress();
-              // Navigator.pop(context);
-              setState(() {
-                _isLoading = false;
-              });
-              _showSuccessDialog(context);
-            }
-          } else {
-            if (widget.order) {
-              if (widget.shipAddress != null) {
-                url =
-                    'api/v1/orders/${prefs.getString('orderNumber')}/addresses/${widget.shipAddress.id}';
-                data = {"address_params": address};
-              } else {
-                url =
-                    'api/v1/checkouts/${prefs.getString('orderNumber')}.json?order_token=${prefs.getString('orderToken')}';
-                data = {
-                  "order": {
-                    "bill_address_attributes": address,
-                    "ship_address_attributes": address
-                  }
-                };
-              }
-            }
-
-            if (widget.order) {
-              http.Response response = await http.put(Settings.SERVER_URL + url,
-                  headers: headers, body: json.encode(data));
-              orderUpdateResponse = json.decode(response.body);
-              updateResponse = json.decode(response.body);
-              if (updateResponse.containsKey('id')) {
-                await model.fetchCurrentOrder();
-              }
-            }
-            http.Response response = await http.post(
-                Settings.SERVER_URL + profileAddressUrl,
-                headers: headers,
-                body: json.encode(profileAddressData));
-            updateResponse = json.decode(response.body);
-            if (updateResponse['status'] == 'Address updated Successfully!') {
-              await model.fetchCurrentOrder();
-              await model.getAddress();
-              // Navigator.pop(context);
-              setState(() {
-                _isLoading = false;
-              });
-              _showSuccessDialog(context);
-            }
-          }
+        onPressed: () {
+          submitAddress(model);
         },
         child: Text(
           'SAVE ADDRESS',

@@ -24,6 +24,7 @@ class _AuthenticationState extends State<Authentication>
   final Map<String, dynamic> _formData = {'email': null, 'password': null};
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _formKeyForLogin = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final TextEditingController _passwordTextController = TextEditingController();
   bool _isLoader = false;
   TabController _tabController;
@@ -51,6 +52,7 @@ class _AuthenticationState extends State<Authentication>
       home: DefaultTabController(
         length: 2,
         child: Scaffold(
+          key: _scaffoldKey,
           appBar: AppBar(
             backgroundColor: Colors.green,
             leading: IconButton(
@@ -305,21 +307,19 @@ class _AuthenticationState extends State<Authentication>
     };
     if (successInformation['success']) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
-      print("SPREE API KEY ${responseData['spree_api_key']}");
       prefs.setInt('id', responseData['id']);
       prefs.setString('email', responseData['email']);
       prefs.setString('spreeApiKey', responseData['spree_api_key']);
+      prefs.setString('createdAt', responseData['created_at']);
       model.getAddress();
       model.fetchCurrentOrder();
       model.loggedInUser();
       Navigator.of(context).pop();
     } else {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return _alertDialog(
-                'An Error Occurred!', successInformation['message'], context);
-          });
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text('${successInformation['message']}'),
+        duration: Duration(seconds: 1),
+      ));
     }
     setState(() {
       _isLoader = false;
@@ -368,39 +368,18 @@ class _AuthenticationState extends State<Authentication>
     };
     if (successInformation['success']) {
       Navigator.of(context).pop();
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return _alertDialog(
-                'Success!', successInformation['message'], context);
-          });
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text('${successInformation['message']}'),
+        duration: Duration(seconds: 1),
+      ));
     } else {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return _alertDialog(
-                'An Error Occurred!', successInformation['message'], context);
-          });
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        content: Text('${successInformation['message']}'),
+        duration: Duration(seconds: 1),
+      ));
     }
     setState(() {
       _isLoader = false;
     });
-  }
-
-  Widget _alertDialog(String boxTitle, String message, BuildContext context) {
-    return AlertDialog(
-      title: Text(boxTitle),
-      content: Text(message),
-      actions: <Widget>[
-        FlatButton(
-          child: Text('Okay',
-              style:
-                  TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        )
-      ],
-    );
   }
 }

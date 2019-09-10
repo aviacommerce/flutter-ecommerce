@@ -36,69 +36,97 @@ class _AddressPageState extends State<AddressPage> {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return Scaffold(
-        appBar: AppBar(
-            title: Text('Delivery Address'),
-            bottom: model.isLoading
-                ? PreferredSize(
-                    child: LinearProgressIndicator(),
-                    preferredSize: Size.fromHeight(10),
-                  )
-                : PreferredSize(
-                    child: Container(),
-                    preferredSize: Size.fromHeight(10),
-                  )),
-        body: CustomScrollView(
-          slivers: <Widget>[
-            SliverList(
-              delegate: SliverChildListDelegate([
-                FlatButton(
-                  child: Text(model.isLoading
-                      ? ''
-                      : model.order.shipAddress != null ? '' : 'ADD ADDRESS'),
-                  onPressed: () {
-                    MaterialPageRoute payment = MaterialPageRoute(
-                        builder: (context) =>
-                            UpdateAddress(model.order.shipAddress, true));
-                    Navigator.push(context, payment);
-                  },
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 15.0, top: 0.0),
-                  child: Text(
-                    'Shipping Address',
-                    style:
-                        TextStyle(color: Colors.grey.shade700, fontSize: 16.0),
+          appBar: AppBar(
+              title: Text('Delivery Address'),
+              bottom: model.isLoading
+                  ? PreferredSize(
+                      child: LinearProgressIndicator(),
+                      preferredSize: Size.fromHeight(10),
+                    )
+                  : PreferredSize(
+                      child: Container(),
+                      preferredSize: Size.fromHeight(10),
+                    )),
+          body: CustomScrollView(
+            slivers: <Widget>[
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  FlatButton(
+                    child: Text(model.isLoading
+                        ? ''
+                        : model.order.shipAddress != null ? '' : 'ADD ADDRESS'),
+                    onPressed: () {
+                      MaterialPageRoute payment = MaterialPageRoute(
+                          builder: (context) =>
+                              UpdateAddress(model.order.shipAddress, true));
+                      Navigator.push(context, payment);
+                    },
                   ),
-                ),
-                addressContainer(),
-                Divider(),
-                Padding(
-                  padding:
-                      const EdgeInsets.only(left: 5.0, top: 15.0, bottom: 10.0),
-                  child: Text(
-                    'Order Summary',
-                    style:
-                        TextStyle(color: Colors.grey.shade700, fontSize: 16.0),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15.0, top: 0.0),
+                    child: Text(
+                      'Shipping Address',
+                      style: TextStyle(
+                          color: Colors.grey.shade700, fontSize: 16.0),
+                    ),
                   ),
-                ),
-                items(),
-                orderDetailCard(),
-                Divider(
-                  indent: 20,
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Text(
-                    'By placing this order, you agree to Ofypets.com’\s Privacy Policy and Terms of Use.',
-                    style: TextStyle(color: Colors.grey.shade700),
+                  addressContainer(),
+                  Divider(),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 10.0, top: 15.0, bottom: 10.0),
+                    child: Text(
+                      'Order Summary',
+                      style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w100),
+                    ),
                   ),
-                ),
-              ]),
-            ), //items(),
-          ],
-        ),
-        bottomNavigationBar: paymentButton(context),
-      );
+                  items(),
+                  orderDetailCard(),
+                  Divider(
+                    indent: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Text(
+                      'By placing this order, you agree to Ofypets.com’\s Privacy Policy and Terms of Use.',
+                      style: TextStyle(color: Colors.grey.shade700),
+                    ),
+                  ),
+                ]),
+              ), //items(),
+            ],
+          ),
+          bottomNavigationBar: BottomAppBar(
+              child: Container(
+                  height: 100,
+                  child: Column(children: [
+                    Container(
+                        padding: EdgeInsets.only(top: 10),
+                        alignment: Alignment.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              'Order Total: ',
+                              style: TextStyle(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16),
+                            ),
+                            Text(
+                              '${model.order.displayTotal}',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16),
+                            )
+                          ],
+                        )),
+                    paymentButton(context),
+                  ]))));
     });
   }
 
@@ -106,17 +134,24 @@ class _AddressPageState extends State<AddressPage> {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return Container(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.all(10),
+        width: MediaQuery.of(context).size.width,
         child: FlatButton(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-          color: Colors.green,
+          // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+          color: Colors.deepOrange,
           child: Text(
-            'PLACE ORDER',
+            model.order.shipAddress != null ? 'PLACE ORDER' : 'ADD ADDRESS',
             style: TextStyle(
                 fontSize: 18, color: Colors.white, fontWeight: FontWeight.w300),
           ),
           onPressed: () {
-            model.order.shipAddress != null ? pushPaymentScreen(model) : null;
+            MaterialPageRoute address = MaterialPageRoute(
+                builder: (context) =>
+                    UpdateAddress(model.order.shipAddress, true));
+
+            model.order.shipAddress != null
+                ? pushPaymentScreen(model)
+                : Navigator.push(context, address);
           },
         ),
       );

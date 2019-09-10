@@ -44,27 +44,44 @@ class _EmailEditState extends State<EmailEdit> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Email"),
-      ),
-      body: ScopedModelDescendant(
-          builder: (BuildContext context, Widget child, MainModel model) {
-        if (_fetchingEmail) {
-          return LinearProgressIndicator();
-        } else {
-          return Container(
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                padding: EdgeInsets.all(20),
-                children: <Widget>[buildEmailField(), submitButton()],
+    return ScopedModelDescendant(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Email"),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.check),
+              onPressed: () {
+                saveEmail(context, model);
+              },
+            )
+          ],
+        ),
+        body: ScopedModelDescendant(
+            builder: (BuildContext context, Widget child, MainModel model) {
+          if (_fetchingEmail) {
+            return LinearProgressIndicator();
+          } else {
+            return Container(
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  padding: EdgeInsets.all(20),
+                  children: <Widget>[
+                    buildEmailField(),
+                    SizedBox(
+                      height: 50,
+                    ),
+                    submitButton()
+                  ],
+                ),
               ),
-            ),
-          );
-        }
-      }),
-    );
+            );
+          }
+        }),
+      );
+    });
   }
 
   Widget buildEmailField() {
@@ -92,11 +109,11 @@ class _EmailEditState extends State<EmailEdit> {
     return ScopedModelDescendant(
         builder: (BuildContext context, Widget child, MainModel model) {
       return FlatButton(
-          color: Colors.green,
+          color: Colors.deepOrange,
           disabledColor: Colors.grey,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: Text(
-            'SAVE EMAIL',
+            'SAVE',
             style: TextStyle(color: Colors.white),
           ),
           onPressed: _savingEmail
@@ -133,8 +150,10 @@ class _EmailEditState extends State<EmailEdit> {
       logoutUser(context, model);
     } else {
       String error = updateResponse['errors']['email'][0];
-      Scaffold.of(context)
-          .showSnackBar(SnackBar(content: Text('Email ${error}'), duration: Duration(seconds: 1),));
+      Scaffold.of(context).showSnackBar(SnackBar(
+        content: Text('Email ${error}'),
+        duration: Duration(seconds: 1),
+      ));
     }
   }
 

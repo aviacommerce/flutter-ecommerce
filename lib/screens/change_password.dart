@@ -28,27 +28,39 @@ class _ChangePasswordState extends State<ChangePassword> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Password"),
-      ),
-      body: ScopedModelDescendant(
-          builder: (BuildContext context, Widget child, MainModel model) {
-        return Container(
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              padding: EdgeInsets.all(20),
-              children: <Widget>[
-                buildNewPasswordField(),
-                buildConfirmPasswordField(),
-                submitButton()
-              ],
+    return ScopedModelDescendant(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Password"),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.check),
+              onPressed: () {
+                setNewPassword(context, model);
+              },
+            )
+          ],
+        ),
+        body: ScopedModelDescendant(
+            builder: (BuildContext context, Widget child, MainModel model) {
+          return Container(
+            child: Form(
+              key: _formKey,
+              child: ListView(
+                padding: EdgeInsets.all(20),
+                children: <Widget>[
+                  buildNewPasswordField(),
+                  buildConfirmPasswordField(),
+                  SizedBox(height: 50,),
+                  submitButton()
+                ],
+              ),
             ),
-          ),
-        );
-      }),
-    );
+          );
+        }),
+      );
+    });
   }
 
   Widget buildNewPasswordField() {
@@ -97,9 +109,8 @@ class _ChangePasswordState extends State<ChangePassword> {
     return ScopedModelDescendant(
         builder: (BuildContext context, Widget child, MainModel model) {
       return FlatButton(
-          color: Colors.orange,
+          color: Colors.deepOrange,
           disabledColor: Colors.grey,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           child: Text(
             'SET NEW PASSWORD',
             style: TextStyle(color: Colors.white),

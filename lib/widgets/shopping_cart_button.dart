@@ -35,12 +35,12 @@ Widget shoppingCartIconButton() {
                   child: new Stack(
                     children: <Widget>[
                       new Icon(Icons.brightness_1,
-                          size: 21.0, color: Colors.orange),
+                          size: 21.0, color: Colors.yellow),
                       new Center(
                         child: new Text(
                           model.lineItems.length.toString(),
                           style: new TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontSize: 11.0,
                               fontWeight: FontWeight.w500),
                         ),

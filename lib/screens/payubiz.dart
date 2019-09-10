@@ -57,13 +57,7 @@ class _PayubizScreenState extends State<PayubizScreen> {
       },
       child: Scaffold(
           appBar: AppBar(
-            // leading: IconButton(
-            //   color: Colors.black,
-            //   icon: Icon(Icons.arrow_back_ios),
-            //   onPressed: () {
-            //     pushSuccessPage(false);
-            //   },
-            // ),
+            leading: Container(),
             title: Text(
               'Payubiz',
               style: TextStyle(
