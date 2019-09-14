@@ -107,10 +107,10 @@ class _OrderList extends State<OrderList> {
                   }
                   if (!hasMore) {
                     return Padding(
-                      padding: EdgeInsets.symmetric(vertical: 0.0),
+                      padding: EdgeInsets.symmetric(vertical: _deviceSize.height/2),
                       child: Center(
                           child: CircularProgressIndicator(
-                        backgroundColor: Colors.green,
+                        backgroundColor: Colors.white,
                       )),
                     );
                   } else {
@@ -148,7 +148,8 @@ class _OrderList extends State<OrderList> {
                       title: Text('${order.number}'),
                       subtitle: Text((formatter.format(DateTime.parse(
                           (order.completedAt.split('+05:30')[0]))))),
-                      trailing: trailingSpace(order)),
+                      trailing: trailingSpace(order),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 10.0)),
                 ]),
           ),
         ),
@@ -193,7 +194,7 @@ class _OrderList extends State<OrderList> {
             ),
           ),
           Positioned(
-            bottom: 200,
+            bottom: 100,
             right: 0,
             left: 0,
             child: Container(
@@ -202,7 +203,7 @@ class _OrderList extends State<OrderList> {
               child: Padding(
                 padding: const EdgeInsets.only(left: 30.0, right: 30.0),
                 child: RaisedButton(
-                    color: Colors.green,
+                    color: Colors.orange,
                     onPressed: () {
                       // Navigator.pop(context);
                       Navigator.popUntil(context,
@@ -239,11 +240,12 @@ class _OrderList extends State<OrderList> {
 
   trailingSpace(detailOrder) {
     return new Container(
-      margin: EdgeInsets.all(5),
+      margin: EdgeInsets.only(top: 8),
       child: new Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: <Widget>[
             Text('${detailOrder.displayTotal}'),
+            SizedBox(height: 8),
             getOrderStatus(detailOrder)
           ]),
     );

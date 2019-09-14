@@ -6,6 +6,9 @@ import 'package:ofypets_mobile_app/screens/payubiz.dart';
 import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:ofypets_mobile_app/utils/params.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/widgets/snackbar.dart';
+import 'package:ofypets_mobile_app/screens/update_address.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,12 +24,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
   static List<PaymentMethod> paymentMethods = List();
   String _character = '';
   int selectedPaymentId;
+  bool _isShippable = false;
+  final MainModel _model = MainModel();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
     super.initState();
-    // getPaymentMethods();
     locator<ConnectivityManager>().initConnectivity(context);
+    checkShipmentAvailability();
   }
 
   @override
@@ -36,12 +42,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
     locator<ConnectivityManager>().dispose();
   }
 
+  checkShipmentAvailability() async {
+    bool _isShippableResponse = await _model.shipmentAvailability(
+        pincode: ScopedModel.of<MainModel>(context, rebuildOnChange: false)
+            .order
+            .shipAddress
+            .pincode);
+    setState(() {
+      _isShippable = _isShippableResponse;
+    });
+  }
+
 // In the State of a stateful widget:
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return Scaffold(
+        key: _scaffoldKey,
         appBar: AppBar(
             title: Text('Payment Methods'),
             bottom: model.isLoading || _isLoading
@@ -102,23 +120,45 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ),
           onPressed: () async {
             if (_character == 'COD') {
-              bool isComplete = false;
-              model.paymentMethods.forEach((paymentMethodObj) async {
-                if (paymentMethodObj.name == 'COD') {
-                  setState(() {
-                    selectedPaymentId = paymentMethodObj.id;
-                  });
-                }
-              });
-              isComplete = await model.completeOrder(selectedPaymentId);
-              if (isComplete) {
-                bool isChanged = false;
+              if (_isShippable &&
+                  double.parse(model.order.total) >= FREE_SHIPPING_AMOUNT) {
+                bool isComplete = false;
+                model.paymentMethods.forEach((paymentMethodObj) async {
+                  if (paymentMethodObj.name == 'COD') {
+                    setState(() {
+                      selectedPaymentId = paymentMethodObj.id;
+                    });
+                  }
+                });
+                isComplete = await model.completeOrder(selectedPaymentId);
+                if (isComplete) {
+                  bool isChanged = false;
 
-                if (model.order.state == 'payment') {
-                  isChanged = await model.changeState();
+                  if (model.order.state == 'payment') {
+                    isChanged = await model.changeState();
+                  }
+                  if (isChanged) {
+                    pushSuccessPage();
+                  }
                 }
-                if (isChanged) {
-                  pushSuccessPage();
+              } else {
+                if (double.parse(model.order.total) < FREE_SHIPPING_AMOUNT) {
+                  _scaffoldKey.currentState.showSnackBar(insufficientAmt);
+                } else if (!_isShippable) {
+                  final invalidPincode = SnackBar(
+                    content: Text('COD not available for this Pincode'),
+                    duration: Duration(seconds: 3),
+                    action: SnackBarAction(
+                      label: 'CHANGE',
+                      onPressed: () {
+                        MaterialPageRoute route = MaterialPageRoute(
+                            builder: (context) =>
+                                UpdateAddress(model.order.shipAddress, true));
+                        Navigator.pushReplacement(context, route);
+                      },
+                    ),
+                  );
+                  _scaffoldKey.currentState.showSnackBar(invalidPincode);
                 }
               }
             } else if (_character == 'Payubiz') {

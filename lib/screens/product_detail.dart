@@ -21,6 +21,7 @@ import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 import 'package:ofypets_mobile_app/widgets/similar_products_card.dart';
 import 'package:ofypets_mobile_app/widgets/snackbar.dart';
+import 'package:ofypets_mobile_app/utils/headers.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -51,6 +52,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   String htmlDescription;
   List<Product> similarProducts = List();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  String pincode = '';
 
   @override
   void initState() {
@@ -709,6 +712,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             SizedBox(
               height: 4.0,
             ),
+            pincodeBox(model, context),
+            SizedBox(
+              height: 4.0,
+            ),
             addToCartFlatButton(),
             SizedBox(
               height: 12.0,
@@ -766,7 +773,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
         return Padding(
-          padding: const EdgeInsets.only(left: 16.0, right: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Container(
             width: double.infinity,
             height: 45.0,
@@ -826,8 +833,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                         }
                       }
                     : () {},
-                backgroundColor:
-                    selectedProduct.isOrderable ? Colors.deepOrange : Colors.grey,
+                backgroundColor: selectedProduct.isOrderable
+                    ? Colors.deepOrange
+                    : Colors.grey,
               )
             : FloatingActionButton(
                 child: Icon(
@@ -889,6 +897,60 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     strike ? TextDecoration.lineThrough : TextDecoration.none),
           ),
         ),
+      ],
+    );
+  }
+
+  Widget pincodeBox(MainModel model, BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Container(
+          width: _deviceSize.width * 0.60,
+          height: 70,
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.only(bottom: 15, left: 10),
+          child: Form(
+            key: _formKey,
+            child: TextFormField(
+              initialValue: pincode,
+              decoration: InputDecoration(
+                  labelText: 'Pin Code',
+                  labelStyle: TextStyle(color: Colors.grey),
+                  contentPadding: EdgeInsets.all(0.0)),
+              onSaved: (String value) {
+                setState(() {
+                  pincode = value;
+                });
+              },
+            ),
+          ),
+        ),
+        FlatButton(
+            child: Container(
+              child: Text(
+                'CHECK',
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green),
+              ),
+            ),
+            onPressed: () async {
+              FocusScope.of(context).requestFocus(new FocusNode());
+              _formKey.currentState.save();
+              if (pincode != '') {
+                bool available =
+                    await model.shipmentAvailability(pincode: pincode);
+                if (available) {
+                  Scaffold.of(context).showSnackBar(codAvailable);
+                } else {
+                  Scaffold.of(context).showSnackBar(codNotAvailable);
+                }
+              } else {
+                Scaffold.of(context).showSnackBar(codEmpty);
+              }
+            }),
       ],
     );
   }

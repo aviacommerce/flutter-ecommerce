@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ofypets_mobile_app/models/line_item.dart';
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
@@ -6,6 +7,9 @@ import 'package:ofypets_mobile_app/screens/update_address.dart';
 import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:ofypets_mobile_app/widgets/order_details_card.dart';
+import 'package:ofypets_mobile_app/widgets/snackbar.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart';
+
 import 'package:scoped_model/scoped_model.dart';
 
 class AddressPage extends StatefulWidget {
@@ -19,9 +23,30 @@ class AddressPage extends StatefulWidget {
 
 class _AddressPageState extends State<AddressPage> {
   bool stateChanged = true;
+  String promocode;
+  Size _deviceSize;
+  String promoCodeResponseMsg = '';
+  bool promoChecked = false;
+  bool isPromoDiscount = false;
+  bool _isLoading = false;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
   void initState() {
     super.initState();
+    setState(() {
+      print("ORDER ADDRESS PAGE INIT-------");
+      String adjustMentTotal =
+          ScopedModel.of<MainModel>(context, rebuildOnChange: false)
+              .order
+              .adjustmentTotal;
+      print(adjustMentTotal);
+      print(double.parse(adjustMentTotal));
+      promoChecked = isPromoDiscount = adjustMentTotal != '0.0';
+
+      print(isPromoDiscount);
+    });
+
     locator<ConnectivityManager>().initConnectivity(context);
   }
 
@@ -33,11 +58,14 @@ class _AddressPageState extends State<AddressPage> {
   }
 
   Widget build(BuildContext context) {
+    _deviceSize = MediaQuery.of(context).size;
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return Scaffold(
+          key: _scaffoldKey,
           appBar: AppBar(
-              title: Text('Delivery Address'),
+              title: Text('Review Order'),
+              centerTitle: false,
               bottom: model.isLoading
                   ? PreferredSize(
                       child: LinearProgressIndicator(),
@@ -47,86 +75,77 @@ class _AddressPageState extends State<AddressPage> {
                       child: Container(),
                       preferredSize: Size.fromHeight(10),
                     )),
-          body: CustomScrollView(
-            slivers: <Widget>[
-              SliverList(
-                delegate: SliverChildListDelegate([
-                  FlatButton(
-                    child: Text(model.isLoading
-                        ? ''
-                        : model.order.shipAddress != null ? '' : 'ADD ADDRESS'),
-                    onPressed: () {
-                      MaterialPageRoute payment = MaterialPageRoute(
-                          builder: (context) =>
-                              UpdateAddress(model.order.shipAddress, true));
-                      Navigator.push(context, payment);
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15.0, top: 0.0),
-                    child: Text(
-                      'Shipping Address',
-                      style: TextStyle(
-                          color: Colors.grey.shade700, fontSize: 16.0),
+          body: Stack(children: [
+            CustomScrollView(
+              slivers: <Widget>[
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    FlatButton(
+                      child: Text(model.isLoading
+                          ? ''
+                          : model.order.shipAddress != null
+                              ? ''
+                              : 'ADD ADDRESS'),
+                      onPressed: () {
+                        MaterialPageRoute payment = MaterialPageRoute(
+                            builder: (context) =>
+                                UpdateAddress(model.order.shipAddress, true));
+                        Navigator.push(context, payment);
+                      },
                     ),
-                  ),
-                  addressContainer(),
-                  Divider(),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: 10.0, top: 15.0, bottom: 10.0),
-                    child: Text(
-                      'Order Summary',
-                      style: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w100),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15.0, top: 0.0),
+                      child: Text(
+                        'Shipping Address',
+                        style: TextStyle(
+                            color: Colors.grey.shade700, fontSize: 16.0),
+                      ),
                     ),
-                  ),
-                  items(),
-                  orderDetailCard(),
-                  Divider(
-                    indent: 20,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Text(
-                      'By placing this order, you agree to Ofypets.com’\s Privacy Policy and Terms of Use.',
-                      style: TextStyle(color: Colors.grey.shade700),
+                    addressContainer(),
+                    Divider(),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15.0, top: 0.0),
+                      child: Text(
+                        'Promotion',
+                        style: TextStyle(
+                            color: Colors.grey.shade700, fontSize: 16.0),
+                      ),
                     ),
-                  ),
-                ]),
-              ), //items(),
-            ],
-          ),
-          bottomNavigationBar: BottomAppBar(
-              child: Container(
-                  height: 100,
-                  child: Column(children: [
-                    Container(
-                        padding: EdgeInsets.only(top: 10),
-                        alignment: Alignment.center,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text(
-                              'Order Total: ',
-                              style: TextStyle(
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16),
-                            ),
-                            Text(
-                              '${model.order.displayTotal}',
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16),
-                            )
-                          ],
-                        )),
-                    paymentButton(context),
-                  ]))));
+                    SizedBox(
+                      height: 10,
+                    ),
+                    promoCodeBox(model, context),
+                    Divider(),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 15.0, top: 15.0, bottom: 10.0),
+                      child: Text(
+                        'Order Summary',
+                        style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w100),
+                      ),
+                    ),
+                    items(),
+                    orderDetailCard(),
+                    Divider(
+                      indent: 20,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Text(
+                        'By placing this order, you agree to Ofypets.com’\s Privacy Policy and Terms of Use.',
+                        style: TextStyle(color: Colors.grey.shade700),
+                      ),
+                    ),
+                  ]),
+                ),
+                // items(),
+              ],
+            ),
+            Positioned(bottom: 0, child: bottomContainer(model))
+          ]));
     });
   }
 
@@ -134,7 +153,7 @@ class _AddressPageState extends State<AddressPage> {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return Container(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 18),
         width: MediaQuery.of(context).size.width,
         child: FlatButton(
           // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
@@ -142,7 +161,7 @@ class _AddressPageState extends State<AddressPage> {
           child: Text(
             model.order.shipAddress != null ? 'PLACE ORDER' : 'ADD ADDRESS',
             style: TextStyle(
-                fontSize: 18, color: Colors.white, fontWeight: FontWeight.w300),
+                fontSize: 15, color: Colors.white, fontWeight: FontWeight.w300),
           ),
           onPressed: () {
             MaterialPageRoute address = MaterialPageRoute(
@@ -182,12 +201,184 @@ class _AddressPageState extends State<AddressPage> {
     }
     if (stateChanged) {
       print('STATE IS CHANGED, FETCH CURRENT ORDER');
-      model.fetchCurrentOrder();
-      model.getPaymentMethods();
+      bool fetched = await model.fetchCurrentOrder();
+      bool paymentFetched = await model.getPaymentMethods();
       MaterialPageRoute payment =
           MaterialPageRoute(builder: (context) => PaymentScreen());
       Navigator.push(context, payment);
     }
+  }
+
+  Widget promoCodeBox(MainModel model, BuildContext context) {
+    return Container(
+        padding: EdgeInsets.only(left: 10, right: 10),
+        child: Card(
+            child: _isLoading
+                ? Padding(
+                    padding: EdgeInsets.all(10),
+                    child: CupertinoActivityIndicator())
+                : !promoChecked || !isPromoDiscount
+                    ? Column(children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Container(
+                              width: _deviceSize.width * 0.60,
+                              height: 70,
+                              alignment: Alignment.centerLeft,
+                              padding: EdgeInsets.only(bottom: 15, left: 10),
+                              child: Form(
+                                key: _formKey,
+                                child: TextFormField(
+                                  initialValue: promocode,
+                                  decoration: InputDecoration(
+                                    labelText: 'Promo Code',
+                                    labelStyle: TextStyle(color: Colors.grey),
+                                    contentPadding: EdgeInsets.all(0.0),
+                                  ),
+                                  onSaved: (String value) {
+                                    setState(() {
+                                      promocode = value;
+                                    });
+                                  },
+                                ),
+                              ),
+                            ),
+                            FlatButton(
+                                child: Container(
+                                  child: Text(
+                                    'APPLY',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.green),
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  FocusScope.of(context)
+                                      .requestFocus(new FocusNode());
+
+                                  _formKey.currentState.save();
+                                  if (promocode != '') {
+                                    setState(() {
+                                      _isLoading = true;
+                                    });
+                                    Map<String, dynamic> promocodeResponse =
+                                        await model.promoCodeApplied(
+                                            promocode: promocode);
+                                    print("RESPONSE RECVD $promocodeResponse");
+                                    if (promocodeResponse['successful']) {
+                                      print(
+                                          "RESPONSE ------> ${promocodeResponse['success'].toString()}");
+                                      bool fetched =
+                                          await model.fetchCurrentOrder();
+                                      print(
+                                          "ADJUSTMENTTOTAL ${model.order.displayAdjustmentTotal}");
+                                      setState(() {
+                                        _isLoading = false;
+                                        promoChecked = true;
+                                        isPromoDiscount = true;
+                                        promoCodeResponseMsg =
+                                            promocodeResponse['success'];
+                                      });
+                                    } else {
+                                      print(
+                                          "RESPONSE ------> ${promocodeResponse['error']}");
+                                      setState(() {
+                                        _isLoading = false;
+                                        promoChecked = true;
+                                        isPromoDiscount = false;
+                                        promoCodeResponseMsg =
+                                            promocodeResponse['error'];
+                                      });
+                                      _scaffoldKey.currentState
+                                          .showSnackBar(SnackBar(
+                                        content:
+                                            Text(promocodeResponse['error']),
+                                        duration: Duration(seconds: 3),
+                                      ));
+                                    }
+                                  } else {
+                                    _scaffoldKey.currentState
+                                        .showSnackBar(promoEmpty);
+                                  }
+                                }),
+                          ],
+                        ),
+                      ])
+                    : Column(children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Container(
+                              padding: EdgeInsets.only(
+                                  left: 10, bottom: 15, top: 15, right: 10),
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                promoCodeText(model).toUpperCase(),
+                                style: TextStyle(
+                                    color: Colors.green, fontSize: 17),
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.only(right: 10),
+                              child: Icon(
+                                Icons.check_circle_outline,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Text(
+                            'The coupon code was successfully applied to your order. You will save ${model.order.displayAdjustmentTotal.toString().substring(1)}.',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                        Divider(
+                          color: Colors.grey,
+                        ),
+                        GestureDetector(
+                            onTap: () async {
+                              setState(() {
+                                _isLoading = true;
+                              });
+                              Map<String, dynamic> promocodeResponse =
+                                  await model.promoCodeRemoved(
+                                      promocode: promoCodeText(model));
+                              if (promocodeResponse['successful']) {
+                                bool fetched = await model.fetchCurrentOrder();
+                                print(model.order.displayAdjustmentTotal);
+                                setState(() {
+                                  promoChecked = false;
+                                  isPromoDiscount = false;
+                                  _isLoading = false;
+                                });
+                              }
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.only(right: 10, bottom: 10),
+                              child: Text(
+                                'Remove',
+                                style: TextStyle(
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ))
+                      ])));
+  }
+
+  String promoCodeText(MainModel model) {
+    String codeName = '';
+    model.order.adjustments.forEach((adjustmentObj) {
+      String adjustmentString = adjustmentObj['label'].toString();
+      if (adjustmentString.contains('Promotion')) {
+        final match = RegExp(r'\(([^)]+)\)').firstMatch(adjustmentString);
+        codeName = match.group(1);
+      }
+    });
+    return codeName;
   }
 
   Widget addressContainer() {
@@ -206,15 +397,17 @@ class _AddressPageState extends State<AddressPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text(
-                        model.order.shipAddress.firstName +
-                            ' ' +
-                            model.order.shipAddress.lastName,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      Flexible(
+                        child: Text(
+                          model.order.shipAddress.firstName +
+                              ' ' +
+                              model.order.shipAddress.lastName,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        textAlign: TextAlign.left,
                       ),
                       FlatButton(
                           onPressed: () {
@@ -224,9 +417,11 @@ class _AddressPageState extends State<AddressPage> {
                             Navigator.push(context, payment);
                           },
                           child: Text(
-                            'Edit',
-                            style:
-                                TextStyle(color: Colors.blue, fontSize: 17.0),
+                            'EDIT',
+                            style: TextStyle(
+                                color: Colors.green,
+                                fontSize: 15.0,
+                                fontWeight: FontWeight.bold),
                           )),
                     ],
                   ),
@@ -246,6 +441,37 @@ class _AddressPageState extends State<AddressPage> {
       } else
         return Container();
     });
+  }
+
+  Widget bottomContainer(MainModel model) {
+    return BottomAppBar(
+        child: Container(
+            height: 100,
+            child: Column(children: [
+              Container(
+                  padding: EdgeInsets.only(top: 10),
+                  alignment: Alignment.center,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'Order Total: ',
+                        style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16),
+                      ),
+                      Text(
+                        '${model.order.displayTotal}',
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16),
+                      )
+                    ],
+                  )),
+              paymentButton(context),
+            ])));
   }
 
   Widget items() {
@@ -303,7 +529,7 @@ class _AddressPageState extends State<AddressPage> {
                                         text: TextSpan(children: [
                                           TextSpan(
                                             text:
-                                                '${widget.lineItems[index].variant.name.split(' ')[0]} ',
+                                                '${widget.lineItems[index].variant.name.split('')[0]} ',
                                             style: TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 16.0,

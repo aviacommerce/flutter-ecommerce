@@ -7,7 +7,10 @@ class Order {
   final String itemTotal;
   final String displayTotal;
   final String displaySubTotal;
+  final String adjustmentTotal;
+  final String displayAdjustmentTotal;
   final List<LineItem> lineItems;
+  final List<dynamic> adjustments;
   int totalQuantity;
   String shipTotal;
   String state;
@@ -23,6 +26,9 @@ class Order {
       this.number,
       this.displayTotal,
       this.displaySubTotal,
+      this.adjustmentTotal,
+      this.displayAdjustmentTotal,
+      this.adjustments,
       this.itemTotal,
       this.lineItems,
       this.shipTotal,

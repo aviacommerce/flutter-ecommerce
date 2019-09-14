@@ -38,10 +38,6 @@ mixin CartModel on Model {
     return _isLoading;
   }
 
-  bool get hii {
-    return hi;
-  }
-
   void setLoading(bool loading) {
     _isLoading = loading;
     notifyListeners();
@@ -295,6 +291,9 @@ mixin CartModel on Model {
             total: responseBody['total'],
             id: responseBody['id'],
             itemTotal: responseBody['item_total'],
+            adjustments: responseBody['adjustments'],
+            adjustmentTotal: responseBody['adjustment_total'],
+            displayAdjustmentTotal: responseBody['display_adjustment_total'],
             displaySubTotal: responseBody['display_item_total'],
             displayTotal: responseBody['display_total'],
             lineItems: _lineItems,
@@ -311,6 +310,7 @@ mixin CartModel on Model {
     } else {
       _lineItems = [];
     }
+    return true;
   }
 
   Future<bool> changeState() async {
@@ -334,6 +334,9 @@ mixin CartModel on Model {
         total: responseBody['total'],
         id: responseBody['id'],
         itemTotal: responseBody['item_total'],
+        adjustments: responseBody['adjustments'],
+        adjustmentTotal: responseBody['adjustment_total'],
+        displayAdjustmentTotal: responseBody['display_adjustment_total'],
         displaySubTotal: responseBody['display_item_total'],
         displayTotal: responseBody['display_total'],
         lineItems: _lineItems,
@@ -396,6 +399,7 @@ mixin CartModel on Model {
     });
     _isLoading = false;
     notifyListeners();
+    return true;
   }
 
   clearData() async {
@@ -405,5 +409,52 @@ mixin CartModel on Model {
     _lineItems.clear();
     order = null;
     notifyListeners();
+  }
+
+  Future<bool> shipmentAvailability({String pincode}) async {
+    Map<String, dynamic> responseBody = Map();
+    Map<String, String> headers = await getHeaders();
+    Map<String, String> params = {'pincode': pincode};
+    http.Response response = await http.post(
+        Settings.SERVER_URL + 'address/shipment_availability',
+        headers: headers,
+        body: json.encode(params));
+    responseBody = json.decode(response.body);
+    return responseBody['available'];
+  }
+
+  Future<Map<String, dynamic>> promoCodeApplied({String promocode}) async {
+    Map<String, dynamic> responseBody = Map();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, String> headers = await getHeaders();
+    Map<String, String> params = {
+      'order_token': prefs.getString('orderToken'),
+      'coupon_code': promocode
+    };
+    http.Response response = await http.put(
+        Settings.SERVER_URL +
+            'api/v1/orders/${prefs.getString('orderNumber')}/apply_coupon_code',
+        headers: headers,
+        body: json.encode(params));
+    responseBody = json.decode(response.body);
+    return responseBody;
+  }
+
+  Future<Map<String, dynamic>> promoCodeRemoved({String promocode}) async {
+    Map<String, dynamic> responseBody = Map();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    Map<String, String> headers = await getHeaders();
+    Map<String, String> params = {
+      'order_token': prefs.getString('orderToken'),
+      'coupon_code': promocode
+    };
+    http.Response response = await http.put(
+        Settings.SERVER_URL +
+            'api/v1/orders/${prefs.getString('orderNumber')}/remove_coupon_code',
+        headers: headers,
+        body: json.encode(params));
+    responseBody = json.decode(response.body);
+    print("PROMO CODE REMOVE RESPONSE $responseBody");
+    return responseBody;
   }
 }

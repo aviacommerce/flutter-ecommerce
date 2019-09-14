@@ -489,22 +489,25 @@ class _UpdateAddressState extends State<UpdateAddress> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Address Update"),
-            content: new Text("Address updated successfully."),
-            actions: <Widget>[
-              new FlatButton(
-                child: Text(
-                  "OK",
-                  style: TextStyle(color: Colors.black),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                },
-              )
-            ],
-          );
+          return ScopedModelDescendant<MainModel>(
+              builder: (BuildContext context, Widget child, MainModel model) {
+            return AlertDialog(
+              title: Text("Address Update"),
+              content: new Text("Address updated successfully."),
+              actions: <Widget>[
+                new FlatButton(
+                  child: Text(
+                    "OK",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          });
         });
   }
 }

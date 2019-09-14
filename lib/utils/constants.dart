@@ -1,9 +1,12 @@
 class Settings {
-  // static const String SERVER_URL = 'https://ofypets.indiepet.co.in/';
-  // static const String WEB_URL = 'https://beta.ofypets.com/';
-  static const String WEB_URL = 'https://www.ofypets.com/';
-  static const String SERVER_URL = 'https://app.ofypets.com/';
+  static const String SERVER_URL = 'https://ofypets.indiepet.co.in/';
+  static const String WEB_URL = 'https://beta.ofypets.com/';
+  // static const String WEB_URL = 'https://www.ofypets.com/';
+  // static const String SERVER_URL = 'https://app.ofypets.com/';
 }
+
+final double FREE_SHIPPING_AMOUNT = 699;
+final String CURRENCY_SYMBOL = '₹';
 
 final int ONE = 1;
 final int ZERO = 0;

@@ -22,6 +22,8 @@ Widget orderDetailCard() {
                     Colors.red),
                 amountRow('Shipping:', model.order.shipTotal, model,
                     Colors.grey.shade700),
+                amountRow('Adjustments:', model.order.displayAdjustmentTotal, model,
+                    Colors.grey.shade700),    
                 amountRow(
                     'Order Total:', model.order.displayTotal, model, Colors.red)
               ],
