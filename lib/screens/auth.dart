@@ -49,17 +49,24 @@ class _AuthenticationState extends State<Authentication>
     final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth = deviceWidth > 550.0 ? 500.0 : deviceWidth * 0.95;
     return MaterialApp(
+      color: Colors.green,
+      theme: ThemeData(
+        primarySwatch: Colors.green,
+        accentColor: Colors.white,
+      ),
       home: DefaultTabController(
         length: 2,
         child: Scaffold(
           key: _scaffoldKey,
           appBar: AppBar(
+            centerTitle: false,
             backgroundColor: Colors.green,
             leading: IconButton(
               icon: Icon(Icons.close),
               onPressed: () => Navigator.of(context).pop(),
             ),
             bottom: TabBar(
+              indicatorWeight: 4.0,
               controller: _tabController,
               indicatorColor: Colors.green,
               tabs: [
@@ -97,52 +104,60 @@ class _AuthenticationState extends State<Authentication>
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return SingleChildScrollView(
-        child: Container(
-          width: targetWidth,
-          child: Form(
-            key: _formKeyForLogin,
-            child: Column(
-              children: <Widget>[
-                SizedBox(
-                  height: 30.0,
-                ),
-                _buildEmailTextField(),
-                SizedBox(
-                  height: 20.0,
-                ),
-                _buildPasswordTextField(),
-                SizedBox(
-                  height: 20.0,
-                ),
-                _isLoader
-                    ? CircularProgressIndicator(backgroundColor: Colors.green)
-                    : Container(
-                        width: MediaQuery.of(context).size.width,
-                        padding: EdgeInsets.all(15),
-                        child: FlatButton(
-                          textColor: Colors.white,
-                          color: Colors.deepOrange,
-                          child: Text('SIGN IN'),
-                          onPressed: () => _submitLogin(model),
-                        )),
-                SizedBox(
-                  height: 20.0,
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return ForgetPassword();
-                    }));
-                  },
-                  child: Text(
-                    'FORGOT YOUR PASSWORD?',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.green),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+          child: Container(
+            width: targetWidth,
+            child: Form(
+              key: _formKeyForLogin,
+              child: Column(
+                children: <Widget>[
+                  SizedBox(
+                    height: 30.0,
                   ),
-                )
-              ],
+                  _buildEmailTextField(),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  _buildPasswordTextField(false),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  _isLoader
+                      ? CircularProgressIndicator(backgroundColor: Colors.green)
+                      : Container(
+                          width: MediaQuery.of(context).size.width,
+                          padding: EdgeInsets.all(15),
+                          child: FlatButton(
+                            textColor: Colors.white,
+                            color: Colors.deepOrange,
+                            child: Text(
+                              'SIGN IN',
+                              style: TextStyle(fontSize: 13.0),
+                            ),
+                            onPressed: () => _submitLogin(model),
+                          )),
+                  SizedBox(
+                    height: 20.0,
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return ForgetPassword();
+                      }));
+                    },
+                    child: Text(
+                      'FORGOT YOUR PASSWORD?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal,
+                          color: Colors.green,
+                          fontSize: 14.0),
+                    ),
+                  )
+                ],
+              ),
             ),
           ),
         ),
@@ -152,42 +167,45 @@ class _AuthenticationState extends State<Authentication>
 
   Widget _renderSignup(double targetWidth) {
     return SingleChildScrollView(
-      child: Container(
-        width: targetWidth,
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: <Widget>[
-              SizedBox(
-                height: 20.0,
-              ),
-              _buildEmailTextField(),
-              SizedBox(
-                height: 20.0,
-              ),
-              _buildPasswordTextField(),
-              SizedBox(
-                height: 20.0,
-              ),
-              _buildPasswordConfirmTextField(),
-              SizedBox(
-                height: 20.0,
-              ),
-              _isLoader
-                  ? CircularProgressIndicator(backgroundColor: Colors.green)
-                  : Container(
-                      width: MediaQuery.of(context).size.width,
-                      padding: EdgeInsets.all(15),
-                      child: FlatButton(
-                        textColor: Colors.white,
-                        color: Colors.deepOrange,
-                        child: Text('CREATE ACCOUNT'),
-                        onPressed: () => _submitForm(),
-                      )),
-              SizedBox(
-                height: 20.0,
-              ),
-            ],
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+        child: Container(
+          width: targetWidth,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: <Widget>[
+                SizedBox(
+                  height: 20.0,
+                ),
+                _buildEmailTextField(),
+                SizedBox(
+                  height: 20.0,
+                ),
+                _buildPasswordTextField(true),
+                SizedBox(
+                  height: 20.0,
+                ),
+                _buildPasswordConfirmTextField(),
+                SizedBox(
+                  height: 30.0,
+                ),
+                _isLoader
+                    ? CircularProgressIndicator(backgroundColor: Colors.green)
+                    : Container(
+                        width: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.all(15),
+                        child: FlatButton(
+                          textColor: Colors.white,
+                          color: Colors.deepOrange,
+                          child: Text('CREATE ACCOUNT'),
+                          onPressed: () => _submitForm(),
+                        )),
+                SizedBox(
+                  height: 20.0,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -199,6 +217,7 @@ class _AuthenticationState extends State<Authentication>
         padding: EdgeInsets.symmetric(horizontal: 15),
         child: TextFormField(
           decoration: InputDecoration(
+            labelStyle: TextStyle(color: Colors.grey),
             labelText: 'Email',
             contentPadding: EdgeInsets.all(0.0),
           ),
@@ -217,14 +236,17 @@ class _AuthenticationState extends State<Authentication>
         ));
   }
 
-  Widget _buildPasswordTextField() {
+  Widget _buildPasswordTextField([bool isLimitCharacter = false]) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15.0),
         child: Theme(
           data: ThemeData(hintColor: Colors.grey.shade700),
           child: TextFormField(
             decoration: InputDecoration(
-                labelText: 'Password (Atleast 6 Characters)',
+                labelText: isLimitCharacter
+                    ? 'Password (Atleast 6 Characters)'
+                    : 'Password',
+                labelStyle: TextStyle(color: Colors.grey),
                 contentPadding: EdgeInsets.all(0.0)),
             obscureText: true,
             controller: _passwordTextController,
@@ -248,6 +270,7 @@ class _AuthenticationState extends State<Authentication>
           data: ThemeData(hintColor: Colors.grey.shade700),
           child: TextFormField(
             decoration: InputDecoration(
+              labelStyle: TextStyle(color: Colors.grey),
               labelText: 'Confirm Password',
               contentPadding: EdgeInsets.all(0.0),
             ),

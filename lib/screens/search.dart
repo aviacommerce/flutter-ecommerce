@@ -223,7 +223,7 @@ class _ProductSearchState extends State<ProductSearch> {
                                           EdgeInsets.symmetric(vertical: 25.0),
                                       child: Center(
                                           child: CircularProgressIndicator(
-                                        backgroundColor: Colors.green,
+                                        backgroundColor: Colors.white,
                                       )),
                                     );
                                   } else {
@@ -302,8 +302,11 @@ class _ProductSearchState extends State<ProductSearch> {
           reviewProductId: searchObj['id'],
           name: searchObj['attributes']['name'],
           image: searchObj['attributes']['product_url'],
+          currencySymbol: searchObj['attributes']['currency_symbol'],
           displayPrice: searchObj['attributes']['currency_symbol'] +
               searchObj['attributes']['price'],
+          price: searchObj['attributes']['price'],
+          costPrice: searchObj['attributes']['cost_price'],
           slug: searchObj['attributes']['slug'],
           avgRating: double.parse(searchObj['attributes']['avg_rating']),
           reviewsCount: searchObj['attributes']['reviews_count'].toString()));

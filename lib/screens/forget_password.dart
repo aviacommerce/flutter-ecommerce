@@ -42,6 +42,7 @@ class _ForgetPasswordState extends State<ForgetPassword>
         child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
+            centerTitle: false,
             backgroundColor: Colors.green,
             leading: IconButton(
                 icon: Icon(Icons.close),
@@ -49,8 +50,8 @@ class _ForgetPasswordState extends State<ForgetPassword>
                   Navigator.of(context).pop();
                 }),
             title: Text(
-              'FORGOT PASSWORD',
-              style: TextStyle(fontSize: 16, color: Colors.white),
+              'Forgot Password',
+              style: TextStyle(fontSize: 20, color: Colors.white),
             ),
           ),
           body: SingleChildScrollView(
@@ -94,7 +95,7 @@ class _ForgetPasswordState extends State<ForgetPassword>
                       ),
                       _isLoader
                           ? CircularProgressIndicator(
-                              backgroundColor: Colors.green)
+                              backgroundColor: Colors.white)
                           : Container(
                               width: MediaQuery.of(context).size.width,
                               child: RaisedButton(

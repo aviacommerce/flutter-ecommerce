@@ -211,7 +211,6 @@ class _BrandListState extends State<BrandList> {
     List<Product> variants = [];
     List<OptionValue> optionValues = [];
     List<OptionType> optionTypes = [];
-
     final response = (await http.get(Settings.SERVER_URL +
             'api/v1/taxons/products?id=$brandId&page=$currentPage&per_page=$perPage&data_set=small'))
         .body;
@@ -243,8 +242,10 @@ class _BrandListState extends State<BrandList> {
                 id: variant['id'],
                 name: variant['name'],
                 description: variant['description'],
+                price: variant['price'],
                 optionValues: optionValues,
                 displayPrice: variant['display_price'],
+                costPrice: variant['cost_price'],
                 image: variant['images'][0]['product_url'],
                 isOrderable: variant['is_orderable'],
                 avgRating: double.parse(product['avg_rating']),
@@ -266,6 +267,7 @@ class _BrandListState extends State<BrandList> {
               slug: product['slug'],
               taxonId: product['taxon_ids'].first,
               id: product['id'],
+              price: product['price'],
               name: product['name'],
               displayPrice: product['display_price'],
               avgRating: double.parse(product['avg_rating']),
@@ -284,10 +286,12 @@ class _BrandListState extends State<BrandList> {
             id: product['id'],
             name: product['name'],
             displayPrice: product['display_price'],
+            costPrice: product['cost_price'],
             avgRating: double.parse(product['avg_rating']),
             reviewsCount: product['reviews_count'].toString(),
             image: product['master']['images'][0]['product_url'],
             hasVariants: product['has_variants'],
+            price: product['price'],
             isOrderable: product['master']['is_orderable'],
             reviewProductId: reviewProductId,
             description: product['description'],

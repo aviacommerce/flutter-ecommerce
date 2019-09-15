@@ -348,7 +348,7 @@ class _CategoryListingState extends State<CategoryListing> {
     List<Widget> progressBar = [];
     progressBar.add(
       CircularProgressIndicator(
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.white,
       ),
     );
     return progressBar;
@@ -450,7 +450,7 @@ class _CategoryListingState extends State<CategoryListing> {
                       padding: EdgeInsets.symmetric(vertical: 25.0),
                       child: Center(
                           child: CircularProgressIndicator(
-                        backgroundColor: Colors.green,
+                        backgroundColor: Colors.white,
                       )),
                     );
                   } else {
@@ -623,7 +623,8 @@ class _CategoryListingState extends State<CategoryListing> {
     List<Product> variants = [];
     List<OptionValue> optionValues = [];
     List<OptionType> optionTypes = [];
-
+    print(
+        "CATEGORY URL + ${Settings.SERVER_URL + 'api/v1/taxons/products?id=$subCatId&page=$currentPage&per_page=$perPage&q[s]=$sortBy&data_set=small'}");
     setState(() {
       hasMore = false;
     });
@@ -667,6 +668,7 @@ class _CategoryListingState extends State<CategoryListing> {
             variants.add(Product(
                 slug: variant['slug'],
                 id: variant['id'],
+                price: variant['price'],
                 name: variant['name'],
                 description: variant['description'],
                 optionValues: optionValues,
@@ -694,6 +696,7 @@ class _CategoryListingState extends State<CategoryListing> {
               taxonId: product['taxon_ids'].first,
               id: product['id'],
               name: product['name'],
+              price: product['price'],
               displayPrice: product['display_price'],
               avgRating: double.parse(product['avg_rating']),
               reviewsCount: product['reviews_count'].toString(),
@@ -710,6 +713,7 @@ class _CategoryListingState extends State<CategoryListing> {
             taxonId: product['taxon_ids'].first,
             id: product['id'],
             name: product['name'],
+            price: product['price'],
             displayPrice: product['display_price'],
             avgRating: double.parse(product['avg_rating']),
             reviewsCount: product['reviews_count'].toString(),

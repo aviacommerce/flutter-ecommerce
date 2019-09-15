@@ -324,7 +324,7 @@ class _OrderResponseState extends State<OrderResponse> {
                   )
                 : Center(
                     child: CircularProgressIndicator(
-                    backgroundColor: Colors.green,
+                    backgroundColor: Colors.white,
                   )),
           ));
     });

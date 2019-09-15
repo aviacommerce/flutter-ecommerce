@@ -104,10 +104,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                           }
                           if (!hasMore || _isLoading) {
                             return Padding(
-                              padding: EdgeInsets.symmetric(vertical: 0.0),
+                              padding: EdgeInsets.symmetric(vertical: 10.0),
                               child: Center(
                                   child: CircularProgressIndicator(
-                                backgroundColor: Colors.green,
+                                backgroundColor: Colors.white,
                               )),
                             );
                           } else {

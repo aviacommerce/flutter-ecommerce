@@ -31,62 +31,6 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                               'images/placeholders/no-product-image.png'),
                         ),
                       ),
-                      // Container(
-                      //   width: 150.0,
-                      //   alignment: Alignment.topLeft,
-                      //   child: IconButton(
-                      //     alignment: Alignment.topLeft,
-                      //     icon: Icon(Icons.favorite),
-                      //     color: Colors.orange,
-                      //     onPressed: () async {
-                      //       final SharedPreferences prefs =
-                      //           await SharedPreferences.getInstance();
-                      //       String authToken = prefs.getString('spreeApiKey');
-
-                      //       if (authToken == null) {
-                      //         Scaffold.of(context).showSnackBar(SnackBar(
-                      //           content: Text(
-                      //             'Please Login to add to Favorites',
-                      //           ),
-                      //           action: SnackBarAction(
-                      //             label: 'LOGIN',
-                      //             onPressed: () {
-                      //               MaterialPageRoute route = MaterialPageRoute(
-                      //                   builder: (context) =>
-                      //                       Authentication(0));
-                      //               Navigator.push(context, route);
-                      //             },
-                      //           ),
-                      //           duration: Duration(seconds: 3),
-                      //         ));
-                      //       } else {
-                      //         Scaffold.of(context).showSnackBar(SnackBar(
-                      //           content: Text(
-                      //             'Adding to Favorites, please wait.',
-                      //           ),
-                      //           duration: Duration(seconds: 1),
-                      //         ));
-                      //         Map<String, String> headers = await getHeaders();
-                      //         http
-                      //             .post(
-                      //                 Settings.SERVER_URL + 'favorite_products',
-                      //                 body: json.encode({
-                      //                   'id': product.reviewProductId.toString()
-                      //                 }),
-                      //                 headers: headers)
-                      //             .then((response) {
-                      //           Map<dynamic, dynamic> responseBody =
-                      //               json.decode(response.body);
-
-                      //           Scaffold.of(context).showSnackBar(SnackBar(
-                      //             content: Text(responseBody['message']),
-                      //             duration: Duration(seconds: 1),
-                      //           ));
-                      //         });
-                      //       }
-                      //     },
-                      //   ),
-                      // ),
                     ],
                   ),
                   Container(
@@ -96,7 +40,7 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                       child: Text(
                         'More Choices\nAvailable',
                         style: TextStyle(
-                            fontWeight: FontWeight.w300, fontSize: 14),
+                            fontSize: 12, color: Colors.grey.shade600),
                         textAlign: TextAlign.center,
                       )),
                 ],
@@ -106,6 +50,8 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
               ),
               Expanded(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.only(right: 5.0, top: 0.0),
@@ -114,7 +60,7 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                           TextSpan(
                             text: '${product.name.split(' ')[0]} ',
                             style: TextStyle(
-                                color: Colors.black,
+                                color: Color(0xff676767),
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.bold),
                           ),
@@ -127,9 +73,9 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                         ]),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 15),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
                         Container(
                           alignment: Alignment.topLeft,
@@ -142,9 +88,50 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                                 fontSize: 18),
                           ),
                         ),
+                        product.costPrice != null
+                            ? Container(
+                                margin: EdgeInsets.only(left: 10),
+                                alignment: Alignment.topLeft,
+                                child: Text(
+                                  product.currencySymbol + product.costPrice,
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      decoration: TextDecoration.lineThrough,
+                                      color: Colors.grey,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12),
+                                ),
+                              )
+                            : Container(),
                       ],
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 15),
+                    Container(
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 5.0, top: 0.0),
+                        child: RichText(
+                          textAlign: TextAlign.start,
+                          text: TextSpan(children: [
+                            TextSpan(
+                              text: 'Free 1-2 Day ',
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(
+                              text: double.parse(product.price) < 699
+                                  ? 'shipping over Rs.699'
+                                  : 'shipping',
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.black),
+                            ),
+                          ]),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 15),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[

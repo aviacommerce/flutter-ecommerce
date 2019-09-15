@@ -93,13 +93,23 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         drawer: HomeDrawer(),
-        body: CustomScrollView(slivers: [
-          SliverList(
-            delegate: SliverChildListDelegate([bannerCarousel]),
-          ),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              Container(
+        body: Container(
+          color: Colors.white,
+          child: CustomScrollView(slivers: [
+            SliverList(
+              delegate: SliverChildListDelegate([
+                Container(
+                    color: Colors.grey.withOpacity(0.1), child: bannerCarousel)
+              ]),
+            ),
+            SliverToBoxAdapter(
+              child: Divider(
+                height: 1.0,
+              ),
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate([
+                Container(
                   width: _deviceSize.width,
                   color: Colors.white,
                   child: Padding(
@@ -115,100 +125,113 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         Text('Shop by Category',
                             style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 14,
                                 fontWeight: FontWeight.normal,
                                 fontFamily: fontFamily)),
                       ],
-                    ),
-                  ))
-            ]),
-          ),
-          _isCategoryLoading
-              ? SliverList(
-                  delegate: SliverChildListDelegate([
-                  Container(
-                    height: _deviceSize.height * 0.5,
-                    alignment: Alignment.center,
-                    child: CircularProgressIndicator(
-                      backgroundColor: Colors.green,
-                    ),
-                  )
-                ]))
-              : categories.length > 0
-                  ? SliverGrid(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2),
-                      delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                        return categoryBox(
-                            index, context, _deviceSize, categories);
-                      }, childCount: categories.length + 1),
-                    )
-                  : SliverList(
-                      delegate: SliverChildListDelegate([
-                        Container(
-                          width: _deviceSize.width,
-                          color: Colors.white,
-                          child: Center(
-                            child: Text('No items present'),
-                          ),
-                        ),
-                      ]),
-                    ),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              Container(
-                  width: _deviceSize.width,
-                  color: Colors.white,
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          Icons.local_offer,
-                          color: Colors.orange,
-                        ),
-                        SizedBox(
-                          width: 8.0,
-                        ),
-                        Text('Today\'s Deals',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.normal,
-                                fontFamily: fontFamily)),
-                      ],
-                    ),
-                  ))
-            ]),
-          ),
-          _isDealsLoading
-              ? SliverList(
-                  delegate: SliverChildListDelegate([
-                  Container(
-                    height: _deviceSize.height * 0.47,
-                    alignment: Alignment.center,
-                    child: CircularProgressIndicator(
-                      backgroundColor: Colors.green,
-                    ),
-                  )
-                ]))
-              : SliverToBoxAdapter(
-                  child: Container(
-                    height: _deviceSize.height * 0.47,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: todaysDealProducts.length,
-                      itemBuilder: (context, index) {
-                        return todaysDealsCard(
-                            index, todaysDealProducts, _deviceSize, context);
-                      },
                     ),
                   ),
                 ),
-          SliverToBoxAdapter(
-            child: Divider(),
-          ),
-        ]),
+              ]),
+            ),
+            _isCategoryLoading
+                ? SliverList(
+                    delegate: SliverChildListDelegate([
+                    Container(
+                      height: _deviceSize.height * 0.5,
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator(
+                        backgroundColor: Colors.green,
+                      ),
+                    )
+                  ]))
+                : categories.length > 0
+                    ? SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2),
+                        delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+                          return categoryBox(
+                              index, context, _deviceSize, categories);
+                        }, childCount: categories.length + 1),
+                      )
+                    : SliverList(
+                        delegate: SliverChildListDelegate([
+                          Container(
+                            width: _deviceSize.width,
+                            color: Colors.white,
+                            child: Center(
+                              child: Text('No items present'),
+                            ),
+                          ),
+                        ]),
+                      ),
+            SliverToBoxAdapter(
+              child: Container(
+                height: 20.0,
+                color: Colors.grey.withOpacity(0.1),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Divider(
+                height: 1.0,
+              ),
+            ),
+            SliverList(
+              delegate: SliverChildListDelegate([
+                Container(
+                    width: _deviceSize.width,
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Row(
+                        children: <Widget>[
+                          Icon(
+                            Icons.local_offer,
+                            color: Colors.orange,
+                          ),
+                          SizedBox(
+                            width: 8.0,
+                          ),
+                          Text('Today\'s Deals',
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.normal,
+                                  fontFamily: fontFamily)),
+                        ],
+                      ),
+                    ))
+              ]),
+            ),
+            _isDealsLoading
+                ? SliverList(
+                    delegate: SliverChildListDelegate([
+                    Container(
+                      height: _deviceSize.height * 0.47,
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator(
+                        backgroundColor: Colors.green,
+                      ),
+                    )
+                  ]))
+                : SliverToBoxAdapter(
+                    child: Container(
+                      height: _deviceSize.height * 0.47,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: todaysDealProducts.length,
+                        itemBuilder: (context, index) {
+                          return todaysDealsCard(
+                              index, todaysDealProducts, _deviceSize, context);
+                        },
+                      ),
+                    ),
+                  ),
+            SliverToBoxAdapter(
+              child: Divider(),
+            ),
+          ]),
+        ),
         bottomNavigationBar:
             !model.isAuthenticated ? bottomNavigationBar() : null,
       );
