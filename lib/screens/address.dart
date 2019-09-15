@@ -17,8 +17,14 @@ class AddressPage extends StatefulWidget {
   AddressPage({this.lineItems});
   @override
   State<StatefulWidget> createState() {
+    // TODO: implement createState
     return _AddressPageState();
   }
+  // @override
+  // State<StatefulWidget> createState() {
+  //   return _AddressPageState()
+  //   // return _AddressPageState();
+  // }
 }
 
 class _AddressPageState extends State<AddressPage> {
@@ -64,8 +70,13 @@ class _AddressPageState extends State<AddressPage> {
       return Scaffold(
           key: _scaffoldKey,
           appBar: AppBar(
-              title: Text('Review Order'),
+              leading: IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  }),
               centerTitle: false,
+              title: Text('Review Order'),
               bottom: model.isLoading
                   ? PreferredSize(
                       child: LinearProgressIndicator(),
@@ -139,9 +150,9 @@ class _AddressPageState extends State<AddressPage> {
                         style: TextStyle(color: Colors.grey.shade700),
                       ),
                     ),
+                    Container(height: 150,)
                   ]),
                 ),
-                // items(),
               ],
             ),
             Positioned(bottom: 0, child: bottomContainer(model))
@@ -153,7 +164,7 @@ class _AddressPageState extends State<AddressPage> {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return Container(
-        padding: EdgeInsets.symmetric(vertical: 10, horizontal: 18),
+        padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 5.0),
         width: MediaQuery.of(context).size.width,
         child: FlatButton(
           // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
@@ -476,65 +487,69 @@ class _AddressPageState extends State<AddressPage> {
 
   Widget items() {
     return ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemBuilder: (BuildContext context, int index) {
-          return GestureDetector(
-              onTap: () {},
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                margin: EdgeInsets.all(4.0),
-                child: Container(
-                  color: Colors.white,
-                  child: GestureDetector(
-                    onTap: () {},
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Stack(
-                          children: <Widget>[
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              height: 150,
-                              width: 150,
-                              color: Colors.white,
-                              child: FadeInImage(
-                                image: NetworkImage(
-                                    widget.lineItems[index].variant.image),
-                                placeholder: AssetImage(
-                                    'images/placeholders/no-product-image.png'),
-                              ),
+      itemCount: widget.lineItems.length,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemBuilder: (BuildContext context, int index) {
+        return GestureDetector(
+          onTap: () {},
+          child: Card(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            margin: EdgeInsets.all(4.0),
+            child: Container(
+              color: Colors.white,
+              child: GestureDetector(
+                onTap: () {},
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Stack(
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.all(14),
+                            padding: EdgeInsets.all(10),
+                            height: 80,
+                            width: 80,
+                            color: Colors.white,
+                            child: FadeInImage(
+                              image: NetworkImage(
+                                  widget.lineItems[index].variant.image),
+                              placeholder: AssetImage(
+                                  'images/placeholders/no-product-image.png'),
                             ),
-                          ],
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Expanded(
-                            child: Column(
+                          ),
+                        ],
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Expanded(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
+                            SizedBox(height: 15,),
                             Container(
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
+                                  
                                   Expanded(
                                     child: Padding(
                                       padding: const EdgeInsets.only(
                                           right: 10.0, top: 10.0),
                                       child: RichText(
                                         text: TextSpan(children: [
-                                          TextSpan(
-                                            text:
-                                                '${widget.lineItems[index].variant.name.split('')[0]} ',
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.bold),
-                                          ),
+                                            TextSpan(
+                                              text:
+                                                  '${widget.lineItems[index].variant.name.split(' ')[0]} ',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
                                           TextSpan(
                                             text: widget
                                                 .lineItems[index].variant.name
@@ -557,9 +572,9 @@ class _AddressPageState extends State<AddressPage> {
                                 ],
                               ),
                             ),
-                            SizedBox(height: 10),
+                            SizedBox(height: 20),
                             Padding(
-                              padding: const EdgeInsets.only(top: 20.0),
+                              padding: const EdgeInsets.only(bottom: 10.0),
                               child: Container(
                                 alignment: Alignment.topLeft,
                                 child: Row(
@@ -571,11 +586,11 @@ class _AddressPageState extends State<AddressPage> {
                                       textAlign: TextAlign.left,
                                       style: TextStyle(
                                           color: Colors.grey.shade700,
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 17),
+                                          fontWeight: FontWeight.w200,
+                                          fontSize: 14),
                                     ),
                                     Container(
-                                      padding: EdgeInsets.only(right: 12.0),
+                                      padding: EdgeInsets.only(right: 24.0),
                                       alignment: Alignment.topLeft,
                                       child: Text(
                                         widget.lineItems[index].variant
@@ -584,21 +599,24 @@ class _AddressPageState extends State<AddressPage> {
                                         style: TextStyle(
                                             color: Colors.red,
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 18),
+                                            fontSize: 14),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
+                            Divider(color: Colors.grey.shade700,),
+                            SizedBox(height: 10,)
                           ],
-                        )),
-                      ],
-                    ),
-                  ),
-                ),
-              ));
-        },
-        itemCount: widget.lineItems.length);
+                        ),
+                      )
+                    ]),
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }

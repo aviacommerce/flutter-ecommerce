@@ -18,8 +18,8 @@ Widget orderDetailCard() {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),*/
-                amountRow('Sub Total:', model.order.displaySubTotal, model,
-                    Colors.red),
+                amountRow('Subtotal:', model.order.displaySubTotal, model,
+                    Colors.grey.shade700),
                 amountRow('Shipping:', model.order.shipTotal, model,
                     Colors.grey.shade700),
                 amountRow('Adjustments:', model.order.displayAdjustmentTotal, model,
