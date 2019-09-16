@@ -22,6 +22,7 @@ import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 import 'package:ofypets_mobile_app/widgets/similar_products_card.dart';
 import 'package:ofypets_mobile_app/widgets/snackbar.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:ofypets_mobile_app/screens/cart.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -97,6 +98,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     get_reviews();
     getSimilarProducts();
     locator<ConnectivityManager>().initConnectivity(context);
+    // _dropDownVariantItems = getVariants();
     super.initState();
   }
 
@@ -418,71 +420,175 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     return "By ${exp.firstMatch(review.name).group(0)} - ${formatter.format(now)}";
   }
 
-  Widget variantRow() {
-    if (widget.product.hasVariants != null) {
-      if (widget.product.hasVariants) {
-        List<Widget> optionValueNames = [];
-        List<Widget> optionTypeNames = [];
-        widget.product.optionTypes.forEach((optionType) {
-          optionTypeNames.add(Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.all(10),
-              child: Text(optionType.name)));
-        });
-        widget.product.variants.forEach((variant) {
-          variant.optionValues.forEach((optionValue) {
-            optionValueNames.add(GestureDetector(
+  Widget quantityRow(MainModel model, Product selectedProduct) {
+    print(
+        "SELECTED PRODUCT ---> ${selectedProduct.totalOnHand}  ${selectedProduct.slug}");
+    return Container(
+        height: 60.0,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: selectedProduct.totalOnHand > 12
+              ? 13
+              : selectedProduct.isBackOrderable ? 13 : selectedProduct.totalOnHand + 1,
+          itemBuilder: (BuildContext context, int index) {
+            if (index == 0) {
+              return Container();
+            } else {
+              return GestureDetector(
                 onTap: () {
                   setState(() {
-                    widget.product.variants.forEach((variant) {
-                      if (variant.optionValues[0] == optionValue) {
-                        setState(() {
-                          selectedProduct = variant;
-                          discount = (double.parse(variant.costPrice) -
-                                      double.parse(variant.price)) >
-                                  0
-                              ? true
-                              : false;
-                        });
-                      }
-                    });
+                    quantity = index;
                   });
                 },
                 child: Container(
+                    width: 50,
                     decoration: BoxDecoration(
                         border: Border.all(
-                      color: selectedProduct.optionValues[0].name ==
-                              optionValue.name
-                          ? Colors.green
-                          : Colors.black,
-                    )),
-                    alignment: Alignment.centerLeft,
-                    margin: EdgeInsets.all(10),
+                          color: quantity == index ? Colors.green : Colors.grey,
+                        ),
+                        borderRadius: BorderRadius.circular(5)),
+                    alignment: Alignment.center,
+                    // margin: EdgeInsets.all(10),
+                    margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                     padding: EdgeInsets.all(10),
                     child: Text(
-                      optionValue.name,
+                      index.toString(),
                       style: TextStyle(
-                          color: selectedProduct.optionValues[0].name ==
-                                  optionValue.name
-                              ? Colors.green
-                              : Colors.black),
-                    ))));
-          });
-        });
-        return Container(
-          height: 60.0,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: optionValueNames,
-          ),
-        );
-      } else {
-        return Container();
-      }
-    } else {
-      return Container();
-    }
+                          color:
+                              quantity == index ? Colors.green : Colors.grey),
+                    )),
+              );
+            }
+          },
+        ));
   }
+
+  List<DropdownMenuItem<String>> getVariants() {
+    List<DropdownMenuItem<String>> items = new List();
+
+    widget.product.variants.forEach((variant) {
+      variant.optionValues.forEach((optionValue) {
+        items.add(DropdownMenuItem(
+          value: optionValue.name,
+          child: Text(
+            optionValue.name,
+            style: TextStyle(color: Colors.green),
+          ),
+        ));
+      });
+    });
+    return items;
+  }
+
+  Widget variantDropDown() {
+    return Container(
+        margin: EdgeInsets.symmetric(horizontal: 15),
+        width: _deviceSize.width,
+        child: DropdownButton(
+          isExpanded: true,
+          iconEnabledColor: Colors.green,
+          items: getVariants(),
+          value: selectedProduct.optionValues[0].name,
+          onChanged: (value) {
+            widget.product.variants.forEach((variant) {
+              print(variant.optionValues[0]);
+              if (variant.optionValues[0].name == value) {
+                setState(() {
+                  selectedProduct = variant;
+                  discount = (double.parse(variant.costPrice) -
+                              double.parse(variant.price)) >
+                          0
+                      ? true
+                      : false;
+                });
+              }
+            });
+          },
+        ));
+  }
+
+  // Widget variantDialog() {
+  //   return Padding(
+  //     padding: EdgeInsets.all(10),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: <Widget>[
+  //         Text(
+  //           selectedProduct.optionValues.first.name,
+  //           style: TextStyle(color: Colors.green),
+  //         ),
+  //         IconButton(
+  //           icon: Icon(Icons.arrow_drop_down),
+  //           color: Colors.green,
+  //           onPressed: () {
+  //             showDialog(
+
+  //             )
+  //           },
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  // Widget variantRow() {
+  //   if (widget.product.hasVariants != null) {
+  //     if (widget.product.hasVariants) {
+  //       List<Widget> optionValueNames = [];
+  //       widget.product.variants.forEach((variant) {
+  //         variant.optionValues.forEach((optionValue) {
+  //           optionValueNames.add(GestureDetector(
+  //               onTap: () {
+  //                 setState(() {
+  //                   widget.product.variants.forEach((variant) {
+  //                     if (variant.optionValues[0] == optionValue) {
+  //                       setState(() {
+  //                         selectedProduct = variant;
+  //                         discount = (double.parse(variant.costPrice) -
+  //                                     double.parse(variant.price)) >
+  //                                 0
+  //                             ? true
+  //                             : false;
+  //                       });
+  //                     }
+  //                   });
+  //                 });
+  //               },
+  //               child: Container(
+  //                   decoration: BoxDecoration(
+  //                       border: Border.all(
+  //                     color: selectedProduct.optionValues[0].name ==
+  //                             optionValue.name
+  //                         ? Colors.green
+  //                         : Colors.black,
+  //                   )),
+  //                   alignment: Alignment.centerLeft,
+  //                   margin: EdgeInsets.all(10),
+  //                   padding: EdgeInsets.all(10),
+  //                   child: Text(
+  //                     optionValue.name,
+  //                     style: TextStyle(
+  //                         color: selectedProduct.optionValues[0].name ==
+  //                                 optionValue.name
+  //                             ? Colors.green
+  //                             : Colors.black),
+  //                   ))));
+  //         });
+  //       });
+  //       return Container(
+  //         height: 60.0,
+  //         child: ListView(
+  //           scrollDirection: Axis.horizontal,
+  //           children: optionValueNames,
+  //         ),
+  //       );
+  //     } else {
+  //       return Container();
+  //     }
+  //   } else {
+  //     return Container();
+  //   }
+  // }
 
   Widget highlightsTab() {
     return ScopedModelDescendant<MainModel>(
@@ -643,41 +749,30 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 textAlign: TextAlign.start,
               ),
             ),
-            variantRow(),
-            Divider(),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Expanded(
-                  child: Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Quantity: ',
-                  style: TextStyle(fontSize: 17, fontFamily: fontFamily),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(10),
+              child: Text(
+                'Size: ',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontFamily: fontFamily,
                 ),
-              )),
-              IconButton(
-                icon: Icon(Icons.remove),
-                onPressed: () {
-                  if (quantity > 1) {
-                    setState(() {
-                      quantity = quantity - 1;
-                    });
-                  }
-                },
               ),
-              Text(
-                quantity.toString(),
-                style: TextStyle(fontFamily: fontFamily),
+            ),
+            // variantRow(),
+            variantDropDown(),
+            // variantDialog(),
+            Divider(),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(10),
+              child: Text(
+                'Quantity: ',
+                style: TextStyle(fontSize: 12, fontFamily: fontFamily),
               ),
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: () {
-                  setState(() {
-                    quantity = quantity + 1;
-                  });
-                },
-              ),
-            ]),
+            ),
+            quantityRow(model, selectedProduct),
             Divider(),
             discount
                 ? buildPriceRow('M.R.P',
@@ -738,17 +833,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 ),
               ),
             ),
-            SizedBox(
-              height: 4.0,
-            ),
+            Divider(),
             pincodeBox(model, context),
+            Divider(),
             SizedBox(
-              height: 4.0,
+              height: 10.0,
             ),
             addToCartFlatButton(),
             SizedBox(
               height: 12.0,
             ),
+            !selectedProduct.isOrderable ? Container() : buyNowFlatButton(),
             Divider(),
             Column(
               children: <Widget>[
@@ -796,6 +891,53 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         ),
       );
     });
+  }
+
+  Widget buyNowFlatButton() {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          child: Container(
+            width: double.infinity,
+            height: 45.0,
+            child: FlatButton(
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                  color: selectedProduct.isOrderable
+                      ? Colors.deepOrange
+                      : Colors.grey,
+                ),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                selectedProduct.isOrderable ? 'BUY NOW' : 'OUT OF STOCK',
+                style: TextStyle(
+                    color: selectedProduct.isOrderable
+                        ? Colors.deepOrange
+                        : Colors.grey),
+              ),
+              onPressed: selectedProduct.isOrderable
+                  ? () {
+                      Scaffold.of(context).showSnackBar(processSnackbar);
+                      if (selectedProduct.isOrderable) {
+                        model.addProduct(
+                            variantId: selectedProduct.id, quantity: quantity);
+                        if (!model.isLoading) {
+                          Scaffold.of(context).showSnackBar(completeSnackbar);
+                          MaterialPageRoute route =
+                              MaterialPageRoute(builder: (context) => Cart());
+
+                          Navigator.push(context, route);
+                        }
+                      }
+                    }
+                  : () {},
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget addToCartFlatButton() {

@@ -16,10 +16,10 @@ class Cart extends StatefulWidget {
 class _CartState extends State<Cart> {
   List<int> quantities = [];
   bool stateChanged = true;
+  static const _ITEM_HEIGHT = 40;
   @override
   void initState() {
     super.initState();
-
     locator<ConnectivityManager>().initConnectivity(context);
   }
 
@@ -35,6 +35,7 @@ class _CartState extends State<Cart> {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return Scaffold(
+          backgroundColor: Colors.grey.shade200,
           appBar: AppBar(
               leading: IconButton(
                 icon: Icon(Icons.close),
@@ -110,7 +111,7 @@ class _CartState extends State<Cart> {
               style: total
                   ? TextStyle(
                       fontSize: 15,
-                      color: Colors.grey,
+                      color: Colors.grey.shade600,
                       fontWeight: FontWeight.bold)
                   : TextStyle(
                       fontSize: 16.5,
@@ -202,8 +203,8 @@ class _CartState extends State<Cart> {
                 child: Card(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
-                  elevation: 3,
-                  margin: EdgeInsets.all(4.0),
+                  elevation: 1,
+                  margin: EdgeInsets.all(8.0),
                   child: Container(
                     color: Colors.white,
                     child: GestureDetector(
@@ -216,7 +217,7 @@ class _CartState extends State<Cart> {
                               Container(
                                 padding: EdgeInsets.all(10),
                                 height: 150,
-                                width: 150,
+                                width: 85,
                                 color: Colors.white,
                                 child: FadeInImage(
                                   image: NetworkImage(
@@ -296,41 +297,10 @@ class _CartState extends State<Cart> {
                                       fontSize: 18),
                                 ),
                               ),
-                              Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.remove,
-                                        color: Colors.orange,
-                                      ),
-                                      onPressed: () {
-                                        if (model.lineItems[index].quantity >=
-                                            1) {
-                                          model.addProduct(
-                                            variantId: model
-                                                .lineItems[index].variantId,
-                                            quantity: -1,
-                                          );
-                                        }
-                                      },
-                                    ),
-                                    Text(model.lineItems[index].quantity
-                                        .toString()),
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.add,
-                                        color: Colors.orange,
-                                      ),
-                                      onPressed: () {
-                                        model.addProduct(
-                                          variantId:
-                                              model.lineItems[index].variantId,
-                                          quantity: 1,
-                                        );
-                                      },
-                                    ),
-                                  ]),
+                              SizedBox(height: 12),
+                              quantityRow(model, index),
+                              SizedBox(height: 12),
+                              Divider()
                             ],
                           )),
                         ],
@@ -342,5 +312,55 @@ class _CartState extends State<Cart> {
         );
       },
     );
+  }
+
+  Widget quantityRow(MainModel model, int lineItemIndex) {
+    print(
+        "LINE ITEM TOTAL IN HAND, ${model.lineItems[lineItemIndex].variant.totalOnHand} ISBACKORDERABLE ${model.lineItems[lineItemIndex].variant.isBackOrderable}");
+    return Container(
+        height: 60.0,
+        child: ListView.builder(
+          scrollDirection: Axis.horizontal,
+          // itemExtent: 50,
+          itemCount: model.lineItems[lineItemIndex].variant.totalOnHand > 38
+              ? 39
+              : model.lineItems[lineItemIndex].variant.isBackOrderable
+                  ? 39
+                  : model.lineItems[lineItemIndex].variant.totalOnHand + 1,
+          itemBuilder: (BuildContext context, int index) {
+            if (index == 0) {
+              return Container();
+            } else {
+              return GestureDetector(
+                onTap: () {
+                  model.addProduct(
+                    variantId: model.lineItems[lineItemIndex].variantId,
+                    quantity: index - model.lineItems[lineItemIndex].quantity,
+                  );
+                },
+                child: Container(
+                    width: 40,
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                          color:
+                              model.lineItems[lineItemIndex].quantity == index
+                                  ? Colors.green
+                                  : Colors.grey,
+                        ),
+                        borderRadius: BorderRadius.circular(5)),
+                    alignment: Alignment.center,
+                    margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    child: Text(
+                      index.toString(),
+                      style: TextStyle(
+                          color:
+                              model.lineItems[lineItemIndex].quantity == index
+                                  ? Colors.green
+                                  : Colors.grey),
+                    )),
+              );
+            }
+          },
+        ));
   }
 }

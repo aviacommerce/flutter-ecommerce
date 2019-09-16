@@ -20,7 +20,7 @@ mixin CartModel on Model {
   bool hi = false;
 
   List<LineItem> _lineItems = [];
-  Order order;
+  Order _order;
   bool _isLoading = false;
   List<PaymentMethod> _paymentMethods = [];
 
@@ -28,6 +28,10 @@ mixin CartModel on Model {
 
   List<LineItem> get lineItems {
     return List.from(_lineItems);
+  }
+
+  Order get order {
+    return _order;
   }
 
   List<PaymentMethod> get paymentMethods {
@@ -51,7 +55,8 @@ mixin CartModel on Model {
     _isLoading = true;
     notifyListeners();
     // setLoading(true);
-
+    print(
+        "PRODUCT SLUG ------> ${Settings.SERVER_URL + 'api/v1/products/$slug?data_set=large'}}");
     http.Response response = await http.get(
         Settings.SERVER_URL + 'api/v1/products/$slug?data_set=large',
         headers: headers);
@@ -66,6 +71,8 @@ mixin CartModel on Model {
     variants = [];
     if (responseBody['data']['attributes']['has_variants']) {
       responseBody['data']['included']['variants'].forEach((variant) {
+        print(
+            "TOTAL ON HAND ${variant['data']['attributes']['total_on_hand']}");
         optionValues = [];
         optionTypes = [];
         variant['data']['included']['option_values'].forEach((option) {
@@ -93,10 +100,12 @@ mixin CartModel on Model {
             image: variant['data']['included']['images'][0]['data']
                 ['attributes']['product_url'],
             isOrderable: variant['data']['attributes']['is_orderable'],
+            isBackOrderable: variant['data']['attributes']['is_backorderable'],
             avgRating:
                 double.parse(responseBody['data']['attributes']['avg_rating']),
             reviewsCount:
                 responseBody['data']['attributes']['reviews_count'].toString(),
+            totalOnHand: variant['data']['attributes']['total_on_hand'],
             reviewProductId: reviewProductId));
       });
       responseBody['data']['included']['option_types'].forEach((optionType) {
@@ -143,8 +152,11 @@ mixin CartModel on Model {
         image: responseBody['data']['included']['master']['data']['included']
             ['images'][0]['data']['attributes']['product_url'],
         hasVariants: responseBody['data']['attributes']['has_variants'],
+        totalOnHand: responseBody['data']['attributes']['total_on_hand'],
         isOrderable: responseBody['data']['included']['master']['data']
             ['attributes']['is_orderable'],
+        isBackOrderable: responseBody['data']['included']['master']['data']
+            ['attributes']['is_backorderable'],
         reviewProductId: reviewProductId,
         description: responseBody['data']['attributes']['description'],
         taxonId: responseBody['data']['attributes']['taxon_ids'].first,
@@ -161,6 +173,7 @@ mixin CartModel on Model {
 
   void addProduct({int variantId, int quantity}) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    print("quantity $quantity");
 
     _lineItems.clear();
     _isLoading = true;
@@ -213,6 +226,7 @@ mixin CartModel on Model {
   }
 
   void createNewLineItem(int variantId, int quantity) async {
+    print("CREATING NEW LINEITEM");
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     Map<String, String> headers = await getHeaders();
 
@@ -226,6 +240,8 @@ mixin CartModel on Model {
             headers: headers,
             body: json.encode(lineItemObject))
         .then((response) {
+      print("ADD PRODUCT RESPONSE _______");
+      print(json.decode(response.body).toString());
       fetchCurrentOrder();
     });
   }
@@ -259,7 +275,10 @@ mixin CartModel on Model {
               image: lineItem['variant']['images'][0]['product_url'],
               displayPrice: lineItem['variant']['display_price'],
               name: lineItem['variant']['name'],
-              quantity: lineItem['quantity']);
+              quantity: lineItem['quantity'],
+              isBackOrderable: lineItem['variant']['is_backorderable'],
+              totalOnHand: lineItem['variant']['total_on_hand']
+              );
 
           lineItem = LineItem(
               id: lineItem['id'],
@@ -287,7 +306,7 @@ mixin CartModel on Model {
         } else {
           shipAddress = null;
         }
-        order = Order(
+        _order = Order(
             total: responseBody['total'],
             id: responseBody['id'],
             itemTotal: responseBody['item_total'],
@@ -330,7 +349,7 @@ mixin CartModel on Model {
     print("ORDER STATE CHANGED -------> ${json.decode(response.body)}");
     print(
         "ORDER STATE PAYMENTS ARRAY ------> ${json.decode(response.body)['payments']}");
-    order = Order(
+    _order = Order(
         total: responseBody['total'],
         id: responseBody['id'],
         itemTotal: responseBody['item_total'],
@@ -403,11 +422,12 @@ mixin CartModel on Model {
   }
 
   clearData() async {
+    print("CLEAR DATA");
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('orderToken', null);
     prefs.setString('orderNumber', null);
     _lineItems.clear();
-    order = null;
+    _order = null;
     notifyListeners();
   }
 

@@ -96,7 +96,7 @@ class _OrderResponseState extends State<OrderResponse> {
               leading: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {
-                  if (widget.detailOrder != null) {
+                  if (widget.detailOrder == null) {
                     print("ORDER EXISTS------");
                     model.clearData();
                     // Navigator.pushReplacementNamed(context, '/home');

@@ -9,6 +9,7 @@ import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/headers.dart';
 import 'package:ofypets_mobile_app/utils/locator.dart';
+import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 
 class OrderList extends StatefulWidget {
   @override
@@ -88,7 +89,7 @@ class _OrderList extends State<OrderList> {
   Widget build(BuildContext context) {
     _deviceSize = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(title: Text('Order History')),
+      appBar: AppBar(title: Text('Order History'), actions: <Widget>[shoppingCartIconButton()],),
       body: Padding(
           padding: const EdgeInsets.only(top: 3.0),
           child: Theme(

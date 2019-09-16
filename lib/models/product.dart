@@ -14,7 +14,9 @@ class Product {
   final String image;
   final double avgRating;
   final String reviewsCount;
+  final int totalOnHand;
   final bool isOrderable;
+  final bool isBackOrderable;
   final bool hasVariants;
   final List<Product> variants;
   final List<OptionValue> optionValues;
@@ -35,7 +37,9 @@ class Product {
       this.image,
       this.avgRating,
       this.reviewsCount,
+      this.totalOnHand,
       this.isOrderable,
+      this.isBackOrderable,
       this.variants,
       this.hasVariants,
       this.description,

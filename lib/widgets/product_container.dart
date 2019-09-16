@@ -68,7 +68,7 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                             text: product.name.substring(
                                 product.name.split(' ')[0].length + 1,
                                 product.name.length),
-                            style: TextStyle(fontSize: 15, color: Colors.black),
+                            style: TextStyle(fontSize: 15, color: Colors.grey.shade500, fontWeight: FontWeight.w400),
                           ),
                         ]),
                       ),
@@ -88,20 +88,8 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                                 fontSize: 18),
                           ),
                         ),
-                        product.costPrice != null
-                            ? Container(
-                                margin: EdgeInsets.only(left: 10),
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  product.currencySymbol + product.costPrice,
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      decoration: TextDecoration.lineThrough,
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12),
-                                ),
-                              )
+                        product.costPrice != null && product.costPrice != ''
+                            ? discountPrice(product)
                             : Container(),
                       ],
                     ),
@@ -149,4 +137,24 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
           ),
         ));
   });
+}
+
+Widget discountPrice(Product product) {
+  if (double.parse(product.costPrice) - double.parse(product.price) > 0) {
+    return Container(
+      margin: EdgeInsets.only(left: 10),
+      alignment: Alignment.topLeft,
+      child: Text(
+        product.currencySymbol + product.costPrice,
+        textAlign: TextAlign.left,
+        style: TextStyle(
+            decoration: TextDecoration.lineThrough,
+            color: Colors.grey,
+            fontWeight: FontWeight.bold,
+            fontSize: 12),
+      ),
+    );
+  } else {
+    return Container();
+  }
 }
