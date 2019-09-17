@@ -45,6 +45,7 @@ class _ProductSearchState extends State<ProductSearch> {
   Map<dynamic, dynamic> responseBody;
   List<Brand> brands = [];
   List<Product> productsByBrand = [];
+  String sortBy = '';
   List filterItems = [
     "Newest",
     "Avg.Customer Review",
@@ -69,6 +70,7 @@ class _ProductSearchState extends State<ProductSearch> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    sortBy = '';
     _dropDownMenuItems = getDropDownMenuItems();
     _currentItem = _dropDownMenuItems[0].value;
     if (widget.slug != null) {
@@ -82,8 +84,9 @@ class _ProductSearchState extends State<ProductSearch> {
       searchProduct();
     }
     scrollController.addListener(() {
-      if (scrollController.position.maxScrollExtent ==
-          scrollController.offset) {
+      if (scrollController.offset >=
+              scrollController.position.maxScrollExtent &&
+          !scrollController.position.outOfRange) {
         searchProduct();
       }
     });
@@ -273,13 +276,15 @@ class _ProductSearchState extends State<ProductSearch> {
     });
   }
 
-  Future<List<Product>> searchProduct([String sortBy]) async {
+  Future<List<Product>> searchProduct() async {
     Map<String, String> headers = await getHeaders();
     Map<String, dynamic> responseBody = Map();
     print('SENDING REQUEST $slug');
     setState(() {
       hasMore = false;
     });
+    print(Settings.SERVER_URL +
+        'api/v1/products?q[name_cont_all]=$slug&page=$currentPage&per_page=$perPage&q[s]=$sortBy&data_set=small');
     http.Response response;
     if (sortBy != null) {
       response = await http.get(
@@ -295,8 +300,7 @@ class _ProductSearchState extends State<ProductSearch> {
     }
     currentPage++;
     responseBody = json.decode(response.body);
-    print("got response");
-    print(responseBody);
+
     responseBody['data'].forEach((searchObj) {
       searchProducts.add(Product(
           reviewProductId: searchObj['id'],
@@ -444,7 +448,8 @@ class _ProductSearchState extends State<ProductSearch> {
       isSearched = true;
       searchProducts = [];
       currentPage = 1;
-      searchProduct(sortingWith);
+      this.sortBy = sortingWith;
+      searchProduct();
     });
   }
 }

@@ -629,7 +629,7 @@ class _CategoryListingState extends State<CategoryListing> {
       hasMore = false;
     });
     var response;
-    print(sortBy);
+
     if (sortBy != null && sortBy.length > 0) {
       response = (await http.get(Settings.SERVER_URL +
               'api/v1/taxons/products?id=$subCatId&page=$currentPage&per_page=$perPage&q[s]=$sortBy&data_set=small'))

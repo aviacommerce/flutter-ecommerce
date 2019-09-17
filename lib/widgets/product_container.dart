@@ -26,7 +26,8 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                         width: 150,
                         color: Colors.white,
                         child: FadeInImage(
-                          image: NetworkImage(product.image),
+                          image: NetworkImage(
+                              product.image != null ? product.image : ''),
                           placeholder: AssetImage(
                               'images/placeholders/no-product-image.png'),
                         ),
@@ -68,7 +69,10 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                             text: product.name.substring(
                                 product.name.split(' ')[0].length + 1,
                                 product.name.length),
-                            style: TextStyle(fontSize: 15, color: Colors.grey.shade500, fontWeight: FontWeight.w400),
+                            style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.grey.shade500,
+                                fontWeight: FontWeight.w400),
                           ),
                         ]),
                       ),
