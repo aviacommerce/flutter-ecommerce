@@ -189,31 +189,33 @@ class _AddressPageState extends State<AddressPage> {
       return Container(
         padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 5.0),
         width: MediaQuery.of(context).size.width,
-        child: FlatButton(
-          disabledColor: Colors.grey.shade200,
-          // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-          color: Colors.deepOrange,
-          child: Text(
-            'PLACE ORDER',
-            style: TextStyle(
-                fontSize: 15,
-                color: model.shipAddress == null
-                    ? Colors.grey.shade400
-                    : Colors.white,
-                fontWeight: FontWeight.w300),
-          ),
-          onPressed: model.order.shipAddress != null
-              ? () {
-                  MaterialPageRoute address = MaterialPageRoute(
-                      builder: (context) =>
-                          UpdateAddress(model.order.shipAddress, true));
+        child: model.isLoading
+            ? Center(child: CircularProgressIndicator(backgroundColor: Colors.green))
+            : FlatButton(
+                disabledColor: Colors.grey.shade200,
+                // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                color: Colors.deepOrange,
+                child: Text(
+                  'PLACE ORDER',
+                  style: TextStyle(
+                      fontSize: 15,
+                      color: model.shipAddress == null
+                          ? Colors.grey.shade400
+                          : Colors.white,
+                      fontWeight: FontWeight.w300),
+                ),
+                onPressed: model.order.shipAddress != null
+                    ? () {
+                        MaterialPageRoute address = MaterialPageRoute(
+                            builder: (context) =>
+                                UpdateAddress(model.order.shipAddress, true));
 
-                  model.order.shipAddress != null
-                      ? pushPaymentScreen(model)
-                      : Navigator.push(context, address);
-                }
-              : null,
-        ),
+                        model.order.shipAddress != null
+                            ? pushPaymentScreen(model)
+                            : Navigator.push(context, address);
+                      }
+                    : null,
+              ),
       );
     });
   }
@@ -526,132 +528,133 @@ class _AddressPageState extends State<AddressPage> {
           child: Padding(
             padding: EdgeInsets.all(5),
             child: Card(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            margin: EdgeInsets.all(4.0),
-            child: Container(
-              color: Colors.white,
-              child: GestureDetector(
-                onTap: () {},
-                child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Stack(
-                        children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.all(14),
-                            padding: EdgeInsets.all(10),
-                            height: 80,
-                            width: 80,
-                            color: Colors.white,
-                            child: FadeInImage(
-                              image: NetworkImage(
-                                  widget.lineItems[index].variant.image),
-                              placeholder: AssetImage(
-                                  'images/placeholders/no-product-image.png'),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          mainAxisSize: MainAxisSize.min,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              margin: EdgeInsets.all(4.0),
+              child: Container(
+                color: Colors.white,
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Stack(
                           children: <Widget>[
-                            SizedBox(
-                              height: 15,
-                            ),
                             Container(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          right: 10.0, top: 10.0),
-                                      child: RichText(
-                                        text: TextSpan(children: [
-                                          TextSpan(
-                                            text:
-                                                '${widget.lineItems[index].variant.name.split(' ')[0]} ',
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 16.0,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          TextSpan(
-                                            text: widget
-                                                .lineItems[index].variant.name
-                                                .substring(
-                                                    widget.lineItems[index]
-                                                            .variant.name
-                                                            .split(' ')[0]
-                                                            .length +
-                                                        1,
-                                                    widget.lineItems[index]
-                                                        .variant.name.length),
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                color: Colors.black),
-                                          ),
-                                        ]),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              margin: EdgeInsets.all(14),
+                              padding: EdgeInsets.all(10),
+                              height: 80,
+                              width: 80,
+                              color: Colors.white,
+                              child: FadeInImage(
+                                image: NetworkImage(
+                                    widget.lineItems[index].variant.image),
+                                placeholder: AssetImage(
+                                    'images/placeholders/no-product-image.png'),
                               ),
                             ),
-                            SizedBox(height: 20),
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 10.0),
-                              child: Container(
-                                alignment: Alignment.topLeft,
+                          ],
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              SizedBox(
+                                height: 15,
+                              ),
+                              Container(
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: <Widget>[
-                                    Text(
-                                      'Qty: ${widget.lineItems[index].quantity.toString()}',
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(
-                                          color: Colors.grey.shade700,
-                                          fontWeight: FontWeight.w200,
-                                          fontSize: 14),
-                                    ),
-                                    Container(
-                                      padding: EdgeInsets.only(right: 24.0),
-                                      alignment: Alignment.topLeft,
-                                      child: Text(
-                                        widget.lineItems[index].variant
-                                            .displayPrice,
-                                        textAlign: TextAlign.left,
-                                        style: TextStyle(
-                                            color: Colors.red,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            right: 10.0, top: 10.0),
+                                        child: RichText(
+                                          text: TextSpan(children: [
+                                            TextSpan(
+                                              text:
+                                                  '${widget.lineItems[index].variant.name.split(' ')[0]} ',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                              text: widget
+                                                  .lineItems[index].variant.name
+                                                  .substring(
+                                                      widget.lineItems[index]
+                                                              .variant.name
+                                                              .split(' ')[0]
+                                                              .length +
+                                                          1,
+                                                      widget.lineItems[index]
+                                                          .variant.name.length),
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.black),
+                                            ),
+                                          ]),
+                                        ),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                            ),
-                            Divider(
-                              color: Colors.grey.shade700,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            )
-                          ],
-                        ),
-                      )
-                    ]),
+                              SizedBox(height: 20),
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 10.0),
+                                child: Container(
+                                  alignment: Alignment.topLeft,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Text(
+                                        'Qty: ${widget.lineItems[index].quantity.toString()}',
+                                        textAlign: TextAlign.left,
+                                        style: TextStyle(
+                                            color: Colors.grey.shade700,
+                                            fontWeight: FontWeight.w200,
+                                            fontSize: 14),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.only(right: 24.0),
+                                        alignment: Alignment.topLeft,
+                                        child: Text(
+                                          widget.lineItems[index].variant
+                                              .displayPrice,
+                                          textAlign: TextAlign.left,
+                                          style: TextStyle(
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                color: Colors.grey.shade700,
+                              ),
+                              SizedBox(
+                                height: 10,
+                              )
+                            ],
+                          ),
+                        )
+                      ]),
+                ),
               ),
             ),
-          ),),
+          ),
         );
       },
     );

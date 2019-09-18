@@ -106,94 +106,105 @@ class _PaymentScreenState extends State<PaymentScreen> {
         builder: (BuildContext context, Widget child, MainModel model) {
       return Container(
         padding: EdgeInsets.all(20),
-        child: FlatButton(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          color: Colors.green,
-          child: Text(
-            _character == ''
-                ? 'SELECT PAYMENT METHOD'
-                : _character == 'COD'
-                    ? 'PAY ON DELIVERY'
-                    : 'CONTINUE TO PAYUBIZ',
-            style: TextStyle(
-                fontSize: 20, color: Colors.white, fontWeight: FontWeight.w300),
-          ),
-          onPressed: () async {
-            if (_character == 'COD') {
-              if (_isShippable &&
-                  double.parse(model.order.total) >= FREE_SHIPPING_AMOUNT) {
-                bool isComplete = false;
-                model.paymentMethods.forEach((paymentMethodObj) async {
-                  if (paymentMethodObj.name == 'COD') {
-                    setState(() {
-                      selectedPaymentId = paymentMethodObj.id;
+        child: model.isLoading
+            ? Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.green,
+                ),
+              )
+            : FlatButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8)),
+                color: Colors.green,
+                child: Text(
+                  _character == ''
+                      ? 'SELECT PAYMENT METHOD'
+                      : _character == 'COD'
+                          ? 'PAY ON DELIVERY'
+                          : 'CONTINUE TO PAYUBIZ',
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w300),
+                ),
+                onPressed: () async {
+                  if (_character == 'COD') {
+                    if (_isShippable &&
+                        double.parse(model.order.total) >=
+                            FREE_SHIPPING_AMOUNT) {
+                      bool isComplete = false;
+                      model.paymentMethods.forEach((paymentMethodObj) async {
+                        if (paymentMethodObj.name == 'COD') {
+                          setState(() {
+                            selectedPaymentId = paymentMethodObj.id;
+                          });
+                        }
+                      });
+                      isComplete = await model.completeOrder(selectedPaymentId);
+                      if (isComplete) {
+                        bool isChanged = false;
+
+                        if (model.order.state == 'payment') {
+                          isChanged = await model.changeState();
+                        }
+                        if (isChanged) {
+                          pushSuccessPage();
+                        }
+                      }
+                    } else {
+                      if (double.parse(model.order.total) <
+                          FREE_SHIPPING_AMOUNT) {
+                        _scaffoldKey.currentState.showSnackBar(insufficientAmt);
+                      } else if (!_isShippable) {
+                        final invalidPincode = SnackBar(
+                          content: Text('COD not available for this Pincode'),
+                          duration: Duration(seconds: 3),
+                          action: SnackBarAction(
+                            label: 'CHANGE',
+                            onPressed: () {
+                              MaterialPageRoute route = MaterialPageRoute(
+                                  builder: (context) => UpdateAddress(
+                                      model.order.shipAddress, true));
+                              Navigator.pushReplacement(context, route);
+                            },
+                          ),
+                        );
+                        _scaffoldKey.currentState.showSnackBar(invalidPincode);
+                      }
+                    }
+                  } else if (_character == 'Payubiz') {
+                    print('PAYUBIZ');
+                    bool isComplete = false;
+                    // isComplete = await model.completeOrder(paymentMethods.first.id);
+                    model.paymentMethods.forEach((paymentMethodObj) async {
+                      print(paymentMethodObj.name);
+                      if (paymentMethodObj.name == 'Payubiz') {
+                        setState(() {
+                          selectedPaymentId = paymentMethodObj.id;
+                        });
+                      }
                     });
-                  }
-                });
-                isComplete = await model.completeOrder(selectedPaymentId);
-                if (isComplete) {
-                  bool isChanged = false;
+                    isComplete = await model.completeOrder(selectedPaymentId);
+                    if (isComplete) {
+                      print("IS COMPLETE TRUE");
+                      bool isChanged = false;
 
-                  if (model.order.state == 'payment') {
-                    isChanged = await model.changeState();
+                      if (model.order.state == 'payment') {
+                        print("STATE CHANGE TO PAYMENT");
+                        isChanged = await model.changeState();
+                      }
+                      if (isChanged) {
+                        // pushSuccessPage();
+                        String url = await getParams();
+                        print(url);
+                        MaterialPageRoute payment = MaterialPageRoute(
+                            builder: (context) => PayubizScreen(url));
+                        Navigator.push(context, payment);
+                      }
+                    }
                   }
-                  if (isChanged) {
-                    pushSuccessPage();
-                  }
-                }
-              } else {
-                if (double.parse(model.order.total) < FREE_SHIPPING_AMOUNT) {
-                  _scaffoldKey.currentState.showSnackBar(insufficientAmt);
-                } else if (!_isShippable) {
-                  final invalidPincode = SnackBar(
-                    content: Text('COD not available for this Pincode'),
-                    duration: Duration(seconds: 3),
-                    action: SnackBarAction(
-                      label: 'CHANGE',
-                      onPressed: () {
-                        MaterialPageRoute route = MaterialPageRoute(
-                            builder: (context) =>
-                                UpdateAddress(model.order.shipAddress, true));
-                        Navigator.pushReplacement(context, route);
-                      },
-                    ),
-                  );
-                  _scaffoldKey.currentState.showSnackBar(invalidPincode);
-                }
-              }
-            } else if (_character == 'Payubiz') {
-              print('PAYUBIZ');
-              bool isComplete = false;
-              // isComplete = await model.completeOrder(paymentMethods.first.id);
-              model.paymentMethods.forEach((paymentMethodObj) async {
-                print(paymentMethodObj.name);
-                if (paymentMethodObj.name == 'Payubiz') {
-                  setState(() {
-                    selectedPaymentId = paymentMethodObj.id;
-                  });
-                }
-              });
-              isComplete = await model.completeOrder(selectedPaymentId);
-              if (isComplete) {
-                print("IS COMPLETE TRUE");
-                bool isChanged = false;
-
-                if (model.order.state == 'payment') {
-                  print("STATE CHANGE TO PAYMENT");
-                  isChanged = await model.changeState();
-                }
-                if (isChanged) {
-                  // pushSuccessPage();
-                  String url = await getParams();
-                  print(url);
-                  MaterialPageRoute payment = MaterialPageRoute(
-                      builder: (context) => PayubizScreen(url));
-                  Navigator.push(context, payment);
-                }
-              }
-            }
-          },
-        ),
+                },
+              ),
       );
     });
   }

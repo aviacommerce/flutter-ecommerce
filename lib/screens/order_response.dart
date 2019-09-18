@@ -88,8 +88,11 @@ class _OrderResponseState extends State<OrderResponse> {
         builder: (BuildContext context, Widget child, MainModel model) {
       return WillPopScope(
           onWillPop: () {
-            model.clearData();
-            return Future<bool>.value(true);
+            if (widget.detailOrder == null) {
+              model.clearData();
+              Navigator.canPop(context);
+            }
+            return Future<bool>.value(false);
           },
           child: Scaffold(
             appBar: new AppBar(
@@ -384,19 +387,19 @@ class _OrderResponseState extends State<OrderResponse> {
         ? responseBody["payments"][0]["payment_method"]["name"]
         : '';
     String payState = responseBody["payment_state"];
-      if (payState == 'balance_due') {
-        return Expanded(
-            child: new Text('Balance due',
-                style: new TextStyle(fontWeight: FontWeight.w800)));
-      } else if (payState == 'paid') {
-        return Expanded(
-            child: new Text('Paid',
-                style: new TextStyle(fontWeight: FontWeight.w800)));
-      } else if (payState == 'void') {
-        return Expanded(
-            child: new Text('Void',
-                style: new TextStyle(fontWeight: FontWeight.w800)));
-      }
+    if (payState == 'balance_due') {
+      return Expanded(
+          child: new Text('Balance due',
+              style: new TextStyle(fontWeight: FontWeight.w800)));
+    } else if (payState == 'paid') {
+      return Expanded(
+          child: new Text('Paid',
+              style: new TextStyle(fontWeight: FontWeight.w800)));
+    } else if (payState == 'void') {
+      return Expanded(
+          child: new Text('Void',
+              style: new TextStyle(fontWeight: FontWeight.w800)));
+    }
   }
 
   retryPayment(responseBody) async {

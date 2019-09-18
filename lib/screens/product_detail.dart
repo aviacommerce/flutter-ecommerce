@@ -152,45 +152,56 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   @override
   Widget build(BuildContext context) {
     _deviceSize = MediaQuery.of(context).size;
-    return Scaffold(
-        key: _scaffoldKey,
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () {
-                Navigator.pop(context);
-              }),
-          title: Text('Item Details'),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {
-                MaterialPageRoute route =
-                    MaterialPageRoute(builder: (context) => ProductSearch());
-                Navigator.of(context).push(route);
-              },
-            ),
-            shoppingCartIconButton()
-          ],
-          bottom: TabBar(
-            indicatorWeight: 4.0,
-            controller: _tabController,
-            tabs: <Widget>[
-              Tab(
-                text: 'HIGHLIGHTS',
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
+      return Scaffold(
+          key: _scaffoldKey,
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            leading: IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () {
+                  Navigator.pop(context);
+                }),
+            title: Text('Item Details'),
+            actions: <Widget>[
+              IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () {
+                  MaterialPageRoute route =
+                      MaterialPageRoute(builder: (context) => ProductSearch());
+                  Navigator.of(context).push(route);
+                },
               ),
-              Tab(
-                text: 'REVIEWS',
-              )
+              shoppingCartIconButton()
             ],
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(50),
+              child: Column(
+                children: [
+                  TabBar(
+                    indicatorWeight: 4.0,
+                    controller: _tabController,
+                    tabs: <Widget>[
+                      Tab(
+                        text: 'HIGHLIGHTS',
+                      ),
+                      Tab(
+                        text: 'REVIEWS',
+                      )
+                    ],
+                  ),
+                  model.isLoading ? LinearProgressIndicator() : Container()
+                ],
+              ),
+            ),
           ),
-        ),
-        body: TabBarView(
-          controller: _tabController,
-          children: <Widget>[highlightsTab(), reviewsTab()],
-        ),
-        floatingActionButton: addToCartFAB());
+          body: TabBarView(
+            controller: _tabController,
+            children: <Widget>[highlightsTab(), reviewsTab()],
+          ),
+          floatingActionButton: addToCartFAB());
+    });
   }
 
   Widget reviewsTab() {
@@ -519,30 +530,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         ));
   }
 
-  // Widget variantDialog() {
-  //   return Padding(
-  //     padding: EdgeInsets.all(10),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //       children: <Widget>[
-  //         Text(
-  //           selectedProduct.optionValues.first.name,
-  //           style: TextStyle(color: Colors.green),
-  //         ),
-  //         IconButton(
-  //           icon: Icon(Icons.arrow_drop_down),
-  //           color: Colors.green,
-  //           onPressed: () {
-  //             showDialog(
-
-  //             )
-  //           },
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
-
   Widget variantRow(int index) {
     if (widget.product.hasVariants != null) {
       if (widget.product.hasVariants) {
@@ -557,104 +544,33 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         widget.product.variants.forEach((variant) {
           variant.optionValues.forEach((optionValue) {
             optionValueNames.add(GestureDetector(
-                onTap: () {
-                  setState(() {
-                    quantity = index;
-                  });
-                },
-                child: Container(
-                    width: 50,
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                          color: quantity == index ? Colors.green : Colors.grey,
-                        ),
-                        borderRadius: BorderRadius.circular(5)),
-                    alignment: Alignment.center,
-                    // margin: EdgeInsets.all(10),
-                    margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      index.toString(),
-                      style: TextStyle(
-                          color:
-                              quantity == index ? Colors.green : Colors.grey),
-                    )),
-              ));
-        }); }
-         
-        );
+              onTap: () {
+                setState(() {
+                  quantity = index;
+                });
+              },
+              child: Container(
+                  width: 50,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        color: quantity == index ? Colors.green : Colors.grey,
+                      ),
+                      borderRadius: BorderRadius.circular(5)),
+                  alignment: Alignment.center,
+                  // margin: EdgeInsets.all(10),
+                  margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    index.toString(),
+                    style: TextStyle(
+                        color: quantity == index ? Colors.green : Colors.grey),
+                  )),
+            ));
+          });
+        });
       }
     }
   }
-
-
-  // List<DropdownMenuItem<String>> getVariants() {
-  //   List<DropdownMenuItem<String>> items = new List();
-
-  //   widget.product.variants.forEach((variant) {
-  //     variant.optionValues.forEach((optionValue) {
-  //       items.add(DropdownMenuItem(
-  //         value: optionValue.name,
-  //         child: Text(
-  //           optionValue.name,
-  //           style: TextStyle(color: Colors.green),
-  //         ),
-  //       ));
-  //     });
-  //   });
-  //   return items;
-  // }
-
-  // Widget variantDropDown() {
-  //   return Container(
-  //       margin: EdgeInsets.symmetric(horizontal: 15),
-  //       width: _deviceSize.width,
-  //       child: DropdownButton(
-  //         isExpanded: true,
-  //         iconEnabledColor: Colors.green,
-  //         items: getVariants(),
-  //         value: selectedProduct.optionValues[0].name,
-  //         onChanged: (value) {
-  //           widget.product.variants.forEach((variant) {
-  //             print(variant.optionValues[0]);
-  //             if (variant.optionValues[0].name == value) {
-  //               setState(() {
-  //                 selectedProduct = variant;
-  //                 discount = (double.parse(variant.costPrice) -
-  //                             double.parse(variant.price)) >
-  //                         0
-  //                     ? true
-  //                     : false;
-  //               });
-  //             }
-  //           });
-  //         },
-  //       ));
-  // }
-
-  // Widget variantDialog() {
-  //   return Padding(
-  //     padding: EdgeInsets.all(10),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //       children: <Widget>[
-  //         Text(
-  //           selectedProduct.optionValues.first.name,
-  //           style: TextStyle(color: Colors.green),
-  //         ),
-  //         IconButton(
-  //           icon: Icon(Icons.arrow_drop_down),
-  //           color: Colors.green,
-  //           onPressed: () {
-  //             showDialog(
-
-  //             )
-  //           },
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
 
   // Widget variantRow() {
   //   if (widget.product.hasVariants != null) {
@@ -1246,8 +1162,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                         TextSpan(
                             text: discountPercent,
                             style: TextStyle(
-                                color: Colors.red,
-                                )),
+                              color: Colors.red,
+                            )),
                         TextSpan(
                             text: value,
                             style: TextStyle(
@@ -1260,11 +1176,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   : Text(
                       value,
                       style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: fontFamily,
-                          ),
+                        fontSize: 18,
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: fontFamily,
+                      ),
                     ),
         ),
       ],
