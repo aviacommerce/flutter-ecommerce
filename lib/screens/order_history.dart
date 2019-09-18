@@ -19,7 +19,7 @@ class OrderList extends StatefulWidget {
 }
 
 class _OrderList extends State<OrderList> {
-  Map<dynamic, dynamic> orderListResponse;
+  List<dynamic> orderListResponse = List();
   var formatter = new DateFormat('dd-MMM-yyyy hh:mm a');
   final int perPage = TWENTY;
   int currentPage = ONE;
@@ -44,6 +44,7 @@ class _OrderList extends State<OrderList> {
   Size _deviceSize;
 
   Future<List<Order>> getOrdersLists() async {
+    print("GET ORDER LIST");
     setState(() {
       hasMore = false;
     });
@@ -57,7 +58,8 @@ class _OrderList extends State<OrderList> {
 
     currentPage++;
     responseBody = json.decode(response);
-    orderListResponse = json.decode(response);
+    print('ORDER LIST RESPONSE $responseBody');
+
     responseBody['orders'].forEach((order) {
       if (order["completed_at"] != null) {
         setState(() {
@@ -70,6 +72,7 @@ class _OrderList extends State<OrderList> {
               paymentMethod: order["payments"][0]["payment_method"]["name"],
               paymentState: order["payment_state"],
               shipState: order["shipment_state"]));
+          orderListResponse.add(order);
         });
       }
     });
@@ -137,7 +140,7 @@ class _OrderList extends State<OrderList> {
     if (order.completedAt != null) {
       return GestureDetector(
         onTap: () {
-          goToDetailsPage(orderListResponse["orders"][index]);
+          goToDetailsPage(orderListResponse[index]);
         },
         child: Card(
           child: new Container(
