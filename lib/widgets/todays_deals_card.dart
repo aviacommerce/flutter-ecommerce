@@ -72,10 +72,6 @@ Widget todaysDealsCard(int index, List<Product> todaysDealProducts,
     return GestureDetector(
         onTap: () {
           model.getProductDetail(todaysDealProducts[index].slug, context);
-          // MaterialPageRoute addressRoute = MaterialPageRoute(
-          //     builder: (context) =>
-          //         ProductDetailScreen(todaysDealProducts[index]));
-          // Navigator.push(context, addressRoute);
         },
         child: SizedBox(
             width: _deviceSize.width * 0.4,
@@ -86,18 +82,18 @@ Widget todaysDealsCard(int index, List<Product> todaysDealProducts,
                   borderRadius: BorderRadius.circular(4.0)),
               child: Column(
                 children: <Widget>[
-                  Expanded(
-                    flex: 1,
+                  Container(
+                    margin: EdgeInsets.all(15),
                     child: FadeInImage(
                       image: NetworkImage(displayProduct.image),
                       placeholder: AssetImage(
                           'images/placeholders/no-product-image.png'),
-                      // height: _deviceSize.height * 0.2,
-                      height: 100,
+                      height: 120,
                     ),
                   ),
                   Container(
                     width: double.infinity,
+                    height: 50,
                     padding: EdgeInsets.only(left: 12.0, right: 12.0),
                     child: Text(
                       displayProduct.name,
@@ -134,7 +130,6 @@ Widget todaysDealsCard(int index, List<Product> todaysDealProducts,
                     height: 1.0,
                   ),
                   AddToCart(displayProduct, index, todaysDealProducts),
-                  // addToCartButton(todaysDealProducts, index, displayProduct)
                 ],
               ),
             )));

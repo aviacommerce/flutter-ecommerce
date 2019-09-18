@@ -15,14 +15,14 @@ import 'package:ofypets_mobile_app/screens/review_detail.dart';
 import 'package:ofypets_mobile_app/screens/search.dart';
 import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/utils/constants.dart' as prefix0;
 import 'package:ofypets_mobile_app/utils/headers.dart';
 import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
-import 'package:ofypets_mobile_app/widgets/similar_products_card.dart';
 import 'package:ofypets_mobile_app/widgets/snackbar.dart';
-import 'package:ofypets_mobile_app/utils/headers.dart';
 import 'package:ofypets_mobile_app/screens/cart.dart';
+import 'package:ofypets_mobile_app/widgets/todays_deals_card.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -156,6 +156,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         key: _scaffoldKey,
         backgroundColor: Colors.white,
         appBar: AppBar(
+          leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
           title: Text('Item Details'),
           actions: <Widget>[
             IconButton(
@@ -429,7 +434,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           scrollDirection: Axis.horizontal,
           itemCount: selectedProduct.totalOnHand > 12
               ? 13
-              : selectedProduct.isBackOrderable ? 13 : selectedProduct.totalOnHand + 1,
+              : selectedProduct.isBackOrderable
+                  ? 13
+                  : selectedProduct.totalOnHand + 1,
           itemBuilder: (BuildContext context, int index) {
             if (index == 0) {
               return Container();
@@ -441,10 +448,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   });
                 },
                 child: Container(
-                    width: 50,
+                    width: 45,
                     decoration: BoxDecoration(
                         border: Border.all(
-                          color: quantity == index ? Colors.green : Colors.grey,
+                          color: quantity == index
+                              ? Colors.green
+                              : Colors.grey.shade300,
                         ),
                         borderRadius: BorderRadius.circular(5)),
                     alignment: Alignment.center,
@@ -454,8 +463,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     child: Text(
                       index.toString(),
                       style: TextStyle(
-                          color:
-                              quantity == index ? Colors.green : Colors.grey),
+                          color: quantity == index
+                              ? Colors.green
+                              : Colors.grey.shade300),
                     )),
               );
             }
@@ -484,7 +494,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     return Container(
         margin: EdgeInsets.symmetric(horizontal: 15),
         width: _deviceSize.width,
+        height: 60,
         child: DropdownButton(
+          elevation: 0,
           isExpanded: true,
           iconEnabledColor: Colors.green,
           items: getVariants(),
@@ -506,6 +518,119 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           },
         ));
   }
+
+  // Widget variantDialog() {
+  //   return Padding(
+  //     padding: EdgeInsets.all(10),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: <Widget>[
+  //         Text(
+  //           selectedProduct.optionValues.first.name,
+  //           style: TextStyle(color: Colors.green),
+  //         ),
+  //         IconButton(
+  //           icon: Icon(Icons.arrow_drop_down),
+  //           color: Colors.green,
+  //           onPressed: () {
+  //             showDialog(
+
+  //             )
+  //           },
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
+
+  Widget variantRow(int index) {
+    if (widget.product.hasVariants != null) {
+      if (widget.product.hasVariants) {
+        List<Widget> optionValueNames = [];
+        List<Widget> optionTypeNames = [];
+        widget.product.optionTypes.forEach((optionType) {
+          optionTypeNames.add(Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.all(10),
+              child: Text(optionType.name)));
+        });
+        widget.product.variants.forEach((variant) {
+          variant.optionValues.forEach((optionValue) {
+            optionValueNames.add(GestureDetector(
+                onTap: () {
+                  setState(() {
+                    quantity = index;
+                  });
+                },
+                child: Container(
+                    width: 50,
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                          color: quantity == index ? Colors.green : Colors.grey,
+                        ),
+                        borderRadius: BorderRadius.circular(5)),
+                    alignment: Alignment.center,
+                    // margin: EdgeInsets.all(10),
+                    margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                    padding: EdgeInsets.all(10),
+                    child: Text(
+                      index.toString(),
+                      style: TextStyle(
+                          color:
+                              quantity == index ? Colors.green : Colors.grey),
+                    )),
+              ));
+        }); }
+         
+        );
+      }
+    }
+  }
+
+
+  // List<DropdownMenuItem<String>> getVariants() {
+  //   List<DropdownMenuItem<String>> items = new List();
+
+  //   widget.product.variants.forEach((variant) {
+  //     variant.optionValues.forEach((optionValue) {
+  //       items.add(DropdownMenuItem(
+  //         value: optionValue.name,
+  //         child: Text(
+  //           optionValue.name,
+  //           style: TextStyle(color: Colors.green),
+  //         ),
+  //       ));
+  //     });
+  //   });
+  //   return items;
+  // }
+
+  // Widget variantDropDown() {
+  //   return Container(
+  //       margin: EdgeInsets.symmetric(horizontal: 15),
+  //       width: _deviceSize.width,
+  //       child: DropdownButton(
+  //         isExpanded: true,
+  //         iconEnabledColor: Colors.green,
+  //         items: getVariants(),
+  //         value: selectedProduct.optionValues[0].name,
+  //         onChanged: (value) {
+  //           widget.product.variants.forEach((variant) {
+  //             print(variant.optionValues[0]);
+  //             if (variant.optionValues[0].name == value) {
+  //               setState(() {
+  //                 selectedProduct = variant;
+  //                 discount = (double.parse(variant.costPrice) -
+  //                             double.parse(variant.price)) >
+  //                         0
+  //                     ? true
+  //                     : false;
+  //               });
+  //             }
+  //           });
+  //         },
+  //       ));
+  // }
 
   // Widget variantDialog() {
   //   return Padding(
@@ -594,300 +719,339 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Container(
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Container(
-                          alignment: Alignment.center,
-                          height: 300,
-                          child: FadeInImage(
-                            image: NetworkImage(selectedProduct.image),
-                            placeholder: AssetImage(
-                                'images/placeholders/no-product-image.png'),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: Column(
+            children: <Widget>[
+              Stack(
+                children: <Widget>[
+                  Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        // Expanded(
+                        //   child:
+                        Center(
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 300,
+                            width: 220,
+                            child: FadeInImage(
+                              image: NetworkImage(selectedProduct.image),
+                              placeholder: AssetImage(
+                                  'images/placeholders/no-product-image.png'),
+                            ),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.topRight,
-                  child: IconButton(
-                    padding: EdgeInsets.only(top: 40, right: 15.0),
-                    alignment: Alignment.topRight,
-                    icon: Icon(Icons.favorite),
-                    color: _isFavorite ? Colors.orange : Colors.grey,
-                    onPressed: () async {
-                      final SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      String authToken = prefs.getString('spreeApiKey');
-                      Map<String, String> headers = await getHeaders();
+                        )
 
-                      if (!_isFavorite) {
-                        if (authToken == null) {
-                          _scaffoldKey.currentState.showSnackBar(SnackBar(
-                            content: Text(
-                              'Please Login to add to Favorites',
-                            ),
-                            action: SnackBarAction(
-                              label: 'LOGIN',
-                              onPressed: () {
-                                MaterialPageRoute route = MaterialPageRoute(
-                                    builder: (context) => Authentication(0));
-                                Navigator.push(context, route);
-                              },
-                            ),
-                          ));
+                        // ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    alignment: Alignment.topRight,
+                    child: IconButton(
+                      padding: EdgeInsets.only(top: 40, right: 15.0),
+                      alignment: Alignment.topRight,
+                      icon: Icon(Icons.favorite),
+                      color: _isFavorite ? Colors.orange : Colors.grey,
+                      onPressed: () async {
+                        final SharedPreferences prefs =
+                            await SharedPreferences.getInstance();
+                        String authToken = prefs.getString('spreeApiKey');
+                        Map<String, String> headers = await getHeaders();
+
+                        if (!_isFavorite) {
+                          if (authToken == null) {
+                            _scaffoldKey.currentState.showSnackBar(SnackBar(
+                              content: Text(
+                                'Please Login to add to Favorites',
+                              ),
+                              action: SnackBarAction(
+                                label: 'LOGIN',
+                                onPressed: () {
+                                  MaterialPageRoute route = MaterialPageRoute(
+                                      builder: (context) => Authentication(0));
+                                  Navigator.push(context, route);
+                                },
+                              ),
+                            ));
+                          } else {
+                            _scaffoldKey.currentState.showSnackBar(SnackBar(
+                              content: Text(
+                                'Adding to Favorites, please wait.',
+                              ),
+                              duration: Duration(seconds: 1),
+                            ));
+                            http
+                                .post(Settings.SERVER_URL + 'favorite_products',
+                                    body: json.encode({
+                                      'id': widget.product.reviewProductId
+                                          .toString()
+                                    }),
+                                    headers: headers)
+                                .then((response) {
+                              Map<dynamic, dynamic> responseBody =
+                                  json.decode(response.body);
+                              setState(() {
+                                _isFavorite = true;
+                              });
+                              _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                content: Text('Product marked as favorite!'),
+                                duration: Duration(seconds: 1),
+                              ));
+                            });
+                          }
                         } else {
                           _scaffoldKey.currentState.showSnackBar(SnackBar(
                             content: Text(
-                              'Adding to Favorites, please wait.',
+                              'Removing from Favorites, please wait.',
                             ),
                             duration: Duration(seconds: 1),
                           ));
                           http
-                              .post(Settings.SERVER_URL + 'favorite_products',
-                                  body: json.encode({
-                                    'id': widget.product.reviewProductId
-                                        .toString()
-                                  }),
+                              .delete(
+                                  Settings.SERVER_URL +
+                                      'favorite_products/${widget.product.reviewProductId}',
                                   headers: headers)
                               .then((response) {
                             Map<dynamic, dynamic> responseBody =
                                 json.decode(response.body);
-                            setState(() {
-                              _isFavorite = true;
-                            });
-                            _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              content: Text('Product marked as favorite!'),
-                              duration: Duration(seconds: 1),
-                            ));
+                            if (responseBody['message'] != null) {
+                              setState(() {
+                                _isFavorite = false;
+                              });
+                              _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                content: Text(responseBody['message']),
+                                duration: Duration(seconds: 1),
+                              ));
+                            } else {
+                              _scaffoldKey.currentState.showSnackBar(SnackBar(
+                                content: Text('Oops! Something went wrong'),
+                                duration: Duration(seconds: 1),
+                              ));
+                            }
                           });
                         }
-                      } else {
-                        _scaffoldKey.currentState.showSnackBar(SnackBar(
-                          content: Text(
-                            'Removing from Favorites, please wait.',
-                          ),
-                          duration: Duration(seconds: 1),
-                        ));
-                        http
-                            .delete(
-                                Settings.SERVER_URL +
-                                    'favorite_products/${widget.product.reviewProductId}',
-                                headers: headers)
-                            .then((response) {
-                          Map<dynamic, dynamic> responseBody =
-                              json.decode(response.body);
-                          if (responseBody['message'] != null) {
-                            setState(() {
-                              _isFavorite = false;
-                            });
-                            _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              content: Text(responseBody['message']),
-                              duration: Duration(seconds: 1),
-                            ));
-                          } else {
-                            _scaffoldKey.currentState.showSnackBar(SnackBar(
-                              content: Text('Oops! Something went wrong'),
-                              duration: Duration(seconds: 1),
-                            ));
-                          }
-                        });
-                      }
-                    },
-                  ),
-                )
-              ],
-            ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Container(
-                width: _deviceSize.width,
-                alignment: Alignment.centerRight,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10.0),
-                      child: Text(
-                        'By ${selectedProduct.name.split(' ')[0]}',
-                        style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.normal,
-                            color: Colors.green,
-                            fontFamily: fontFamily),
-                      ),
-                    ),
-                    Row(
-                      children: <Widget>[
-                        ratingBar(selectedProduct.avgRating, 20),
-                        Container(
-                            margin: EdgeInsets.only(right: 10),
-                            child: Text(selectedProduct.reviewsCount)),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.all(10),
-              child: Text(
-                selectedProduct.name,
-                style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: fontFamily),
-                textAlign: TextAlign.start,
-              ),
-            ),
-            Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.all(10),
-              child: Text(
-                'Size: ',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontFamily: fontFamily,
-                ),
-              ),
-            ),
-            // variantRow(),
-            variantDropDown(),
-            // variantDialog(),
-            Divider(),
-            Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.all(10),
-              child: Text(
-                'Quantity: ',
-                style: TextStyle(fontSize: 12, fontFamily: fontFamily),
-              ),
-            ),
-            quantityRow(model, selectedProduct),
-            Divider(),
-            discount
-                ? buildPriceRow('M.R.P',
-                    '${selectedProduct.currencySymbol} ${selectedProduct.costPrice}',
-                    strike: true)
-                : Container(),
-            discount
-                ? Column(
-                    children: <Widget>[
-                      buildPriceRow(
-                          'You Save:',
-                          '${selectedProduct.currencySymbol}' +
-                              (double.parse(selectedProduct.costPrice) -
-                                      double.parse(selectedProduct.price))
-                                  .toString() +
-                              '(' +
-                              (((double.parse(selectedProduct.costPrice) -
-                                              double.parse(
-                                                  selectedProduct.price)) /
-                                          double.parse(
-                                              selectedProduct.costPrice)) *
-                                      100)
-                                  .round()
-                                  .toString() +
-                              '%)',
-                          strike: false),
-                    ],
-                  )
-                : Container(),
-            buildPriceRow('Price', selectedProduct.displayPrice, strike: false),
-            Divider(
-              height: 1.0,
-            ),
-            Container(
-              height: 40.0,
-              alignment: Alignment.center,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 5.0, top: 0.0),
-                child: RichText(
-                  textAlign: TextAlign.start,
-                  text: TextSpan(children: [
-                    TextSpan(
-                      text: 'Free 1-2 Day ',
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    TextSpan(
-                      text: double.parse(selectedProduct.costPrice.substring(
-                                  1, selectedProduct.costPrice.length - 1)) <
-                              699
-                          ? 'shipping over Rs.699'
-                          : 'shipping',
-                      style: TextStyle(fontSize: 12, color: Colors.black),
-                    ),
-                  ]),
-                ),
-              ),
-            ),
-            Divider(),
-            pincodeBox(model, context),
-            Divider(),
-            SizedBox(
-              height: 10.0,
-            ),
-            addToCartFlatButton(),
-            SizedBox(
-              height: 12.0,
-            ),
-            !selectedProduct.isOrderable ? Container() : buyNowFlatButton(),
-            Divider(),
-            Column(
-              children: <Widget>[
-                Container(
-                    width: _deviceSize.width,
-                    color: Colors.white,
-                    child: ListTile(
-                      contentPadding: EdgeInsets.only(left: 10.0),
-                      title: Text('You May Also like',
-                          style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black)),
-                    )),
-                model.isLoading ? LinearProgressIndicator() : Container()
-              ],
-            ),
-            _isLoading
-                ? Container(
-                    height: _deviceSize.height * 0.47,
-                    alignment: Alignment.center,
-                    child: CircularProgressIndicator(
-                      backgroundColor: Colors.green,
-                    ),
-                  )
-                : Container(
-                    height: _deviceSize.height * 0.5,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: similarProducts.length,
-                      itemBuilder: (context, index) {
-                        return similarProductCard(
-                            index, similarProducts, _deviceSize, context, true);
                       },
                     ),
+                  )
+                ],
+              ),
+              Divider(),
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Container(
+                  width: _deviceSize.width,
+                  alignment: Alignment.centerRight,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: Text(
+                          'By ${selectedProduct.name.split(' ')[0]}',
+                          style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.normal,
+                              color: Colors.green,
+                              fontFamily: fontFamily),
+                        ),
+                      ),
+                      Row(
+                        children: <Widget>[
+                          ratingBar(selectedProduct.avgRating, 20),
+                          Container(
+                              margin: EdgeInsets.only(right: 10),
+                              child: Text(selectedProduct.reviewsCount)),
+                        ],
+                      )
+                    ],
                   ),
-            Container(
-                padding: EdgeInsets.only(left: 10.0, top: 20.0),
+                ),
+              ),
+              Container(
                 alignment: Alignment.centerLeft,
-                child: Text("Description",
-                    style: TextStyle(
-                        fontSize: 15.0, fontWeight: FontWeight.bold))),
-            HtmlWidget(htmlDescription),
-          ],
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  selectedProduct.name,
+                  style: TextStyle(
+                      fontSize: 17,
+                      letterSpacing: 0.5,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: fontFamily),
+                  textAlign: TextAlign.start,
+                ),
+              ),
+              SizedBox(
+                height: 18,
+              ),
+              Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  'Size ',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontFamily: fontFamily,
+                  ),
+                ),
+              ),
+              // variantRow(),
+              variantDropDown(),
+              // variantDialog(),
+              SizedBox(
+                height: 18,
+              ),
+              selectedProduct.isOrderable
+                  ? Container(
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        'Quantity ',
+                        style: TextStyle(fontSize: 14, fontFamily: fontFamily),
+                      ),
+                    )
+                  : Container(),
+              SizedBox(
+                height: 5,
+              ),
+              selectedProduct.isOrderable
+                  ? quantityRow(model, selectedProduct)
+                  : Container(),
+              Divider(),
+              discount
+                  ? SizedBox(
+                      height: 18,
+                    )
+                  : Container(),
+              buildPriceRow('Price: ', selectedProduct.displayPrice,
+                  strike: discount,
+                  originalPrice:
+                      '${selectedProduct.currencySymbol} ${selectedProduct.costPrice}'),
+              discount
+                  ? SizedBox(
+                      height: 12,
+                    )
+                  : Container(),
+
+              discount
+                  ? Column(
+                      children: <Widget>[
+                        buildPriceRow(
+                            'You Save: ',
+                            '${selectedProduct.currencySymbol}' +
+                                (double.parse(selectedProduct.costPrice) -
+                                        double.parse(selectedProduct.price))
+                                    .toString(),
+                            strike: false,
+                            discountPercent: '(' +
+                                (((double.parse(selectedProduct.costPrice) -
+                                                double.parse(
+                                                    selectedProduct.price)) /
+                                            double.parse(
+                                                selectedProduct.costPrice)) *
+                                        100)
+                                    .round()
+                                    .toString() +
+                                '%)  '),
+                      ],
+                    )
+                  : Container(),
+              SizedBox(
+                height: 18,
+              ),
+              Divider(
+                height: 1.0,
+              ),
+              Container(
+                height: 40.0,
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 5.0, top: 0.0),
+                  child: RichText(
+                    textAlign: TextAlign.start,
+                    text: TextSpan(children: [
+                      TextSpan(
+                        text: 'Free 1-2 Day ',
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(
+                        text: double.parse(selectedProduct.costPrice.substring(
+                                    1, selectedProduct.costPrice.length - 1)) <
+                                699
+                            ? 'shipping over Rs.699'
+                            : 'shipping',
+                        style: TextStyle(fontSize: 12, color: Colors.black),
+                      ),
+                    ]),
+                  ),
+                ),
+              ),
+              Divider(),
+              pincodeBox(model, context),
+              Divider(),
+              SizedBox(
+                height: 10.0,
+              ),
+              addToCartFlatButton(),
+              SizedBox(
+                height: 12.0,
+              ),
+              !selectedProduct.isOrderable ? Container() : buyNowFlatButton(),
+              Divider(),
+              SizedBox(
+                height: 2,
+              ),
+              Column(
+                children: <Widget>[
+                  Container(
+                      width: _deviceSize.width,
+                      color: Colors.white,
+                      child: ListTile(
+                        contentPadding: EdgeInsets.only(left: 10.0),
+                        title: Text('You May Also like',
+                            style: TextStyle(
+                                fontSize: 14,
+                                // fontWeight: FontWeight.w600,
+                                color: Colors.black)),
+                      )),
+                  model.isLoading ? LinearProgressIndicator() : Container()
+                ],
+              ),
+              _isLoading
+                  ? Container(
+                      height: _deviceSize.height * 0.47,
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator(
+                        backgroundColor: Colors.green,
+                      ),
+                    )
+                  : Container(
+                      height: 355,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: similarProducts.length,
+                        itemBuilder: (context, index) {
+                          return todaysDealsCard(
+                              index, similarProducts, _deviceSize, context);
+                          // similarProductCard(index, similarProducts,
+                          //     _deviceSize, context, true);
+                        },
+                      ),
+                    ),
+              Container(
+                  padding: EdgeInsets.only(left: 10.0, top: 20.0),
+                  alignment: Alignment.centerLeft,
+                  child: Text("Description",
+                      style: TextStyle(
+                          fontSize: 15.0, fontWeight: FontWeight.w600))),
+              HtmlWidget(htmlDescription),
+            ],
+          ),
         ),
       );
     });
@@ -1039,7 +1203,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     );
   }
 
-  Widget buildPriceRow(String key, String value, {bool strike}) {
+  Widget buildPriceRow(String key, String value,
+      {bool strike, String originalPrice, String discountPercent}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
@@ -1057,16 +1222,50 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         Container(
           alignment: Alignment.centerLeft,
           padding: EdgeInsets.all(10),
-          child: Text(
-            value,
-            style: TextStyle(
-                fontSize: 17,
-                color: strike ? Colors.black : Colors.red,
-                fontWeight: FontWeight.bold,
-                fontFamily: fontFamily,
-                decoration:
-                    strike ? TextDecoration.lineThrough : TextDecoration.none),
-          ),
+          child: strike
+              ? RichText(
+                  text: TextSpan(children: [
+                    TextSpan(
+                        text: originalPrice,
+                        style: TextStyle(
+                            color: Colors.grey,
+                            decoration: TextDecoration.lineThrough)),
+                    TextSpan(text: '   '),
+                    TextSpan(
+                        text: value,
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.red,
+                            fontFamily: fontFamily,
+                            fontWeight: FontWeight.bold)),
+                  ]),
+                )
+              : discount
+                  ? RichText(
+                      text: TextSpan(children: [
+                        TextSpan(
+                            text: discountPercent,
+                            style: TextStyle(
+                                color: Colors.red,
+                                )),
+                        TextSpan(
+                            text: value,
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.red,
+                                fontFamily: fontFamily,
+                                fontWeight: FontWeight.bold)),
+                      ]),
+                    )
+                  : Text(
+                      value,
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: fontFamily,
+                          ),
+                    ),
         ),
       ],
     );

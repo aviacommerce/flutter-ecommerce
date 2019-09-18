@@ -7,7 +7,7 @@ Widget shoppingCartIconButton() {
   return ScopedModelDescendant<MainModel>(
       builder: (BuildContext context, Widget child, MainModel model) {
     return new Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.only(top:10.0, bottom: 10.0, right: 25, left: 10),
       child: new Container(
         height: 150.0,
         width: 30.0,

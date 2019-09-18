@@ -47,7 +47,6 @@ class _AddressPageState extends State<AddressPage> {
               .order
               .adjustmentTotal;
       print(adjustMentTotal);
-      print(double.parse(adjustMentTotal));
       promoChecked = isPromoDiscount = adjustMentTotal != '0.0';
 
       print(isPromoDiscount);
@@ -69,6 +68,7 @@ class _AddressPageState extends State<AddressPage> {
         builder: (BuildContext context, Widget child, MainModel model) {
       return Scaffold(
           key: _scaffoldKey,
+          backgroundColor: Colors.grey.shade200,
           appBar: AppBar(
               leading: IconButton(
                   icon: Icon(Icons.arrow_back),
@@ -91,49 +91,70 @@ class _AddressPageState extends State<AddressPage> {
               slivers: <Widget>[
                 SliverList(
                   delegate: SliverChildListDelegate([
-                    FlatButton(
-                      child: Text(model.isLoading
-                          ? ''
-                          : model.order.shipAddress != null
-                              ? ''
-                              : 'ADD ADDRESS'),
-                      onPressed: () {
-                        MaterialPageRoute payment = MaterialPageRoute(
-                            builder: (context) =>
-                                UpdateAddress(model.order.shipAddress, true));
-                        Navigator.push(context, payment);
-                      },
-                    ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 15.0, top: 0.0),
+                      padding: const EdgeInsets.only(left: 15.0, top: 35.0),
                       child: Text(
                         'Shipping Address',
                         style: TextStyle(
-                            color: Colors.grey.shade700, fontSize: 16.0),
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w200,
+                            fontSize: 16.0),
                       ),
                     ),
+                    model.order.shipAddress == null
+                        ? Container(
+                            padding: EdgeInsets.only(top: 15),
+                            height: 40,
+                            margin: EdgeInsets.only(left: 40, right: 120),
+                            child: FlatButton(
+                              color: Colors.white,
+                              child: Text(
+                                model.isLoading
+                                    ? ''
+                                    : model.order.shipAddress != null
+                                        ? ''
+                                        : 'ADD NEW ADDRESS',
+                                style: TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              onPressed: () {
+                                MaterialPageRoute payment = MaterialPageRoute(
+                                    builder: (context) => UpdateAddress(
+                                        model.order.shipAddress, true));
+                                Navigator.push(context, payment);
+                              },
+                            ),
+                          )
+                        : Container(),
+                    SizedBox(
+                      height: 35,
+                    ),
                     addressContainer(),
-                    Divider(),
+                    SizedBox(
+                      height: 25,
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(left: 15.0, top: 0.0),
                       child: Text(
                         'Promotion',
                         style: TextStyle(
-                            color: Colors.grey.shade700, fontSize: 16.0),
+                            color: Colors.grey.shade600,
+                            fontWeight: FontWeight.w200,
+                            fontSize: 16.0),
                       ),
                     ),
                     SizedBox(
-                      height: 10,
+                      height: 15,
                     ),
                     promoCodeBox(model, context),
-                    Divider(),
                     Padding(
                       padding: const EdgeInsets.only(
                           left: 15.0, top: 15.0, bottom: 10.0),
                       child: Text(
                         'Order Summary',
                         style: TextStyle(
-                            color: Colors.grey.shade700,
+                            color: Colors.grey.shade600,
                             fontSize: 16.0,
                             fontWeight: FontWeight.w100),
                       ),
@@ -146,11 +167,13 @@ class _AddressPageState extends State<AddressPage> {
                     Padding(
                       padding: const EdgeInsets.all(15.0),
                       child: Text(
-                        'By placing this order, you agree to Ofypets.com’\s Privacy Policy and Terms of Use.',
+                        privacyPolicy,
                         style: TextStyle(color: Colors.grey.shade700),
                       ),
                     ),
-                    Container(height: 150,)
+                    Container(
+                      height: 150,
+                    )
                   ]),
                 ),
               ],
@@ -167,22 +190,29 @@ class _AddressPageState extends State<AddressPage> {
         padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 5.0),
         width: MediaQuery.of(context).size.width,
         child: FlatButton(
+          disabledColor: Colors.grey.shade200,
           // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
           color: Colors.deepOrange,
           child: Text(
-            model.order.shipAddress != null ? 'PLACE ORDER' : 'ADD ADDRESS',
+            'PLACE ORDER',
             style: TextStyle(
-                fontSize: 15, color: Colors.white, fontWeight: FontWeight.w300),
+                fontSize: 15,
+                color: model.shipAddress == null
+                    ? Colors.grey.shade400
+                    : Colors.white,
+                fontWeight: FontWeight.w300),
           ),
-          onPressed: () {
-            MaterialPageRoute address = MaterialPageRoute(
-                builder: (context) =>
-                    UpdateAddress(model.order.shipAddress, true));
+          onPressed: model.order.shipAddress != null
+              ? () {
+                  MaterialPageRoute address = MaterialPageRoute(
+                      builder: (context) =>
+                          UpdateAddress(model.order.shipAddress, true));
 
-            model.order.shipAddress != null
-                ? pushPaymentScreen(model)
-                : Navigator.push(context, address);
-          },
+                  model.order.shipAddress != null
+                      ? pushPaymentScreen(model)
+                      : Navigator.push(context, address);
+                }
+              : null,
         ),
       );
     });
@@ -441,7 +471,7 @@ class _AddressPageState extends State<AddressPage> {
                   textFieldContainer(model.order.shipAddress.city +
                       ' - ' +
                       model.order.shipAddress.pincode),
-                  textFieldContainer(model.order.shipAddress.state),
+                  textFieldContainer(model.order.shipAddress.stateName),
                   textFieldContainer(
                       'Mobile: ' + ' - ' + model.order.shipAddress.mobile),
                 ],
@@ -457,7 +487,7 @@ class _AddressPageState extends State<AddressPage> {
   Widget bottomContainer(MainModel model) {
     return BottomAppBar(
         child: Container(
-            height: 100,
+            height: 90,
             child: Column(children: [
               Container(
                   padding: EdgeInsets.only(top: 10),
@@ -493,7 +523,9 @@ class _AddressPageState extends State<AddressPage> {
       itemBuilder: (BuildContext context, int index) {
         return GestureDetector(
           onTap: () {},
-          child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(5),
+            child: Card(
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             margin: EdgeInsets.all(4.0),
@@ -529,27 +561,28 @@ class _AddressPageState extends State<AddressPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
-                            SizedBox(height: 15,),
+                            SizedBox(
+                              height: 15,
+                            ),
                             Container(
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  
                                   Expanded(
                                     child: Padding(
                                       padding: const EdgeInsets.only(
                                           right: 10.0, top: 10.0),
                                       child: RichText(
                                         text: TextSpan(children: [
-                                            TextSpan(
-                                              text:
-                                                  '${widget.lineItems[index].variant.name.split(' ')[0]} ',
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 16.0,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
+                                          TextSpan(
+                                            text:
+                                                '${widget.lineItems[index].variant.name.split(' ')[0]} ',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.bold),
+                                          ),
                                           TextSpan(
                                             text: widget
                                                 .lineItems[index].variant.name
@@ -606,15 +639,19 @@ class _AddressPageState extends State<AddressPage> {
                                 ),
                               ),
                             ),
-                            Divider(color: Colors.grey.shade700,),
-                            SizedBox(height: 10,)
+                            Divider(
+                              color: Colors.grey.shade700,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            )
                           ],
                         ),
                       )
                     ]),
               ),
             ),
-          ),
+          ),),
         );
       },
     );

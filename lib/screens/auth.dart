@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' as prefix0;
 import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
 import 'package:ofypets_mobile_app/screens/forget_password.dart';
@@ -26,6 +27,9 @@ class _AuthenticationState extends State<Authentication>
   final GlobalKey<FormState> _formKeyForLogin = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final TextEditingController _passwordTextController = TextEditingController();
+  final UnderlineInputBorder _underlineInputBorder =
+      UnderlineInputBorder(borderSide: BorderSide(color: Colors.black54));
+
   bool _isLoader = false;
   TabController _tabController;
 
@@ -117,11 +121,11 @@ class _AuthenticationState extends State<Authentication>
                   ),
                   _buildEmailTextField(),
                   SizedBox(
-                    height: 20.0,
+                    height: 45.0,
                   ),
                   _buildPasswordTextField(false),
                   SizedBox(
-                    height: 20.0,
+                    height: 35.0,
                   ),
                   _isLoader
                       ? CircularProgressIndicator(backgroundColor: Colors.green)
@@ -133,7 +137,7 @@ class _AuthenticationState extends State<Authentication>
                             color: Colors.deepOrange,
                             child: Text(
                               'SIGN IN',
-                              style: TextStyle(fontSize: 13.0),
+                              style: TextStyle(fontSize: 12.0),
                             ),
                             onPressed: () => _submitLogin(model),
                           )),
@@ -151,7 +155,7 @@ class _AuthenticationState extends State<Authentication>
                       'FORGOT YOUR PASSWORD?',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          fontWeight: FontWeight.normal,
+                          fontWeight: FontWeight.w600,
                           color: Colors.green,
                           fontSize: 14.0),
                     ),
@@ -176,19 +180,19 @@ class _AuthenticationState extends State<Authentication>
             child: Column(
               children: <Widget>[
                 SizedBox(
-                  height: 20.0,
+                  height: 30.0,
                 ),
                 _buildEmailTextField(),
                 SizedBox(
-                  height: 20.0,
+                  height: 45.0,
                 ),
                 _buildPasswordTextField(true),
                 SizedBox(
-                  height: 20.0,
+                  height: 45.0,
                 ),
                 _buildPasswordConfirmTextField(),
                 SizedBox(
-                  height: 30.0,
+                  height: 45.0,
                 ),
                 _isLoader
                     ? CircularProgressIndicator(backgroundColor: Colors.green)
@@ -198,7 +202,8 @@ class _AuthenticationState extends State<Authentication>
                         child: FlatButton(
                           textColor: Colors.white,
                           color: Colors.deepOrange,
-                          child: Text('CREATE ACCOUNT'),
+                          child: Text('CREATE ACCOUNT',
+                              style: TextStyle(fontSize: 12.0)),
                           onPressed: () => _submitForm(),
                         )),
                 SizedBox(
@@ -217,10 +222,10 @@ class _AuthenticationState extends State<Authentication>
         padding: EdgeInsets.symmetric(horizontal: 15),
         child: TextFormField(
           decoration: InputDecoration(
-            labelStyle: TextStyle(color: Colors.grey),
-            labelText: 'Email',
-            contentPadding: EdgeInsets.all(0.0),
-          ),
+              labelStyle: TextStyle(color: Colors.grey),
+              labelText: 'Email',
+              contentPadding: EdgeInsets.all(0.0),
+              enabledBorder: _underlineInputBorder),
           keyboardType: TextInputType.emailAddress,
           validator: (String value) {
             if (value.isEmpty ||
@@ -238,29 +243,28 @@ class _AuthenticationState extends State<Authentication>
 
   Widget _buildPasswordTextField([bool isLimitCharacter = false]) {
     return Padding(
-        padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15.0),
-        child: Theme(
-          data: ThemeData(hintColor: Colors.grey.shade700),
-          child: TextFormField(
-            decoration: InputDecoration(
-                labelText: isLimitCharacter
-                    ? 'Password (Atleast 6 Characters)'
-                    : 'Password',
-                labelStyle: TextStyle(color: Colors.grey),
-                contentPadding: EdgeInsets.all(0.0)),
-            obscureText: true,
-            controller: _passwordTextController,
-            validator: (String value) {
-              if (value.isEmpty || value.length < 6) {
-                return 'Password must be atleast 6 characters';
-              }
-              return null;
-            },
-            onSaved: (String value) {
-              _formData['password'] = value;
-            },
-          ),
-        ));
+      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15.0),
+      child: TextFormField(
+        decoration: InputDecoration(
+            labelText: isLimitCharacter
+                ? 'Password (Atleast 6 Characters)'
+                : 'Password',
+            labelStyle: TextStyle(color: Colors.grey),
+            contentPadding: EdgeInsets.all(0.0),
+            enabledBorder: _underlineInputBorder),
+        obscureText: true,
+        controller: _passwordTextController,
+        validator: (String value) {
+          if (value.isEmpty || value.length < 6) {
+            return 'Password must be atleast 6 characters';
+          }
+          return null;
+        },
+        onSaved: (String value) {
+          _formData['password'] = value;
+        },
+      ),
+    );
   }
 
   Widget _buildPasswordConfirmTextField() {
@@ -272,6 +276,7 @@ class _AuthenticationState extends State<Authentication>
             decoration: InputDecoration(
               labelStyle: TextStyle(color: Colors.grey),
               labelText: 'Confirm Password',
+              enabledBorder: _underlineInputBorder,
               contentPadding: EdgeInsets.all(0.0),
             ),
             obscureText: true,
@@ -391,6 +396,12 @@ class _AuthenticationState extends State<Authentication>
     };
     if (successInformation['success']) {
       Navigator.of(context).pop();
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return _alertDialog('Success!',
+                "Account Created Successfully! Sign in to Continue", context);
+          });
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         content: Text('${successInformation['message']}'),
         duration: Duration(seconds: 1),
@@ -404,5 +415,33 @@ class _AuthenticationState extends State<Authentication>
     setState(() {
       _isLoader = false;
     });
+  }
+
+  Widget _alertDialog(String boxTitle, String message, BuildContext context) {
+    return AlertDialog(
+      title: Text(boxTitle),
+      content: Text(message),
+      actions: <Widget>[
+        FlatButton(
+          child: Text('Later',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, color: Colors.green.shade300)),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        FlatButton(
+          child: Text('Sign In',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, color: Colors.green.shade300)),
+          onPressed: () {
+            Navigator.pop(context);
+            MaterialPageRoute route =
+                MaterialPageRoute(builder: (context) => Authentication(0));
+            Navigator.push(context, route);
+          },
+        )
+      ],
+    );
   }
 }

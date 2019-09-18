@@ -1,7 +1,8 @@
 class Address {
   final String firstName;
   final String lastName;
-  final String state;
+  final String stateName;
+  final String stateAbbr;
   final String address1;
   final String address2;
   final String city;
@@ -19,6 +20,7 @@ class Address {
       this.lastName,
       this.mobile,
       this.pincode,
-      this.state,
+      this.stateName,
+      this.stateAbbr,
       this.stateId});
 }

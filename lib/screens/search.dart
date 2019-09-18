@@ -162,20 +162,6 @@ class _ProductSearchState extends State<ProductSearch> {
                   },
                 ),
               ),
-              IconButton(
-                icon: const Icon(
-                  Icons.search,
-                  color: Colors.grey,
-                ),
-                onPressed: () {
-                  FocusScope.of(mainContext).requestFocus(new FocusNode());
-
-                  isSearched = true;
-                  searchProducts = [];
-                  currentPage = 1;
-                  searchProduct();
-                },
-              ),
             ],
           ),
           endDrawer: filterDrawer(),
@@ -183,61 +169,57 @@ class _ProductSearchState extends State<ProductSearch> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(top: 90.0),
-                child: model.isLoading
-                    ? LinearProgressIndicator(backgroundColor: Colors.white)
-                    : isSearched
-                        ? Theme(
-                            data: ThemeData(primarySwatch: Colors.green),
-                            child: ListView.separated(
-                                separatorBuilder: (context, index) {
-                                  return Divider(
-                                    indent: 150.0,
-                                    color: Colors.grey.shade400,
-                                    height: 1.0,
-                                  );
-                                },
-                                controller: scrollController,
-                                itemCount: searchProducts.length + 1,
-                                itemBuilder: (mainContext, index) {
-                                  if (index < searchProducts.length) {
-                                    // return favoriteCard(
-                                    //     context, searchProducts[index], index);
-                                    return productContainer(
-                                        _scaffoldKey.currentContext,
-                                        searchProducts[index],
-                                        index);
-                                  }
-                                  if (hasMore && searchProducts.length == 0) {
-                                    return Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 50.0),
-                                      child: Center(
-                                        child: Text(
-                                          'No Product Found',
-                                          style: TextStyle(fontSize: 20.0),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  if (!hasMore || model.isLoading) {
-                                    return Padding(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 25.0),
-                                      child: Center(
-                                          child: CircularProgressIndicator(
-                                        backgroundColor: Colors.white,
-                                      )),
-                                    );
-                                  } else {
-                                    return Container();
-                                  }
-                                }),
-                          )
-                        : Container(),
+                child: isSearched && !model.isLoading
+                    ? Theme(
+                        data: ThemeData(primarySwatch: Colors.green),
+                        child: ListView.separated(
+                            separatorBuilder: (context, index) {
+                              return Divider(
+                                indent: 150.0,
+                                color: Colors.grey.shade400,
+                                height: 0.5,
+                              );
+                            },
+                            controller: scrollController,
+                            itemCount: searchProducts.length + 1,
+                            itemBuilder: (mainContext, index) {
+                              if (index < searchProducts.length) {
+                                // return favoriteCard(
+                                //     context, searchProducts[index], index);
+                                return productContainer(
+                                    _scaffoldKey.currentContext,
+                                    searchProducts[index],
+                                    index);
+                              }
+                              if (hasMore && searchProducts.length == 0) {
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 50.0),
+                                  child: Center(
+                                    child: Text(
+                                      'No Product Found',
+                                      style: TextStyle(fontSize: 20.0),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                );
+                              }
+                              if (!hasMore || model.isLoading) {
+                                return Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 25.0),
+                                  child: Center(
+                                      child: CircularProgressIndicator(
+                                    backgroundColor: Colors.white,
+                                  )),
+                                );
+                              } else {
+                                return Container();
+                              }
+                            }),
+                      )
+                    : Container(),
               ),
               Visibility(
-                  visible: searchProducts.length > 0 ? true : false,
+                  visible: searchProducts.length > 0,
                   child: Material(
                     elevation: 2.0,
                     child: Container(
@@ -255,7 +237,7 @@ class _ProductSearchState extends State<ProductSearch> {
                     ),
                   )),
               Visibility(
-                visible: searchProducts.length > 0 ? true : false,
+                visible: searchProducts.length > 0,
                 child: Container(
                   padding: EdgeInsets.only(right: 20.0, top: 20.0),
                   alignment: Alignment.topRight,
@@ -271,6 +253,14 @@ class _ProductSearchState extends State<ProductSearch> {
                   ),
                 ),
               ),
+              Visibility(
+                visible: model.isLoading,
+                child: Center(
+                      child: CircularProgressIndicator(
+                        backgroundColor: Colors.green,
+                      ),
+                    )),
+              // )
             ],
           ));
     });
@@ -374,7 +364,7 @@ class _ProductSearchState extends State<ProductSearch> {
                   padding: EdgeInsets.all(8.0),
                   separatorBuilder: (context, index) => Divider(
                     color: Colors.grey,
-                    height: 1.0,
+                    // height: 1.0,
                   ),
                   itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(

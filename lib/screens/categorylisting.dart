@@ -88,8 +88,8 @@ class _CategoryListingState extends State<CategoryListing> {
         getProductsByCategory(0);
       }
     });
-    header.add(
-        textField(widget.categoryName, FontWeight.normal, 0, Colors.white));
+    header
+        .add(textField(widget.categoryName, FontWeight.w100, 0, Colors.white));
     getCategory();
     locator<ConnectivityManager>().initConnectivity(context);
   }
@@ -162,11 +162,6 @@ class _CategoryListingState extends State<CategoryListing> {
 
   @override
   Widget build(BuildContext context) {
-    print(level != 0 && subCategoryList.length == 0);
-    print("LEVEL -----> $level");
-    print("SUBCAT LENGTH -----> ${subCategoryList.length}");
-    print("CAT LENGTH -----> ${categoryList.length}");
-
     _deviceSize = MediaQuery.of(context).size;
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
@@ -283,7 +278,7 @@ class _CategoryListingState extends State<CategoryListing> {
                             value: _currentItem,
                             icon: Icon(
                               Icons.arrow_drop_down,
-                              color: Colors.white,
+                              color: Colors.white60,
                             ),
                             items: _dropDownMenuItems,
                             onChanged: changedDropDownItem,
@@ -474,6 +469,7 @@ class _CategoryListingState extends State<CategoryListing> {
   Widget textField(
       String text, FontWeight fontWeight, int categoryLevel, Color textColor) {
     int sublevel;
+    print("LEVEL ${level == 2} BUILDING TEXTFIELD $text");
 
     return GestureDetector(
         onTap: () {
@@ -484,11 +480,14 @@ class _CategoryListingState extends State<CategoryListing> {
             }
             level = level - sublevel;
           });
+          print("LEVEL $level BUILDING TEXTFIELD $text");
         },
         child: Text(
           text,
-          style:
-              TextStyle(color: textColor, fontSize: 18, fontWeight: fontWeight),
+          style: TextStyle(
+              color:level == 2?Colors.white: Colors.white60,
+              fontSize: 18,
+              fontWeight: level == 2 ? FontWeight.w500 : fontWeight),
         ));
   }
 
@@ -504,22 +503,13 @@ class _CategoryListingState extends State<CategoryListing> {
                       padding: EdgeInsets.symmetric(horizontal: 12),
                       child: Icon(
                         Icons.arrow_forward_ios,
-                        color: Colors.white,
+                        color: Colors.white60,
                         size: 16,
                       )),
-                  textField(categoryList[index].name, FontWeight.normal, 1,
+                  textField(categoryList[index].name, FontWeight.w100, 1,
                       Colors.white)
                 ],
               ));
-              // header.add(Padding(
-              //     padding: EdgeInsets.symmetric(horizontal: 12),
-              //     child: Icon(
-              //       Icons.arrow_forward_ios,
-              //       color: Colors.white,
-              //       size: 16,
-              //     )));
-              // header.add(textField(categoryList[index].name, FontWeight.normal,
-              //     1, Colors.white));
             });
           } else {
             subCatId = subCategoryList[index].id;
@@ -531,22 +521,13 @@ class _CategoryListingState extends State<CategoryListing> {
                       padding: EdgeInsets.symmetric(horizontal: 12),
                       child: Icon(
                         Icons.arrow_forward_ios,
-                        color: Colors.white,
+                        color: Colors.white60,
                         size: 16,
                       )),
-                  textField(subCategoryList[index].name, FontWeight.normal, 2,
+                  textField(subCategoryList[index].name, FontWeight.w100, 2,
                       Colors.white)
                 ],
               ));
-              // header.add(Padding(
-              //     padding: EdgeInsets.symmetric(horizontal: 12),
-              //     child: Icon(
-              //       Icons.arrow_forward_ios,
-              //       color: Colors.white,
-              //       size: 16,
-              //     )));
-              // header.add(textField(subCategoryList[index].name,
-              //     FontWeight.normal, 2, Colors.white));
             });
           }
         },

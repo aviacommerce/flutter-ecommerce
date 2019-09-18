@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:ofypets_mobile_app/models/address.dart';
 import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:ofypets_mobile_app/utils/locator.dart';
@@ -12,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UpdateAddress extends StatefulWidget {
   final bool order;
-  final dynamic shipAddress;
+  final Address shipAddress;
   UpdateAddress(this.shipAddress, this.order);
   @override
   State<StatefulWidget> createState() {
@@ -23,16 +24,18 @@ class UpdateAddress extends StatefulWidget {
 class _UpdateAddressState extends State<UpdateAddress> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  bool _stateEmpty = false;
+  bool _isStateChecked = false;
   bool _isLoading = false;
   String _firstName = '';
   String _lastName = '';
-  String selectedState = '';
+  String selectedState = 'State';
   String _address1 = '';
   String _address2 = '';
   String _city = '';
   String _mobile = '';
   String _pincode = '';
-  int _stateId;
+  int _stateId = 0;
   Map<String, dynamic> data = Map();
   Map<String, dynamic> address = Map();
   Map<String, String> headers = Map();
@@ -44,7 +47,8 @@ class _UpdateAddressState extends State<UpdateAddress> {
     // getUserInfo();
     super.initState();
     if (widget.shipAddress != null) {
-      selectedState = widget.shipAddress.state;
+      _isStateChecked = true;
+      selectedState = widget.shipAddress.stateAbbr;
       _firstName = widget.shipAddress.firstName;
       _lastName = widget.shipAddress.lastName;
       _address2 = widget.shipAddress.address2;
@@ -69,54 +73,84 @@ class _UpdateAddressState extends State<UpdateAddress> {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return Scaffold(
-          appBar: AppBar(
-            title: Text(
-                widget.shipAddress != null ? 'Update Address' : 'Add Address'),
-            bottom: _isLoading
-                ? PreferredSize(
-                    child: LinearProgressIndicator(),
-                    preferredSize: Size.fromHeight(10),
-                  )
-                : PreferredSize(
-                    child: Container(),
-                    preferredSize: Size.fromHeight(10),
-                  ),
-            actions: <Widget>[
-              IconButton(
-                icon: Icon(Icons.check),
-                onPressed: () {
-                  submitAddress(model);
-                },
-              )
-            ],
+        appBar: AppBar(
+          centerTitle: false,
+          title: Text(
+              widget.shipAddress != null ? 'Update Address' : 'Add Address'),
+          leading: IconButton(
+            icon: Icon(Icons.close),
+            onPressed: () => Navigator.of(context).pop(),
           ),
-          body: Card(
-            elevation: 5,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            margin: EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: ListView(
-                padding: EdgeInsets.all(20),
+          bottom: _isLoading
+              ? PreferredSize(
+                  child: LinearProgressIndicator(),
+                  preferredSize: Size.fromHeight(10),
+                )
+              : PreferredSize(
+                  child: Container(),
+                  preferredSize: Size.fromHeight(10),
+                ),
+          actions: <Widget>[
+            Container(
+              padding: EdgeInsets.all(4),
+              child:IconButton(
+              icon: Icon(Icons.check),
+              onPressed: () {
+                submitAddress(model);
+              },
+            ) ,)
+            
+          ],
+        ),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: EdgeInsets.all(25),
+            children: <Widget>[
+              SizedBox(
+                height: 20,
+              ),
+              buildFirstNameField('First Name'),
+              SizedBox(
+                height: 45,
+              ),
+              buildLastNameField('Last Name'),
+              SizedBox(
+                height: 45,
+              ),
+              buildMobileField('Phone Number'),
+              SizedBox(
+                height: 45,
+              ),
+              buildAddressField('Street Address'),
+              SizedBox(
+                height: 45,
+              ),
+              buildTownField('City/Town'),
+              SizedBox(
+                height: 45,
+              ),
+              buildCityField('District'),
+              SizedBox(
+                height: 45,
+              ),
+              Row(
                 children: <Widget>[
-                  buildFirstNameField('First Name *'),
-                  buildLastNameField('Last Name *'),
-                  buildPinCodeField('Pincode *'),
-                  buildTownField('Locality/Town *'),
-                  buildCityField('City/District *'),
-                  buildStateField('State *'),
-                  buildAddressField('Address *'),
-                  buildMobileField('Mobile No. *'),
-                  SizedBox(height: 20),
-                  sendButton(),
-                  SizedBox(
-                    height: 250,
-                  )
+                  buildStateField('State'),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.40,
+                    child: buildPinCodeField('Pincode'),
+                  ),
                 ],
               ),
-            ),
-          ));
+              SizedBox(
+                height: 45,
+              ),
+              sendButton(),
+            ],
+          ),
+        ),
+      );
     });
   }
 
@@ -127,12 +161,10 @@ class _UpdateAddressState extends State<UpdateAddress> {
           return 'First Name is required';
         }
       },
+      decoration: inputDecoration(label),
       initialValue: _firstName,
-      decoration: InputDecoration(
-        labelText: label,
-      ),
       onSaved: (String value) {
-        print("SETTING FIRST NAME-----> $value");
+        print("SETTING LAST NAME ------> $value");
         setState(() {
           _firstName = value;
         });
@@ -147,9 +179,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
           return 'Last Name is required';
         }
       },
-      decoration: InputDecoration(
-        labelText: label,
-      ),
+      decoration: inputDecoration(label),
       initialValue: _lastName,
       onSaved: (String value) {
         print("SETTING LAST NAME ------> $value");
@@ -162,16 +192,14 @@ class _UpdateAddressState extends State<UpdateAddress> {
 
   Widget buildAddressField(String label) {
     return TextFormField(
-      maxLines: 5,
+      // maxLines: 5,
       initialValue: _address1,
       validator: (String value) {
         if (value.isEmpty) {
           return 'Address is required';
         }
       },
-      decoration: InputDecoration(
-        labelText: label,
-      ),
+      decoration: inputDecoration(label),
       onSaved: (String value) {
         setState(() {
           _address1 = value;
@@ -188,9 +216,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
           return 'Locality/Town is required';
         }
       },
-      decoration: InputDecoration(
-        labelText: label,
-      ),
+      decoration: inputDecoration(label),
       onSaved: (String value) {
         setState(() {
           _address2 = value;
@@ -207,9 +233,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
           return 'City is required';
         }
       },
-      decoration: InputDecoration(
-        labelText: label,
-      ),
+      decoration: inputDecoration(label),
       onSaved: (String value) {
         setState(() {
           _city = value;
@@ -223,10 +247,11 @@ class _UpdateAddressState extends State<UpdateAddress> {
       return CupertinoActionSheetAction(
         child: Text(
           item['name'],
-          style: TextStyle(color: Colors.grey),
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: Colors.grey.shade500),
         ),
         onPressed: () {
-          Navigator.pop(context, item['name']);
+          Navigator.pop(context, item['abbr']);
         },
       );
     }).toList();
@@ -235,55 +260,45 @@ class _UpdateAddressState extends State<UpdateAddress> {
           containerForSheet<String>(
             context: context,
             child: CupertinoActionSheet(
-              title: const Text('Select State'),
+              title: Text(
+                'Select State',
+                style: TextStyle(color: Colors.grey.shade500),
+              ),
               actions: actions,
             ),
           );
         },
-        child: Container(
-            color: Colors.white,
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Container(
-                          margin: EdgeInsets.only(top: 10),
-                          child: Text(
-                            'Select State *',
-                            style: TextStyle(
-                                color: Colors.grey.shade700, fontSize: 16),
-                          )),
-                      Container(
-                          margin: EdgeInsets.only(top: 10),
-                          child: IconButton(
-                            onPressed: () {
-                              containerForSheet<String>(
-                                context: context,
-                                child: CupertinoActionSheet(
-                                  title: const Text('Select State'),
-                                  actions: actions,
-                                ),
-                              );
-                            },
-                            icon: Icon(Icons.arrow_drop_down),
-                            iconSize: 30,
-                          ))
-                    ],
-                  ),
-                  Container(
-                    child: Text(
-                      selectedState,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                  Divider(
-                    color: Colors.black,
-                    height: 40,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Container(
+                width: MediaQuery.of(context).size.width * 0.40,
+                margin: EdgeInsets.only(top: 10),
+                child: Text(
+                  selectedState,
+                  style: TextStyle(
+                      color:
+                          _isStateChecked ? Colors.black : Colors.grey.shade500,
+                      fontSize: 16),
+                )),
+            SizedBox(
+              height: 6,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.35,
+              child: Divider(
+                // endIndent: ,
+                color: Colors.black,
+              ),
+            ),
+            _stateEmpty
+                ? Text(
+                    "State is required.",
+                    style: TextStyle(color: Colors.red),
                   )
-                ])));
+                : Container()
+          ],
+        ));
   }
 
   Widget buildMobileField(String label) {
@@ -295,12 +310,10 @@ class _UpdateAddressState extends State<UpdateAddress> {
         } else if (!RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) {
           return 'Please enter numeric value only';
         } else if (value.trim().length != 10) {
-          return 'Pincode should be 10 digits only!';
+          return 'Mobile No. should be 10 digits only!';
         }
       },
-      decoration: InputDecoration(
-        labelText: label,
-      ),
+      decoration: inputDecoration(label),
       onSaved: (String value) {
         setState(() {
           _mobile = value;
@@ -321,7 +334,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
           return 'Pincode should be 6 digits only!';
         }
       },
-      decoration: InputDecoration(labelText: label),
+      decoration: inputDecoration(label),
       onSaved: (String value) {
         setState(() {
           _pincode = value;
@@ -337,13 +350,14 @@ class _UpdateAddressState extends State<UpdateAddress> {
 
     statesResponse = json.decode(response.body);
     statesResponse['states'].forEach((state) {
+      print(state);
       setState(() {
         states.add(state);
       });
     });
     if (widget.shipAddress == null) {
       setState(() {
-        selectedState = states.first['name'];
+        selectedState = 'State';
       });
     }
   }
@@ -355,8 +369,10 @@ class _UpdateAddressState extends State<UpdateAddress> {
     ).then<void>((Map value) {
       setState(() {
         if (value == null) {
-          selectedState = '';
+          selectedState = 'State';
         } else {
+          _isStateChecked = true;
+          _stateEmpty = false;
           selectedState = value.toString();
           states.forEach((state) {
             if (state.containsValue(value.toString())) {
@@ -373,6 +389,12 @@ class _UpdateAddressState extends State<UpdateAddress> {
     Map<dynamic, dynamic> orderUpdateResponse;
 
     if (!_formKey.currentState.validate()) {
+      return;
+    }
+    if (selectedState == 'State') {
+      setState(() {
+        _stateEmpty = true;
+      });
       return;
     }
     _formKey.currentState.save();
@@ -401,9 +423,6 @@ class _UpdateAddressState extends State<UpdateAddress> {
       "state_id": _stateId,
       "country_id": '105'
     };
-
-    print("FIRST NAME BEING SENT ---> $_firstName");
-    print("LAST NAME BEING SENT ---> $_lastName");
 
     String profileAddressUrl = "address/update_address";
     Map<String, dynamic> profileAddressData = {
@@ -472,8 +491,7 @@ class _UpdateAddressState extends State<UpdateAddress> {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
       return FlatButton(
-        color: Colors.green,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        color: Colors.deepOrange,
         onPressed: () {
           submitAddress(model);
         },
@@ -509,5 +527,12 @@ class _UpdateAddressState extends State<UpdateAddress> {
             );
           });
         });
+  }
+
+  InputDecoration inputDecoration(String labelText) {
+    return InputDecoration(
+        labelText: labelText,
+        labelStyle: TextStyle(color: Colors.grey.shade500),
+        contentPadding: EdgeInsets.all(0.0));
   }
 }

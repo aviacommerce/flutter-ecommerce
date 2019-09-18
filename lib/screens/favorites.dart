@@ -63,12 +63,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       return Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
+          centerTitle: false,
           title: Text('Favorites'),
           actions: <Widget>[
-            Padding(
-                padding: EdgeInsets.only(
-                    right: MediaQuery.of(context).size.width * 0.01),
-                child: shoppingCartIconButton()),
+            shoppingCartIconButton(),
           ],
           bottom: _isLoading
               ? PreferredSize(
@@ -125,7 +123,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       height: MediaQuery.of(context).size.height,
       child: Stack(
         children: <Widget>[
-          Padding(
+          Container(
             padding: const EdgeInsets.only(top: 220.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -139,7 +137,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   height: 10.0,
                 ),
                 Text(
-                  'Welcome to Favorites',
+                  'No Previous Orders',
                   style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
@@ -149,25 +147,26 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 SizedBox(
                   height: 10.0,
                 ),
-                Text(
-                  'Shape, organize and shop all you\npet\'s favorite in one spot',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.black, fontSize: 16.0),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal:35.0, vertical: 5),
+                  child: Text(
+                    "Save, organize, and shop all your pet's favorites in one spot!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black, fontSize: 16.0),
+                  ),
                 ),
               ],
             ),
           ),
           Positioned(
-            bottom: 200,
-            right: 0,
-            left: 0,
+            bottom: 150,
             child: Container(
               width: MediaQuery.of(context).size.width,
               height: 40.0,
               child: Padding(
                 padding: const EdgeInsets.only(left: 30.0, right: 30.0),
                 child: RaisedButton(
-                    color: Colors.green,
+                    color: Colors.deepOrange,
                     onPressed: () {
                       // Navigator.pop(context);
                       Navigator.popUntil(context,

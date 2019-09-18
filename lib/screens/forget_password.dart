@@ -51,12 +51,12 @@ class _ForgetPasswordState extends State<ForgetPassword>
                 }),
             title: Text(
               'Forgot Password',
-              style: TextStyle(fontSize: 20, color: Colors.white),
+              style: TextStyle(fontSize: 22, color: Colors.white, fontWeight: FontWeight.w600, letterSpacing: 1),
             ),
           ),
           body: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 25),
               child: Container(
                 width: targetWidth,
                 child: Form(
@@ -67,15 +67,16 @@ class _ForgetPasswordState extends State<ForgetPassword>
                         height: 20.0,
                       ),
                       Text(
-                        'Please enter the email address used to create your account',
-                        style: TextStyle(fontSize: 16.0),
+                        'Please enter the email address used to create your account.',
+                        style: TextStyle(fontSize: 16.0, color: Colors.black87, fontWeight: FontWeight.w100, ),
                       ),
                       SizedBox(
-                        height: 20.0,
+                        height: 30.0,
                       ),
                       TextFormField(
                         decoration: InputDecoration(
                             labelText: 'Email',
+                            labelStyle: TextStyle(color: Colors.grey.shade500),
                             contentPadding: EdgeInsets.all(0.0)),
                         keyboardType: TextInputType.emailAddress,
                         validator: (String value) {
@@ -91,7 +92,7 @@ class _ForgetPasswordState extends State<ForgetPassword>
                         },
                       ),
                       SizedBox(
-                        height: 20.0,
+                        height: 50.0,
                       ),
                       _isLoader
                           ? CircularProgressIndicator(

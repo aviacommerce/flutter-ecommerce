@@ -89,7 +89,11 @@ class _OrderList extends State<OrderList> {
   Widget build(BuildContext context) {
     _deviceSize = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(title: Text('Order History'), actions: <Widget>[shoppingCartIconButton()],),
+      appBar: AppBar(
+        centerTitle: false,
+        title: Text('Order History'),
+        actions: <Widget>[shoppingCartIconButton()],
+      ),
       body: Padding(
           padding: const EdgeInsets.only(top: 3.0),
           child: Theme(
@@ -108,7 +112,8 @@ class _OrderList extends State<OrderList> {
                   }
                   if (!hasMore) {
                     return Padding(
-                      padding: EdgeInsets.symmetric(vertical: _deviceSize.height/2),
+                      padding: EdgeInsets.symmetric(
+                          vertical: _deviceSize.height / 2),
                       child: Center(
                           child: CircularProgressIndicator(
                         backgroundColor: Colors.white,
@@ -164,11 +169,16 @@ class _OrderList extends State<OrderList> {
       height: MediaQuery.of(context).size.height,
       child: Stack(
         children: <Widget>[
-          Padding(
+          Container(
             padding: const EdgeInsets.only(top: 220.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
+                Icon(
+                  Icons.card_giftcard,
+                  size: 80.0,
+                  color: Colors.grey,
+                ),
                 SizedBox(
                   height: 10.0,
                 ),
@@ -183,10 +193,10 @@ class _OrderList extends State<OrderList> {
                 SizedBox(
                   height: 10.0,
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal:35.0, vertical: 5),
                   child: Text(
-                    'We will save items you buy here for fast and\neasy shopping',
+                    'We will save items you buy here for fast and easy shopping',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.black, fontSize: 16.0),
                   ),
@@ -195,16 +205,14 @@ class _OrderList extends State<OrderList> {
             ),
           ),
           Positioned(
-            bottom: 100,
-            right: 0,
-            left: 0,
+            bottom: 150,
             child: Container(
               width: MediaQuery.of(context).size.width,
               height: 40.0,
               child: Padding(
                 padding: const EdgeInsets.only(left: 30.0, right: 30.0),
                 child: RaisedButton(
-                    color: Colors.orange,
+                    color: Colors.deepOrange,
                     onPressed: () {
                       // Navigator.pop(context);
                       Navigator.popUntil(context,

@@ -8,16 +8,9 @@ Widget orderDetailCard() {
     return model.order == null
         ? Container()
         : Container(
-            margin: EdgeInsets.all(15),
+            margin: EdgeInsets.all(10),
             child: Column(
               children: <Widget>[
-                /*Container(
-                  padding: EdgeInsets.all(10),
-                  child: Text(
-                    model.order.totalQuantity.toString() + ' items',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),*/
                 amountRow('Subtotal:', model.order.displaySubTotal, model,
                     Colors.grey.shade700),
                 amountRow('Shipping:', model.order.shipTotal, model,

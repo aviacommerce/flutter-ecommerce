@@ -83,9 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(fontFamily: 'HolyFat', fontSize: 50),
               )),
           actions: <Widget>[
-            Padding(
-                padding: EdgeInsets.only(right: _deviceSize.width * 0.01),
-                child: shoppingCartIconButton()),
+            shoppingCartIconButton(),
           ],
           bottom: PreferredSize(
             preferredSize: Size(_deviceSize.width, 70),
@@ -216,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ]))
                 : SliverToBoxAdapter(
                     child: Container(
-                      height: _deviceSize.height * 0.47,
+                      height: 355,
                       child: ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: todaysDealProducts.length,

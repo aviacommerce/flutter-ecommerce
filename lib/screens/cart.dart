@@ -37,6 +37,7 @@ class _CartState extends State<Cart> {
       return Scaffold(
           backgroundColor: Colors.grey.shade200,
           appBar: AppBar(
+              centerTitle: false,
               leading: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () => Navigator.of(context).pop(),
@@ -111,7 +112,7 @@ class _CartState extends State<Cart> {
               style: total
                   ? TextStyle(
                       fontSize: 15,
-                      color: Colors.grey.shade600,
+                      color: Colors.grey.shade700,
                       fontWeight: FontWeight.bold)
                   : TextStyle(
                       fontSize: 16.5,
@@ -215,9 +216,9 @@ class _CartState extends State<Cart> {
                           Stack(
                             children: <Widget>[
                               Container(
-                                padding: EdgeInsets.all(10),
+                                padding: EdgeInsets.all(15),
                                 height: 150,
-                                width: 85,
+                                width: 100,
                                 color: Colors.white,
                                 child: FadeInImage(
                                   image: NetworkImage(
@@ -241,47 +242,54 @@ class _CartState extends State<Cart> {
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: <Widget>[
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            right: 10.0, top: 10.0),
-                                        child: RichText(
-                                          text: TextSpan(children: [
-                                            TextSpan(
-                                              text:
-                                                  '${model.lineItems[index].variant.name.split(' ')[0]} ',
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 16.0,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            TextSpan(
-                                              text: model
-                                                  .lineItems[index].variant.name
-                                                  .substring(
-                                                      model.lineItems[index]
-                                                              .variant.name
-                                                              .split(' ')[0]
-                                                              .length +
-                                                          1,
-                                                      model.lineItems[index]
-                                                          .variant.name.length),
-                                              style: TextStyle(
-                                                  fontSize: 15,
-                                                  color: Colors.black),
-                                            ),
-                                          ]),
-                                        ),
+                                    // Expanded(
+                                    // child:
+                                    Container(
+                                      padding: EdgeInsets.only(top: 10),
+                                      width: 150,
+                                      child: RichText(
+                                        text: TextSpan(children: [
+                                          TextSpan(
+                                            text:
+                                                '${model.lineItems[index].variant.name.split(' ')[0]} ',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18.0,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          TextSpan(
+                                            text: model
+                                                .lineItems[index].variant.name
+                                                .substring(
+                                                    model.lineItems[index]
+                                                            .variant.name
+                                                            .split(' ')[0]
+                                                            .length +
+                                                        1,
+                                                    model.lineItems[index]
+                                                        .variant.name.length),
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w100,
+                                                color: Colors.black),
+                                          ),
+                                        ]),
                                       ),
                                     ),
-                                    IconButton(
-                                      color: Colors.grey,
-                                      icon: Icon(Icons.clear),
-                                      onPressed: () {
-                                        model.removeProduct(
-                                            model.lineItems[index].id);
-                                      },
-                                    ),
+                                    // ),
+                                    Expanded(
+                                      child: Container(
+                                        child: IconButton(
+                                          iconSize: 28,
+                                          color: Colors.grey,
+                                          icon: Icon(Icons.close),
+                                          onPressed: () {
+                                            model.removeProduct(
+                                                model.lineItems[index].id);
+                                          },
+                                        ),
+                                      ),
+                                    )
                                   ],
                                 ),
                               ),

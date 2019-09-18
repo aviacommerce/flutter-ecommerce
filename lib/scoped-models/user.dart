@@ -46,14 +46,13 @@ mixin UserModel on Model {
         Settings.SERVER_URL + 'api/v1/users/${prefs.getInt('id')}',
         headers: headers);
     responseBody = json.decode(response.body);
-    print("AUTH ADDRESS $responseBody");
     if (responseBody['ship_address'] != null) {
-      print("Address Available");
       _shipAddress = Address(
         id: responseBody['ship_address']['id'],
         firstName: responseBody['ship_address']['firstname'],
         lastName: responseBody['ship_address']['lastname'],
-        state: responseBody['ship_address']['state']['name'],
+        stateName: responseBody['ship_address']['state']['name'],
+        stateAbbr: responseBody['ship_address']['state']['abbr'],
         address2: responseBody['ship_address']['address2'],
         city: responseBody['ship_address']['city'],
         address1: responseBody['ship_address']['address1'],
@@ -61,6 +60,7 @@ mixin UserModel on Model {
         pincode: responseBody['ship_address']['zipcode'],
         stateId: responseBody['ship_address']['state_id'],
       );
+      notifyListeners();
     } else {
       _shipAddress = null;
     }

@@ -22,7 +22,7 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                   Stack(
                     children: <Widget>[
                       Container(
-                        height: 150,
+                        height: 100,
                         width: 150,
                         color: Colors.white,
                         child: FadeInImage(
@@ -97,7 +97,7 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                             : Container(),
                       ],
                     ),
-                    SizedBox(height: 15),
+                    SizedBox(height: 7),
                     Container(
                       alignment: Alignment.topLeft,
                       child: Padding(
@@ -106,11 +106,11 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                           textAlign: TextAlign.start,
                           text: TextSpan(children: [
                             TextSpan(
-                              text: 'Free 1-2 Day ',
+                              text: 'FREE 1-2 Day ',
                               style: TextStyle(
                                   color: Colors.black,
-                                  fontSize: 14.0,
-                                  fontWeight: FontWeight.bold),
+                                  fontSize: 10.0,
+                                  fontWeight: FontWeight.w600),
                             ),
                             TextSpan(
                               text: double.parse(product.price) < 699
@@ -123,7 +123,7 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                         ),
                       ),
                     ),
-                    SizedBox(height: 15),
+                    SizedBox(height: 7),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
@@ -134,6 +134,7 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                         Text(product.reviewsCount),
                       ],
                     ),
+                    SizedBox(height: 10,)
                   ],
                 ),
               ),
