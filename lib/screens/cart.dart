@@ -131,63 +131,67 @@ class _CartState extends State<Cart> {
           width: MediaQuery.of(context).size.width,
           height: 58.0,
           padding: EdgeInsets.all(10),
-          child: FlatButton(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-            color: Colors.deepOrange,
-            child: Text(
-              model.order == null
-                  ? 'BROWSE ITEMS'
-                  : model.order.itemTotal == '0.0'
-                      ? 'BROWSE ITEMS'
-                      : 'PROCEED TO CHECKOUT',
-              style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w300),
-            ),
-            onPressed: () async {
-              if (model.order != null) {
-                if (model.order.itemTotal != '0.0') {
-                  if (model.isAuthenticated) {
-                    if (model.order.state == 'cart') {
-                      print('STATE IS CART, CHANGE');
-                      bool _stateischanged = await model.changeState();
-                      if (_stateischanged) {
-                        if (model.order.state == 'address') {
-                          print(
-                              'DELIVERY, CHANGING STATE BEFORE GOING TO ADDRESS');
-                          _stateischanged = await model.changeState();
+          child: model.isLoading
+              ? Center(
+                  child: CircularProgressIndicator(backgroundColor: Colors.green,),
+                )
+              : FlatButton(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(2)),
+                  color: Colors.deepOrange,
+                  child: Text(
+                    model.order == null
+                        ? 'BROWSE ITEMS'
+                        : model.order.itemTotal == '0.0'
+                            ? 'BROWSE ITEMS'
+                            : 'PROCEED TO CHECKOUT',
+                    style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w300),
+                  ),
+                  onPressed: () async {
+                    if (model.order != null) {
+                      if (model.order.itemTotal != '0.0') {
+                        if (model.isAuthenticated) {
+                          if (model.order.state == 'cart') {
+                            print('STATE IS CART, CHANGE');
+                            bool _stateischanged = await model.changeState();
+                            if (_stateischanged) {
+                              if (model.order.state == 'address') {
+                                print(
+                                    'DELIVERY, CHANGING STATE BEFORE GOING TO ADDRESS');
+                                _stateischanged = await model.changeState();
+                              }
+                            }
+                            setState(() {
+                              stateChanged = _stateischanged;
+                            });
+                          }
+                          if (stateChanged) {
+                            // print('STATE IS CHANGED, FETCH CURRENT ORDER');
+                            // model.fetchCurrentOrder();
+                            MaterialPageRoute addressRoute = MaterialPageRoute(
+                                builder: (context) => AddressPage(
+                                      lineItems: model.lineItems,
+                                    ));
+                            Navigator.push(context, addressRoute);
+                          }
+                        } else {
+                          MaterialPageRoute authRoute = MaterialPageRoute(
+                              builder: (context) => Authentication(0));
+                          Navigator.push(context, authRoute);
                         }
+                      } else {
+                        Navigator.popUntil(context,
+                            ModalRoute.withName(Navigator.defaultRouteName));
                       }
-                      setState(() {
-                        stateChanged = _stateischanged;
-                      });
+                    } else {
+                      Navigator.popUntil(context,
+                          ModalRoute.withName(Navigator.defaultRouteName));
                     }
-                    if (stateChanged) {
-                      // print('STATE IS CHANGED, FETCH CURRENT ORDER');
-                      // model.fetchCurrentOrder();
-                      MaterialPageRoute addressRoute = MaterialPageRoute(
-                          builder: (context) => AddressPage(
-                                lineItems: model.lineItems,
-                              ));
-                      Navigator.push(context, addressRoute);
-                    }
-                  } else {
-                    MaterialPageRoute authRoute = MaterialPageRoute(
-                        builder: (context) => Authentication(0));
-                    Navigator.push(context, authRoute);
-                  }
-                } else {
-                  Navigator.popUntil(
-                      context, ModalRoute.withName(Navigator.defaultRouteName));
-                }
-              } else {
-                Navigator.popUntil(
-                    context, ModalRoute.withName(Navigator.defaultRouteName));
-              }
-            },
-          ),
+                  },
+                ),
         ),
       );
     });

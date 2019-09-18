@@ -111,14 +111,12 @@ class _OrderList extends State<OrderList> {
                     return noProductFoundWidget();
                   }
                   if (!hasMore) {
-                    return Padding(
-                      padding: EdgeInsets.symmetric(
-                          vertical: _deviceSize.height / 2),
-                      child: Center(
-                          child: CircularProgressIndicator(
-                        backgroundColor: Colors.white,
-                      )),
-                    );
+                    return Container(
+                        height: _deviceSize.height,
+                        child: Center(
+                            child: CircularProgressIndicator(
+                          backgroundColor: Colors.white,
+                        )));
                   } else {
                     return Container();
                   }
@@ -136,7 +134,6 @@ class _OrderList extends State<OrderList> {
   }
 
   Widget orderItem(BuildContext context, Order order, int index) {
-    print(order.completedAt);
     if (order.completedAt != null) {
       return GestureDetector(
         onTap: () {
@@ -194,7 +191,8 @@ class _OrderList extends State<OrderList> {
                   height: 10.0,
                 ),
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal:35.0, vertical: 5),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 35.0, vertical: 5),
                   child: Text(
                     'We will save items you buy here for fast and easy shopping',
                     textAlign: TextAlign.center,
