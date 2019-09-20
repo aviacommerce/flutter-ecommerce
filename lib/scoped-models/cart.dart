@@ -142,7 +142,7 @@ mixin CartModel on Model {
         id: responseBody['data']['included']['id'],
         name: responseBody['data']['attributes']['name'],
         displayPrice: responseBody['data']['attributes']['display_price'],
-        price: responseBody['data']['attributes']['display_price'],
+        price: responseBody['data']['attributes']['price'],
         currencySymbol: responseBody['data']['attributes']['currency_symbol'],
         costPrice: responseBody['data']['attributes']['cost_price'],
         avgRating:
@@ -246,7 +246,8 @@ mixin CartModel on Model {
     });
   }
 
-  fetchCurrentOrder() async {
+  Future<bool> fetchCurrentOrder() async {
+    print("FETCH CURRENT ORDER");
     // _isLoading = true;
     notifyListeners();
     Map<dynamic, dynamic> responseBody;
@@ -266,9 +267,11 @@ mixin CartModel on Model {
       url = 'api/v1/orders/current';
     }
 
-    if (url != '') {
-      _lineItems.clear();
-      http.get(Settings.SERVER_URL + url, headers: headers).then((response) {
+    try {
+      if (url != '') {
+        _lineItems.clear();
+        http.Response response =
+            await http.get(Settings.SERVER_URL + url, headers: headers);
         responseBody = json.decode(response.body);
         responseBody['line_items'].forEach((lineItem) {
           variant = Variant(
@@ -277,8 +280,7 @@ mixin CartModel on Model {
               name: lineItem['variant']['name'],
               quantity: lineItem['quantity'],
               isBackOrderable: lineItem['variant']['is_backorderable'],
-              totalOnHand: lineItem['variant']['total_on_hand']
-              );
+              totalOnHand: lineItem['variant']['total_on_hand']);
 
           lineItem = LineItem(
               id: lineItem['id'],
@@ -326,11 +328,18 @@ mixin CartModel on Model {
         prefs.setString('orderToken', responseBody['token']);
         prefs.setString('orderNumber', responseBody['number']);
         notifyListeners();
-      });
-    } else {
-      _lineItems = [];
+      } else {
+        _lineItems = [];
+      }
+      print("SHIPPING TOTAL AFTER FCO ${_order.displayTotal}",);
+
+      print("SHIPPING TOTAL AFTER FCO ${_order.shipTotal}",);
+      return true;
+    } catch (error) {
+      _isLoading = false;
+      notifyListeners();
+      return false;
     }
-    return true;
   }
 
   Future<bool> changeState() async {

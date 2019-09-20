@@ -296,6 +296,7 @@ class _HomeDrawer extends State<HomeDrawer> {
         .get(Settings.SERVER_URL + 'logout.json', headers: headers)
         .then((response) {
       prefs.clear();
+      model.clearData();
       model.loggedInUser();
       model.fetchCurrentOrder();
     });

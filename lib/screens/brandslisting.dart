@@ -16,6 +16,7 @@ import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:ofypets_mobile_app/widgets/product_container.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:ofypets_mobile_app/utils/headers.dart';
 
 class BrandList extends StatefulWidget {
   @override
@@ -211,94 +212,30 @@ class _BrandListState extends State<BrandList> {
     List<Product> variants = [];
     List<OptionValue> optionValues = [];
     List<OptionType> optionTypes = [];
-    final response = (await http.get(Settings.SERVER_URL +
-            'api/v1/taxons/products?id=$brandId&page=$currentPage&per_page=$perPage&data_set=small'))
+    Map<String, String> headers = await getHeaders();
+    print(
+        "GET PRODUCTS BY BRAND +${Settings.SERVER_URL + 'api/v1/taxons/products?id=$brandId&page=$currentPage&per_page=$perPage&data_set=small'}");
+    final response = (await http.get(
+            Settings.SERVER_URL +
+                'api/v1/taxons/products?id=$brandId&page=$currentPage&per_page=$perPage&data_set=small',
+            headers: headers))
         .body;
     currentPage++;
     responseBody = json.decode(response);
-    responseBody['products'].forEach((product) {
-      print('---------TAXON ID---------');
-      print(product['taxon_ids'].first);
-      int reviewProductId = product["id"];
-      variants = [];
-      if (product['has_variants']) {
-        product['variants'].forEach((variant) {
-          optionValues = [];
-          optionTypes = [];
-          variant['option_values'].forEach((option) {
-            setState(() {
-              optionValues.add(OptionValue(
-                id: option['id'],
-                name: option['name'],
-                optionTypeId: option['option_type_id'],
-                optionTypeName: option['option_type_name'],
-                optionTypePresentation: option['option_type_presentation'],
-              ));
-            });
-          });
-          setState(() {
-            variants.add(Product(
-                slug: variant['slug'],
-                id: variant['id'],
-                name: variant['name'],
-                description: variant['description'],
-                price: variant['price'],
-                optionValues: optionValues,
-                displayPrice: variant['display_price'],
-                costPrice: variant['cost_price'],
-                image: variant['images'][0]['product_url'],
-                isOrderable: variant['is_orderable'],
-                avgRating: double.parse(product['avg_rating']),
-                reviewsCount: product['reviews_count'].toString(),
-                reviewProductId: reviewProductId));
-          });
-        });
-        product['option_types'].forEach((optionType) {
-          setState(() {
-            optionTypes.add(OptionType(
-                id: optionType['id'],
-                name: optionType['name'],
-                position: optionType['position'],
-                presentation: optionType['presentation']));
-          });
-        });
-        setState(() {
-          productsByBrand.add(Product(
-              slug: product['slug'],
-              taxonId: product['taxon_ids'].first,
-              id: product['id'],
-              price: product['price'],
-              name: product['name'],
-              displayPrice: product['display_price'],
-              avgRating: double.parse(product['avg_rating']),
-              reviewsCount: product['reviews_count'].toString(),
-              image: product['master']['images'][0]['product_url'],
-              variants: variants,
-              reviewProductId: reviewProductId,
-              hasVariants: product['has_variants'],
-              optionTypes: optionTypes));
-        });
-      } else {
-        setState(() {
-          productsByBrand.add(Product(
-            slug: product['slug'],
-            taxonId: product['taxon_ids'].first,
-            id: product['id'],
-            name: product['name'],
-            displayPrice: product['display_price'],
-            costPrice: product['cost_price'],
-            avgRating: double.parse(product['avg_rating']),
-            reviewsCount: product['reviews_count'].toString(),
-            image: product['master']['images'][0]['product_url'],
-            hasVariants: product['has_variants'],
-            price: product['price'],
-            isOrderable: product['master']['is_orderable'],
-            reviewProductId: reviewProductId,
-            description: product['description'],
-          ));
-        });
-      }
-    });
+      responseBody['data'].forEach((product) {
+        productsByBrand.add(Product(
+            reviewProductId: product['id'],
+            name: product['attributes']['name'],
+            image: product['attributes']['product_url'],
+            currencySymbol: product['attributes']['currency_symbol'],
+            displayPrice: product['attributes']['currency_symbol'] +
+                product['attributes']['price'],
+            price: product['attributes']['price'],
+            costPrice: product['attributes']['cost_price'],
+            slug: product['attributes']['slug'],
+            avgRating: double.parse(product['attributes']['avg_rating']),
+            reviewsCount: product['attributes']['reviews_count'].toString()));
+      });
     return productsByBrand;
     /*setState(() {
         _isLoading = false;
@@ -316,4 +253,6 @@ class _BrandListState extends State<BrandList> {
       return Future<bool>.value(false);
     }
   }
+
+  
 }

@@ -221,7 +221,7 @@ class _AccountState extends State<Account> {
         .get(Settings.SERVER_URL + 'logout.json', headers: headers)
         .then((response) {
       prefs.clear();
-      model.shipAddress = Address();
+      model.clearData();
       model.loggedInUser();
       model.fetchCurrentOrder();
     });

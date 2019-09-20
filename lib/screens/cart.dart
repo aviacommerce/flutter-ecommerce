@@ -15,7 +15,7 @@ class Cart extends StatefulWidget {
 
 class _CartState extends State<Cart> {
   List<int> quantities = [];
-  bool stateChanged = true;
+  bool stateChanged = false;
   static const _ITEM_HEIGHT = 40;
   @override
   void initState() {
@@ -101,7 +101,7 @@ class _CartState extends State<Cart> {
             : model.order.itemTotal == '0.0'
                 ? ''
                 : total
-                    ? 'Cart SubTotal: (${model.order.totalQuantity} items): '
+                    ? 'Cart SubTotal (${model.order.totalQuantity} items): '
                     : model.order.displaySubTotal;
       }
 
@@ -133,7 +133,9 @@ class _CartState extends State<Cart> {
           padding: EdgeInsets.all(10),
           child: model.isLoading
               ? Center(
-                  child: CircularProgressIndicator(backgroundColor: Colors.green,),
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.green,
+                  ),
                 )
               : FlatButton(
                   shape: RoundedRectangleBorder(
@@ -151,6 +153,7 @@ class _CartState extends State<Cart> {
                         fontWeight: FontWeight.w300),
                   ),
                   onPressed: () async {
+                    print("MODEL ORDER STATE ___________ ${model.order.state}");
                     if (model.order != null) {
                       if (model.order.itemTotal != '0.0') {
                         if (model.isAuthenticated) {
@@ -167,15 +170,28 @@ class _CartState extends State<Cart> {
                             setState(() {
                               stateChanged = _stateischanged;
                             });
-                          }
-                          if (stateChanged) {
-                            // print('STATE IS CHANGED, FETCH CURRENT ORDER');
-                            // model.fetchCurrentOrder();
-                            MaterialPageRoute addressRoute = MaterialPageRoute(
-                                builder: (context) => AddressPage(
-                                      lineItems: model.lineItems,
-                                    ));
-                            Navigator.push(context, addressRoute);
+                            if (stateChanged) {
+                              // print('STATE IS CHANGED, FETCH CURRENT ORDER');
+                              // model.fetchCurrentOrder();
+                              MaterialPageRoute addressRoute =
+                                  MaterialPageRoute(
+                                      builder: (context) => AddressPage());
+                              Navigator.push(context, addressRoute);
+                            } else {
+                              print("FETCH CURRENT ORDER ERROR");
+                            }
+                          } else {
+                            stateChanged = await model.fetchCurrentOrder();
+                            if (stateChanged) {
+                              // print('STATE IS CHANGED, FETCH CURRENT ORDER');
+                              // model.fetchCurrentOrder();
+                              MaterialPageRoute addressRoute =
+                                  MaterialPageRoute(
+                                      builder: (context) => AddressPage());
+                              Navigator.push(context, addressRoute);
+                            } else {
+                              print("FETCH CURRENT ORDER ERROR");
+                            }
                           }
                         } else {
                           MaterialPageRoute authRoute = MaterialPageRoute(
@@ -258,7 +274,7 @@ class _CartState extends State<Cart> {
                                                 '${model.lineItems[index].variant.name.split(' ')[0]} ',
                                             style: TextStyle(
                                                 color: Colors.black,
-                                                fontSize: 18.0,
+                                                fontSize: 15.0,
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           TextSpan(
@@ -273,7 +289,7 @@ class _CartState extends State<Cart> {
                                                     model.lineItems[index]
                                                         .variant.name.length),
                                             style: TextStyle(
-                                                fontSize: 18,
+                                                fontSize: 15,
                                                 fontWeight: FontWeight.w100,
                                                 color: Colors.black),
                                           ),
@@ -281,19 +297,21 @@ class _CartState extends State<Cart> {
                                       ),
                                     ),
                                     // ),
-                                    Expanded(
-                                      child: Container(
-                                        child: IconButton(
-                                          iconSize: 28,
-                                          color: Colors.grey,
-                                          icon: Icon(Icons.close),
-                                          onPressed: () {
-                                            model.removeProduct(
-                                                model.lineItems[index].id);
-                                          },
-                                        ),
+                                    // Expanded(
+                                    // child:
+                                    Container(
+                                      padding: EdgeInsets.only(top: 0),
+                                      child: IconButton(
+                                        iconSize: 24,
+                                        color: Colors.grey,
+                                        icon: Icon(Icons.close),
+                                        onPressed: () {
+                                          model.removeProduct(
+                                              model.lineItems[index].id);
+                                        },
                                       ),
-                                    )
+                                    ),
+                                    // )
                                   ],
                                 ),
                               ),
@@ -311,7 +329,7 @@ class _CartState extends State<Cart> {
                               ),
                               SizedBox(height: 12),
                               quantityRow(model, index),
-                              SizedBox(height: 12),
+                              SizedBox(height: 3),
                               Divider()
                             ],
                           )),

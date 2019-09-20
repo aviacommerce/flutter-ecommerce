@@ -172,20 +172,11 @@ class _ProductSearchState extends State<ProductSearch> {
                 child: isSearched && !model.isLoading
                     ? Theme(
                         data: ThemeData(primarySwatch: Colors.green),
-                        child: ListView.separated(
-                            separatorBuilder: (context, index) {
-                              return Divider(
-                                indent: 150.0,
-                                color: Colors.grey.shade400,
-                                height: 0.5,
-                              );
-                            },
+                        child: ListView.builder(
                             controller: scrollController,
                             itemCount: searchProducts.length + 1,
                             itemBuilder: (mainContext, index) {
                               if (index < searchProducts.length) {
-                                // return favoriteCard(
-                                //     context, searchProducts[index], index);
                                 return productContainer(
                                     _scaffoldKey.currentContext,
                                     searchProducts[index],
@@ -359,13 +350,9 @@ class _ProductSearchState extends State<ProductSearch> {
           Expanded(
             child: Theme(
                 data: ThemeData(primarySwatch: Colors.green),
-                child: ListView.separated(
+                child: ListView.builder(
                   shrinkWrap: true,
                   padding: EdgeInsets.all(8.0),
-                  separatorBuilder: (context, index) => Divider(
-                    color: Colors.grey,
-                    // height: 1.0,
-                  ),
                   itemBuilder: (BuildContext context, int index) {
                     return GestureDetector(
                         onTap: () {

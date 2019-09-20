@@ -13,8 +13,7 @@ import 'package:ofypets_mobile_app/utils/constants.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class AddressPage extends StatefulWidget {
-  List<LineItem> lineItems = [];
-  AddressPage({this.lineItems});
+  AddressPage();
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -159,7 +158,7 @@ class _AddressPageState extends State<AddressPage> {
                             fontWeight: FontWeight.w100),
                       ),
                     ),
-                    items(),
+                    items(model.lineItems),
                     orderDetailCard(),
                     Divider(
                       indent: 20,
@@ -199,9 +198,7 @@ class _AddressPageState extends State<AddressPage> {
                   'PLACE ORDER',
                   style: TextStyle(
                       fontSize: 15,
-                      color: model.shipAddress == null
-                          ? Colors.grey.shade400
-                          : Colors.white,
+                      color:  Colors.white,
                       fontWeight: FontWeight.w300),
                 ),
                 onPressed: model.order.shipAddress != null
@@ -517,9 +514,9 @@ class _AddressPageState extends State<AddressPage> {
             ])));
   }
 
-  Widget items() {
+  Widget items(List<LineItem> lineItems) {
     return ListView.builder(
-      itemCount: widget.lineItems.length,
+      itemCount: lineItems.length,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (BuildContext context, int index) {
@@ -548,7 +545,7 @@ class _AddressPageState extends State<AddressPage> {
                               color: Colors.white,
                               child: FadeInImage(
                                 image: NetworkImage(
-                                    widget.lineItems[index].variant.image),
+                                    lineItems[index].variant.image),
                                 placeholder: AssetImage(
                                     'images/placeholders/no-product-image.png'),
                               ),
@@ -579,22 +576,21 @@ class _AddressPageState extends State<AddressPage> {
                                           text: TextSpan(children: [
                                             TextSpan(
                                               text:
-                                                  '${widget.lineItems[index].variant.name.split(' ')[0]} ',
+                                                  '${lineItems[index].variant.name.split(' ')[0]} ',
                                               style: TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 16.0,
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             TextSpan(
-                                              text: widget
-                                                  .lineItems[index].variant.name
+                                              text: lineItems[index].variant.name
                                                   .substring(
-                                                      widget.lineItems[index]
+                                                      lineItems[index]
                                                               .variant.name
                                                               .split(' ')[0]
                                                               .length +
                                                           1,
-                                                      widget.lineItems[index]
+                                                      lineItems[index]
                                                           .variant.name.length),
                                               style: TextStyle(
                                                   fontSize: 15,
@@ -617,7 +613,7 @@ class _AddressPageState extends State<AddressPage> {
                                         MainAxisAlignment.spaceBetween,
                                     children: <Widget>[
                                       Text(
-                                        'Qty: ${widget.lineItems[index].quantity.toString()}',
+                                        'Qty: ${lineItems[index].quantity.toString()}',
                                         textAlign: TextAlign.left,
                                         style: TextStyle(
                                             color: Colors.grey.shade700,
@@ -628,7 +624,7 @@ class _AddressPageState extends State<AddressPage> {
                                         padding: EdgeInsets.only(right: 24.0),
                                         alignment: Alignment.topLeft,
                                         child: Text(
-                                          widget.lineItems[index].variant
+                                          lineItems[index].variant
                                               .displayPrice,
                                           textAlign: TextAlign.left,
                                           style: TextStyle(

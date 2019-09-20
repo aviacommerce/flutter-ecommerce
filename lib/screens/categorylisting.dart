@@ -16,6 +16,7 @@ import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:ofypets_mobile_app/widgets/product_container.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:ofypets_mobile_app/utils/headers.dart';
 
 class CategoryListing extends StatefulWidget {
   final String categoryName;
@@ -412,14 +413,7 @@ class _CategoryListingState extends State<CategoryListing> {
           data: ThemeData(primarySwatch: Colors.green),
           child: Padding(
             padding: const EdgeInsets.only(top: 50.0),
-            child: ListView.separated(
-                separatorBuilder: (context, index) {
-                  return Divider(
-                    indent: 150.0,
-                    color: Colors.grey.shade400,
-                    height: 1.0,
-                  );
-                },
+            child: ListView.builder(
                 controller: scrollController,
                 itemCount: productsByCategory.length + 1,
                 itemBuilder: (context, index) {
@@ -485,7 +479,7 @@ class _CategoryListingState extends State<CategoryListing> {
         child: Text(
           text,
           style: TextStyle(
-              color:level == 2?Colors.white: Colors.white60,
+              color: level == 2 ? Colors.white : Colors.white60,
               fontSize: 18,
               fontWeight: level == 2 ? FontWeight.w500 : fontWeight),
         ));
@@ -604,6 +598,7 @@ class _CategoryListingState extends State<CategoryListing> {
     List<Product> variants = [];
     List<OptionValue> optionValues = [];
     List<OptionType> optionTypes = [];
+    Map<String, String> headers = await getHeaders();
     print(
         "CATEGORY URL + ${Settings.SERVER_URL + 'api/v1/taxons/products?id=$subCatId&page=$currentPage&per_page=$perPage&q[s]=$sortBy&data_set=small'}");
     setState(() {
@@ -612,12 +607,16 @@ class _CategoryListingState extends State<CategoryListing> {
     var response;
 
     if (sortBy != null && sortBy.length > 0) {
-      response = (await http.get(Settings.SERVER_URL +
-              'api/v1/taxons/products?id=$subCatId&page=$currentPage&per_page=$perPage&q[s]=$sortBy&data_set=small'))
+      response = (await http.get(
+              Settings.SERVER_URL +
+                  'api/v1/taxons/products?id=$subCatId&page=$currentPage&per_page=$perPage&q[s]=$sortBy&data_set=small',
+              headers: headers))
           .body;
     } else {
-      response = (await http.get(Settings.SERVER_URL +
-              'api/v1/taxons/products?id=$subCatId&page=$currentPage&per_page=$perPage&data_set=small'))
+      response = (await http.get(
+              Settings.SERVER_URL +
+                  'api/v1/taxons/products?id=$subCatId&page=$currentPage&per_page=$perPage&data_set=small',
+              headers: headers))
           .body;
     }
     print(Settings.SERVER_URL +
@@ -625,87 +624,20 @@ class _CategoryListingState extends State<CategoryListing> {
     currentPage++;
     responseBody = json.decode(response);
     print(responseBody);
-    totalCount = responseBody['total_count'];
-    responseBody['products'].forEach((product) {
-      int reviewProductId = product["id"];
-      variants = [];
-      if (product['has_variants']) {
-        product['variants'].forEach((variant) {
-          optionValues = [];
-          optionTypes = [];
-          variant['option_values'].forEach((option) {
-            setState(() {
-              optionValues.add(OptionValue(
-                id: option['id'],
-                name: option['name'],
-                optionTypeId: option['option_type_id'],
-                optionTypeName: option['option_type_name'],
-                optionTypePresentation: option['option_type_presentation'],
-              ));
-            });
-          });
-
-          setState(() {
-            variants.add(Product(
-                slug: variant['slug'],
-                id: variant['id'],
-                price: variant['price'],
-                name: variant['name'],
-                description: variant['description'],
-                optionValues: optionValues,
-                displayPrice: variant['display_price'],
-                image: variant['images'][0]['product_url'],
-                isOrderable: variant['is_orderable'],
-                avgRating: double.parse(product['avg_rating']),
-                reviewsCount: product['reviews_count'].toString(),
-                reviewProductId: reviewProductId));
-          });
-        });
-        product['option_types'].forEach((optionType) {
-          setState(() {
-            optionTypes.add(OptionType(
-                id: optionType['id'],
-                name: optionType['name'],
-                position: optionType['position'],
-                presentation: optionType['presentation']));
-          });
-        });
-
-        setState(() {
-          productsByCategory.add(Product(
-              slug: product['slug'],
-              taxonId: product['taxon_ids'].first,
-              id: product['id'],
-              name: product['name'],
-              price: product['price'],
-              displayPrice: product['display_price'],
-              avgRating: double.parse(product['avg_rating']),
-              reviewsCount: product['reviews_count'].toString(),
-              image: product['master']['images'][0]['product_url'],
-              variants: variants,
-              reviewProductId: reviewProductId,
-              hasVariants: product['has_variants'],
-              optionTypes: optionTypes));
-        });
-      } else {
-        setState(() {
-          productsByCategory.add(Product(
-            slug: product['slug'],
-            taxonId: product['taxon_ids'].first,
-            id: product['id'],
-            name: product['name'],
-            price: product['price'],
-            displayPrice: product['display_price'],
-            avgRating: double.parse(product['avg_rating']),
-            reviewsCount: product['reviews_count'].toString(),
-            image: product['master']['images'][0]['product_url'],
-            hasVariants: product['has_variants'],
-            isOrderable: product['master']['is_orderable'],
-            reviewProductId: reviewProductId,
-            description: product['description'],
-          ));
-        });
-      }
+    totalCount = responseBody['pagination']['total_count'];
+    responseBody['data'].forEach((product) {
+      productsByCategory.add(Product(
+          reviewProductId: product['id'],
+          name: product['attributes']['name'],
+          image: product['attributes']['product_url'],
+          currencySymbol: product['attributes']['currency_symbol'],
+          displayPrice: product['attributes']['currency_symbol'] +
+              product['attributes']['price'],
+          price: product['attributes']['price'],
+          costPrice: product['attributes']['cost_price'],
+          slug: product['attributes']['slug'],
+          avgRating: double.parse(product['attributes']['avg_rating']),
+          reviewsCount: product['attributes']['reviews_count'].toString()));
     });
 
     setState(() {
