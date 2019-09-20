@@ -134,7 +134,14 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
                         Text(product.reviewsCount),
                       ],
                     ),
-                    SizedBox(height: 10,)
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Divider(
+                      // indent: 150.0,
+                      color: Colors.grey.shade400,
+                      height: 1.0,
+                    )
                   ],
                 ),
               ),
@@ -145,6 +152,8 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
 }
 
 Widget discountPrice(Product product) {
+  print(
+      "DISCOUNT???????? ${double.parse(product.costPrice) - double.parse(product.price) > 0}");
   if (double.parse(product.costPrice) - double.parse(product.price) > 0) {
     return Container(
       margin: EdgeInsets.only(left: 10),

@@ -7,6 +7,7 @@ import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
 import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:ofypets_mobile_app/utils/params.dart';
 import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:ofypets_mobile_app/widgets/order_details_card.dart';
 import 'package:ofypets_mobile_app/widgets/snackbar.dart';
 import 'package:ofypets_mobile_app/screens/update_address.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -74,9 +75,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
         body: _isLoading
             ? Container()
             : ListView.builder(
-                itemCount: model.paymentMethods.length,
+                itemCount: model.paymentMethods.length + 1,
                 itemBuilder: (BuildContext context, int index) {
-                  return paymentMethodsRadioButton(index);
+                  if (index == 2) {
+                    print("SHOW ORDER DETAIL CARD ${model.paymentMethods.length}");
+                    return Padding(padding: EdgeInsets.only(top: 200),child: orderDetailCard());
+                  } else {
+                    return paymentMethodsRadioButton(index);
+                  }
+                  // print("INDEXXX $index");
                 },
               ),
         bottomNavigationBar: !_isLoading ? paymentButton(context) : Container(),

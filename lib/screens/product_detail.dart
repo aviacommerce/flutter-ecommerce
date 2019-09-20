@@ -802,19 +802,21 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               SizedBox(
                 height: 18,
               ),
-              Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.all(10),
-                child: Text(
-                  'Size ',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontFamily: fontFamily,
-                  ),
-                ),
-              ),
+              widget.product.hasVariants
+                  ? Container(
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.all(10),
+                      child: Text(
+                        'Size ',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontFamily: fontFamily,
+                        ),
+                      ),
+                    )
+                  : Container(),
               // variantRow(),
-              variantDropDown(),
+              widget.product.hasVariants ? variantDropDown() : Container(),
               // variantDialog(),
               SizedBox(
                 height: 18,
@@ -935,7 +937,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                                 // fontWeight: FontWeight.w600,
                                 color: Colors.black)),
                       )),
-                  model.isLoading ? LinearProgressIndicator() : Container()
                 ],
               ),
               _isLoading

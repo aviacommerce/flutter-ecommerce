@@ -102,10 +102,9 @@ class _OrderResponseState extends State<OrderResponse> {
                   if (widget.detailOrder == null) {
                     print("ORDER EXISTS------");
                     model.clearData();
-                    // Navigator.pushReplacementNamed(context, '/home');
-                    Navigator.pop(context);
-                  } else {
                     Navigator.pushReplacementNamed(context, '/home');
+                  } else {
+                    Navigator.pop(context);
                   }
                 },
               ),

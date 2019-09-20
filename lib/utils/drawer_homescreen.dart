@@ -296,6 +296,7 @@ class _HomeDrawer extends State<HomeDrawer> {
         .get(Settings.SERVER_URL + 'logout.json', headers: headers)
         .then((response) {
       prefs.clear();
+      model.clearData();
       model.loggedInUser();
       model.fetchCurrentOrder();
     });
@@ -305,6 +306,7 @@ class _HomeDrawer extends State<HomeDrawer> {
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
+        padding: EdgeInsets.all(0.0),
         children: <Widget>[
           DrawerHeader(
             child:

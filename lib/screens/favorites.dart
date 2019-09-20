@@ -137,7 +137,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   height: 10.0,
                 ),
                 Text(
-                  'No Previous Orders',
+                  'Welcome to Favorites',
                   style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
