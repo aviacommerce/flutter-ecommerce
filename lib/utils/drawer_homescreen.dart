@@ -306,6 +306,7 @@ class _HomeDrawer extends State<HomeDrawer> {
   Widget build(BuildContext context) {
     return Drawer(
       child: ListView(
+        padding: EdgeInsets.all(0.0),
         children: <Widget>[
           DrawerHeader(
             child:

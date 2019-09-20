@@ -537,7 +537,7 @@ class _CategoryListingState extends State<CategoryListing> {
           child: Text(
             level == 0 ? categoryList[index].name : subCategoryList[index].name,
             style: TextStyle(
-                color: Colors.white, fontSize: 30, fontWeight: FontWeight.w700),
+                color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
             textAlign: TextAlign.center,
           ),
         ));
