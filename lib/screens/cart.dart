@@ -242,7 +242,10 @@ class _CartState extends State<Cart> {
                                 color: Colors.white,
                                 child: FadeInImage(
                                   image: NetworkImage(
-                                      model.lineItems[index].variant.image),
+                                      model.lineItems[index].variant.image !=
+                                              null
+                                          ? model.lineItems[index].variant.image
+                                          : ''),
                                   placeholder: AssetImage(
                                       'images/placeholders/no-product-image.png'),
                                 ),

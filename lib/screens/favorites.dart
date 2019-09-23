@@ -148,7 +148,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   height: 10.0,
                 ),
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal:35.0, vertical: 5),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 35.0, vertical: 5),
                   child: Text(
                     "Save, organize, and shop all your pet's favorites in one spot!",
                     textAlign: TextAlign.center,
@@ -214,7 +215,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 width: 150,
                 color: Colors.white,
                 child: FadeInImage(
-                  image: NetworkImage(favorite.image),
+                  image: NetworkImage(
+                      favorite.image != null ? favorite.image : ''),
                   placeholder:
                       AssetImage('images/placeholders/no-product-image.png'),
                 ),

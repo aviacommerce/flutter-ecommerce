@@ -57,11 +57,11 @@ class _ProductSearchState extends State<ProductSearch> {
     List<DropdownMenuItem<String>> items = new List();
     for (String city in filterItems) {
       items.add(new DropdownMenuItem(
-          value: city,
-          child: Text(
-            city,
-            style: TextStyle(color: Colors.black),
-          )));
+        value: city,
+        child: Text(
+          city,
+        ),
+      ));
     }
     return items;
   }
@@ -245,12 +245,12 @@ class _ProductSearchState extends State<ProductSearch> {
                 ),
               ),
               Visibility(
-                visible: model.isLoading,
-                child: Center(
-                      child: CircularProgressIndicator(
-                        backgroundColor: Colors.green,
-                      ),
-                    )),
+                  visible: model.isLoading,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      backgroundColor: Colors.green,
+                    ),
+                  )),
               // )
             ],
           ));
@@ -334,8 +334,14 @@ class _ProductSearchState extends State<ProductSearch> {
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 15.0,
-                            fontWeight: FontWeight.bold),
-                        value: _currentItem,
+                            fontWeight: FontWeight.normal),
+                        hint: Text(
+                          _currentItem,
+                          style: TextStyle(
+                              color: Colors.white70,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        value: null,
                         icon: Icon(
                           Icons.arrow_drop_down,
                           color: Colors.white,

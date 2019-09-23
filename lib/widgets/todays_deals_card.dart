@@ -85,7 +85,9 @@ Widget todaysDealsCard(int index, List<Product> todaysDealProducts,
                   Container(
                     margin: EdgeInsets.all(15),
                     child: FadeInImage(
-                      image: NetworkImage(displayProduct.image),
+                      image: NetworkImage(displayProduct.image != null
+                          ? displayProduct.image
+                          : ''),
                       placeholder: AssetImage(
                           'images/placeholders/no-product-image.png'),
                       height: 120,

@@ -189,7 +189,8 @@ class _AddressPageState extends State<AddressPage> {
         padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 5.0),
         width: MediaQuery.of(context).size.width,
         child: model.isLoading
-            ? Center(child: CircularProgressIndicator(backgroundColor: Colors.green))
+            ? Center(
+                child: CircularProgressIndicator(backgroundColor: Colors.green))
             : FlatButton(
                 disabledColor: Colors.grey.shade200,
                 // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
@@ -198,7 +199,7 @@ class _AddressPageState extends State<AddressPage> {
                   'PLACE ORDER',
                   style: TextStyle(
                       fontSize: 15,
-                      color:  Colors.white,
+                      color: Colors.white,
                       fontWeight: FontWeight.w300),
                 ),
                 onPressed: model.order.shipAddress != null
@@ -545,7 +546,9 @@ class _AddressPageState extends State<AddressPage> {
                               color: Colors.white,
                               child: FadeInImage(
                                 image: NetworkImage(
-                                    lineItems[index].variant.image),
+                                    lineItems[index].variant.image != null
+                                        ? lineItems[index].variant.image
+                                        : ''),
                                 placeholder: AssetImage(
                                     'images/placeholders/no-product-image.png'),
                               ),
@@ -583,15 +586,20 @@ class _AddressPageState extends State<AddressPage> {
                                                   fontWeight: FontWeight.bold),
                                             ),
                                             TextSpan(
-                                              text: lineItems[index].variant.name
+                                              text: lineItems[index]
+                                                  .variant
+                                                  .name
                                                   .substring(
                                                       lineItems[index]
-                                                              .variant.name
+                                                              .variant
+                                                              .name
                                                               .split(' ')[0]
                                                               .length +
                                                           1,
                                                       lineItems[index]
-                                                          .variant.name.length),
+                                                          .variant
+                                                          .name
+                                                          .length),
                                               style: TextStyle(
                                                   fontSize: 15,
                                                   color: Colors.black),
@@ -624,8 +632,7 @@ class _AddressPageState extends State<AddressPage> {
                                         padding: EdgeInsets.only(right: 24.0),
                                         alignment: Alignment.topLeft,
                                         child: Text(
-                                          lineItems[index].variant
-                                              .displayPrice,
+                                          lineItems[index].variant.displayPrice,
                                           textAlign: TextAlign.left,
                                           style: TextStyle(
                                               color: Colors.red,

@@ -21,6 +21,7 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
+  bool _proceedPressed = false;
   bool _isLoading = false;
   static List<PaymentMethod> paymentMethods = List();
   String _character = '';
@@ -59,7 +60,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-      return Scaffold(
+      return 
+      WillPopScope(
+        onWillPop: _canGoBack,
+        child: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
             title: Text('Payment Methods'),
@@ -87,7 +91,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 },
               ),
         bottomNavigationBar: !_isLoading ? paymentButton(context) : Container(),
-      );
+      ),
+      )
+      ;
     });
   }
 
@@ -106,6 +112,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
         activeColor: Colors.green,
       );
     });
+  }
+
+   Future<bool> _canGoBack() {
+     print("BACK PRESSED");
+    if (_proceedPressed) {
+      return Future<bool>.value(false);
+    } else {
+      return Future<bool>.value(true);
+    }
   }
 
   Widget paymentButton(BuildContext context) {
@@ -180,6 +195,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       }
                     }
                   } else if (_character == 'Payubiz') {
+                    setState(() {
+                      _proceedPressed = true;
+                    });
                     print('PAYUBIZ');
                     bool isComplete = false;
                     // isComplete = await model.completeOrder(paymentMethods.first.id);

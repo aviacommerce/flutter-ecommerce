@@ -653,7 +653,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                             height: 300,
                             width: 220,
                             child: FadeInImage(
-                              image: NetworkImage(selectedProduct.image),
+                              image: NetworkImage(selectedProduct.image != null
+                                  ? selectedProduct.image
+                                  : ''),
                               placeholder: AssetImage(
                                   'images/placeholders/no-product-image.png'),
                             ),

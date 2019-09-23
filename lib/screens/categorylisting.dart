@@ -44,7 +44,7 @@ class _CategoryListingState extends State<CategoryListing> {
   int subCatId = ZERO;
   int currentIndex = -1;
   int totalCount = 0;
-  Map<int, List<Widget>> subCatListForFilter = Map();
+  List<Widget> subCatList = [];
   final scrollController = ScrollController();
   bool hasMore = false, isFilterDataLoading = false;
   bool isChecked = false;
@@ -56,6 +56,8 @@ class _CategoryListingState extends State<CategoryListing> {
   String sortBy = '';
   List<DropdownMenuItem<String>> _dropDownMenuItems;
   String _currentItem;
+  String _currentCategory = '';
+  int _currentCatIndex;
   List filterItems = [
     "Newest",
     "Avg.Customer Review",
@@ -70,7 +72,7 @@ class _CategoryListingState extends State<CategoryListing> {
           value: city,
           child: Text(
             city,
-            style: TextStyle(color: Colors.black),
+            // style: TextStyle(color: Colors.red),
           )));
     }
     return items;
@@ -86,7 +88,7 @@ class _CategoryListingState extends State<CategoryListing> {
       if (scrollController.offset >=
               scrollController.position.maxScrollExtent &&
           !scrollController.position.outOfRange) {
-        getProductsByCategory(0);
+        getProductsByCategory();
       }
     });
     header
@@ -113,18 +115,15 @@ class _CategoryListingState extends State<CategoryListing> {
               'api/v1/taxonomies/${widget.parentId}/taxons/$categoryId')
           .then((response) {
         responseBody = json.decode(response.body);
-        print(responseBody);
         responseBody['taxons'].forEach((category) {
           _listViewData.add(Category(
-              id: category['id'],
-              name: category['name'],
-              parentId: widget.parentId,
-              isChecked: false));
+            id: category['id'],
+            name: category['name'],
+            parentId: widget.parentId,
+          ));
         });
       });
-      print("SUBCAT LENGTH +$_listViewData");
     }
-    print(_listViewData);
     List<Widget> subCatList = [];
     for (Category cat in _listViewData) {
       print('Data');
@@ -132,10 +131,9 @@ class _CategoryListingState extends State<CategoryListing> {
         onTap: () {
           setState(() {
             productsByCategory = [];
-            cat.isChecked = cat.isChecked ? false : true;
             subCatId = cat.id;
             Navigator.pop(context);
-            adjustHeaders(catName, cat.name);
+            adjustHeaders(cat.name);
             loadProductsByCategory();
           });
         },
@@ -143,12 +141,6 @@ class _CategoryListingState extends State<CategoryListing> {
           children: <Widget>[
             ListTile(
               title: Text(cat.name),
-              /*trailing: cat.isChecked
-                ? Icon(
-                    Icons.radio_button_checked,
-                    color: Colors.green,
-                  )
-                : Icon(Icons.radio_button_unchecked),*/
             ),
             Divider(),
           ],
@@ -156,7 +148,6 @@ class _CategoryListingState extends State<CategoryListing> {
       ));
     }
     setState(() {
-      subCatListForFilter[currentIndex] = subCatList;
       isFilterDataLoading = false;
     });
   }
@@ -275,15 +266,22 @@ class _CategoryListingState extends State<CategoryListing> {
                             style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 15.0,
-                                fontWeight: FontWeight.bold),
-                            value: _currentItem,
+                                fontWeight: FontWeight.normal),
+                            value: null,
+                            hint: Text(
+                              _currentItem,
+                              style: TextStyle(
+                                  color: Colors.white70,
+                                  fontWeight: FontWeight.bold,
+                                  ),
+                            ),
                             icon: Icon(
                               Icons.arrow_drop_down,
                               color: Colors.white60,
                             ),
                             items: _dropDownMenuItems,
                             onChanged: changedDropDownItem,
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -298,44 +296,32 @@ class _CategoryListingState extends State<CategoryListing> {
                   ],
                 )),
           ),
-          Expanded(
-            child: Theme(
-                data: ThemeData(primarySwatch: Colors.green),
-                child: ListView.separated(
-                  shrinkWrap: true,
-                  padding: EdgeInsets.all(8.0),
-                  separatorBuilder: (context, index) => Divider(
-                    height: 1.0,
-                    color: Colors.grey,
-                  ),
-                  itemBuilder: (BuildContext context, int index) {
-                    return ExpansionTile(
-                        onExpansionChanged: (value) {
-                          if (value) {
-                            // widget.getSubCat(index);
-                            currentIndex = index;
-                            getSubCatList(categoryList[index].id,
-                                categoryList[index].name);
-                          }
-                        },
-                        title: Text(categoryList[index].name),
-                        children: subCatListForFilter[index] != null
-                            ? subCatListForFilter[index]
-                            : isFilterDataLoading
-                                ? progressBar()
-                                : subCatListForFilter[index] != null
-                                    ? subCatListForFilter[index]
-                                    : emptyWidget());
-                  },
-                  itemCount: categoryList != null ? categoryList.length : 0,
-                )),
-          ),
+          categoryDropDown(),
           Divider(
             height: 1.0,
             color: Colors.grey,
             indent: 10.0,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget categoryDropDown() {
+    return Expanded(
+      child: Theme(
+        data: ThemeData(primarySwatch: Colors.green),
+        child: ListView(
+          children: [
+            ExpansionTile(
+                initiallyExpanded: true,
+                onExpansionChanged: (value) {
+                  if (value) {}
+                },
+                title: Text(_currentCategory),
+                children: subCatList)
+          ],
+        ),
       ),
     );
   }
@@ -491,6 +477,8 @@ class _CategoryListingState extends State<CategoryListing> {
           if (level == 0) {
             getSubCategory(categoryList[index].id);
             setState(() {
+              _currentCategory = categoryList[index].name;
+              _currentCatIndex = categoryList[index].id;
               header.add(Row(
                 children: <Widget>[
                   Padding(
@@ -543,9 +531,23 @@ class _CategoryListingState extends State<CategoryListing> {
         ));
   }
 
-  void adjustHeaders(String catName, String subCatName) {
+  void adjustHeaders(String subCatName) {
     setState(() {
       header.removeLast();
+      setState(() {
+        header.add(Row(
+          children: <Widget>[
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Icon(
+                  Icons.arrow_forward_ios,
+                  color: Colors.white60,
+                  size: 16,
+                )),
+            textField(subCatName, FontWeight.w100, 2, Colors.white)
+          ],
+        ));
+      });
     });
   }
 
@@ -562,7 +564,6 @@ class _CategoryListingState extends State<CategoryListing> {
             name: category['name'],
             parentId: widget.parentId));
       });
-      //print(Settings.SERVER_URL + 'api/v1/taxonomies/${widget.parentId}/taxons/${widget.categoryId}');
       setState(() {
         _isLoading = false;
         level = 0;
@@ -573,7 +574,9 @@ class _CategoryListingState extends State<CategoryListing> {
   getSubCategory(int categoryId) {
     setState(() {
       _isLoading = true;
+      isFilterDataLoading = true;
       subCategoryList = [];
+      subCatList = [];
     });
     http
         .get(Settings.SERVER_URL +
@@ -587,14 +590,36 @@ class _CategoryListingState extends State<CategoryListing> {
             name: category['name'],
             parentId: widget.parentId));
       });
+      for (Category cat in subCategoryList) {
+        subCatList.add(InkWell(
+          onTap: () {
+            setState(() {
+              productsByCategory = [];
+              subCatId = cat.id;
+              Navigator.pop(context);
+              adjustHeaders(cat.name);
+              loadProductsByCategory();
+            });
+          },
+          child: Column(
+            children: <Widget>[
+              ListTile(
+                title: Text(cat.name),
+              ),
+              // Divider(),
+            ],
+          ),
+        ));
+      }
       setState(() {
         level = 1;
         _isLoading = false;
+        isFilterDataLoading = false;
       });
     });
   }
 
-  void getProductsByCategory(int id) async {
+  void getProductsByCategory() async {
     List<Product> variants = [];
     List<OptionValue> optionValues = [];
     List<OptionType> optionTypes = [];
@@ -650,7 +675,7 @@ class _CategoryListingState extends State<CategoryListing> {
       currentPage = ONE;
       productsByCategory = [];
       this.sortBy = sortBy;
-      getProductsByCategory(0);
+      getProductsByCategory();
       level = 2;
       _isLoading = false;
     });

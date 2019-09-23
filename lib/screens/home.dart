@@ -17,6 +17,7 @@ import 'package:ofypets_mobile_app/utils/locator.dart';
 import 'package:ofypets_mobile_app/widgets/category_box.dart';
 import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
 import 'package:ofypets_mobile_app/widgets/todays_deals_card.dart';
+import 'package:ofypets_mobile_app/models/banners.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -36,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isAuthenticated = false;
   List<Product> todaysDealProducts = [];
   List<Category> categories = [];
+  List<BannerImage> banners = [];
   List<String> bannerImageUrls = [];
   List<String> bannerLinks = [];
   int favCount;
@@ -60,14 +62,14 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     _deviceSize = MediaQuery.of(context).size;
+    List<Widget> actions = [];
+
+    for (int i = 0; i < banners.length; i++) {
+      actions.add(bannerCards(i));
+    }
+
     Widget bannerCarousel = CarouselSlider(
-      items: <Widget>[
-        bannerCards(0),
-        bannerCards(1),
-        bannerCards(2),
-        bannerCards(3),
-        bannerCards(4),
-      ],
+      items: _isBannerLoading ? [bannerCards(0)] : actions,
       autoPlay: true,
       enlargeCenterPage: true,
     );
@@ -286,10 +288,10 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: () {
             MaterialPageRoute route = MaterialPageRoute(
                 builder: (context) => ProductSearch(
-                      slug: bannerLinks[index],
+                      // slug: bannerLinks[index],
+                      slug: banners[index].imageSlug,
                     ));
             Navigator.of(context).push(route);
-            print(bannerLinks[index]);
           },
           child: Container(
             width: _deviceSize.width * 0.8,
@@ -303,7 +305,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ClipRRect(
                 borderRadius: BorderRadius.all(Radius.circular(4)),
                 child: FadeInImage(
-                  image: NetworkImage(bannerImageUrls[index]),
+                  image: NetworkImage(banners[index].imageUrl != null
+                      ? banners[index].imageUrl
+                      : ''),
                   placeholder: AssetImage('images/placeholders/slider1.jpg'),
                   fit: BoxFit.fill,
                 ),
@@ -357,8 +361,6 @@ class _HomeScreenState extends State<HomeScreen> {
             'api/v1/taxons/products?id=$todaysDealsId&per_page=20&data_set=small')
         .then((response) {
       responseBody = json.decode(response.body);
-      print('RESPONSE');
-      print(responseBody);
       responseBody['products'].forEach((product) {
         int reviewProductId = product["id"];
         variants = [];
@@ -478,10 +480,10 @@ class _HomeScreenState extends State<HomeScreen> {
             'api/v1/taxonomies?q[name_cont]=Landing_Banner&set=nested')
         .then((response) {
       responseBody = json.decode(response.body);
-      print("============== Taxons ============");
-      print(responseBody);
       responseBody['taxonomies'][0]['root']['taxons'].forEach((banner) {
         setState(() {
+          banners.add(BannerImage(
+              imageSlug: banner['meta_title'], imageUrl: banner['icon']));
           bannerImageUrls.add(banner['icon']);
           bannerLinks.add(banner['meta_title']); //  meta_title
         });

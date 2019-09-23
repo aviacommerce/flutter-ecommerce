@@ -152,8 +152,6 @@ Widget productContainer(BuildContext myContext, Product product, int index) {
 }
 
 Widget discountPrice(Product product) {
-  print(
-      "DISCOUNT???????? ${double.parse(product.costPrice) - double.parse(product.price) > 0}");
   if (double.parse(product.costPrice) - double.parse(product.price) > 0) {
     return Container(
       margin: EdgeInsets.only(left: 10),

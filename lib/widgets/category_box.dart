@@ -6,7 +6,7 @@ import 'package:ofypets_mobile_app/utils/color_list.dart';
 
 Widget categoryBox(int index, BuildContext context, Size _deviceSize,
     List<Category> categories) {
-  if (index > 4) {
+  if (index > categories.length - 1) {
     return GestureDetector(
         onTap: () {
           MaterialPageRoute route =
@@ -63,7 +63,9 @@ Widget categoryBox(int index, BuildContext context, Size _deviceSize,
             Container(
                 alignment: Alignment.bottomRight,
                 child: ClipRRect(
-                  child: Image.network(categories[index].image),
+                  child: Image.network(categories[index].image == null
+                      ? ''
+                      : categories[index].image),
                   borderRadius: BorderRadius.circular(12),
                 )),
             Container(

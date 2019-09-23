@@ -76,7 +76,9 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     FadeInImage(
-                                      image: NetworkImage(product.image),
+                                      image: NetworkImage(product.image != null
+                                          ? product.image
+                                          : ''),
                                       placeholder: AssetImage(
                                           'images/placeholders/no-product-image.png'),
                                       width: 100,
@@ -152,7 +154,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen>
                             validator: (value) {
                               if (value.isEmpty) {
                                 return 'Enter Title';
-                              } else if(value.length > 80) {
+                              } else if (value.length > 80) {
                                 return 'Title cannot be greater than 80 characters.';
                               }
                               return null;
