@@ -804,7 +804,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               SizedBox(
                 height: 18,
               ),
-              widget.product.hasVariants
+              widget.product.hasVariants &&
+                      selectedProduct.optionValues.length > 0
                   ? Container(
                       alignment: Alignment.centerLeft,
                       padding: EdgeInsets.all(10),
@@ -817,9 +818,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       ),
                     )
                   : Container(),
-              // variantRow(),
-              widget.product.hasVariants ? variantDropDown() : Container(),
-              // variantDialog(),
+              widget.product.hasVariants &&
+                      selectedProduct.optionValues.length > 0
+                  ? variantDropDown()
+                  : Container(),
               SizedBox(
                 height: 18,
               ),
@@ -854,7 +856,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       height: 12,
                     )
                   : Container(),
-
               discount
                   ? Column(
                       children: <Widget>[
