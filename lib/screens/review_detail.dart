@@ -55,7 +55,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen>
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: AppBar(
-            backgroundColor: Colors.blue,
+            backgroundColor: colorCustom,
             title: Text('Write Review'),
             centerTitle: true),
         body: new SingleChildScrollView(
@@ -202,7 +202,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen>
                       ),
                       new Container(
                         child: new RaisedButton(
-                          color: Colors.blue,
+                          color: colorCustom,
                           onPressed: () {
                             _submit(context);
                           },

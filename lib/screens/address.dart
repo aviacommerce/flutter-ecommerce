@@ -114,7 +114,7 @@ class _AddressPageState extends State<AddressPage> {
                                         ? ''
                                         : 'ADD NEW ADDRESS',
                                 style: TextStyle(
-                                    color: Colors.blue,
+                                    color: colorCustom,
                                     fontWeight: FontWeight.bold),
                               ),
                               onPressed: () {
@@ -190,7 +190,7 @@ class _AddressPageState extends State<AddressPage> {
         width: MediaQuery.of(context).size.width,
         child: model.isLoading
             ? Center(
-                child: CircularProgressIndicator(backgroundColor: Colors.blue))
+                child: CircularProgressIndicator(backgroundColor: colorCustom))
             : FlatButton(
                 disabledColor: Colors.grey.shade200,
                 // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
@@ -292,7 +292,7 @@ class _AddressPageState extends State<AddressPage> {
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.blue),
+                                        color: colorCustom),
                                   ),
                                 ),
                                 onPressed: () async {
@@ -358,14 +358,14 @@ class _AddressPageState extends State<AddressPage> {
                               child: Text(
                                 promoCodeText(model).toUpperCase(),
                                 style: TextStyle(
-                                    color: Colors.blue, fontSize: 17),
+                                    color: colorCustom, fontSize: 17),
                               ),
                             ),
                             Container(
                               padding: EdgeInsets.only(right: 10),
                               child: Icon(
                                 Icons.check_circle_outline,
-                                color: Colors.blue,
+                                color: colorCustom,
                               ),
                             ),
                           ],
@@ -460,7 +460,7 @@ class _AddressPageState extends State<AddressPage> {
                           child: Text(
                             'EDIT',
                             style: TextStyle(
-                                color: Colors.blue,
+                                color: colorCustom,
                                 fontSize: 15.0,
                                 fontWeight: FontWeight.bold),
                           )),

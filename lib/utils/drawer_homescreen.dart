@@ -81,7 +81,7 @@ class _HomeDrawer extends State<HomeDrawer> {
       return ListTile(
         leading: Icon(
           Icons.favorite,
-          color: Colors.blue,
+          color: colorCustom,
         ),
         trailing: Container(
           width: 30.0,
@@ -89,7 +89,7 @@ class _HomeDrawer extends State<HomeDrawer> {
           child: favCount != null && favCount > 0
               ? Stack(
                   children: <Widget>[
-                    Icon(Icons.brightness_1, size: 30.0, color: Colors.blue),
+                    Icon(Icons.brightness_1, size: 30.0, color: colorCustom),
                     Center(
                       child: Text(
                         '${favCount}',
@@ -108,7 +108,7 @@ class _HomeDrawer extends State<HomeDrawer> {
         ),
         title: Text(
           'Favorites',
-          style: TextStyle(color: Colors.blue),
+          style: TextStyle(color: colorCustom),
         ),
         onTap: () {
           if (model.isAuthenticated) {
@@ -132,11 +132,11 @@ class _HomeDrawer extends State<HomeDrawer> {
       return ListTile(
         leading: Icon(
           Icons.person,
-          color: Colors.blue,
+          color: colorCustom,
         ),
         title: Text(
           'Account',
-          style: TextStyle(color: Colors.blue),
+          style: TextStyle(color: colorCustom),
         ),
         onTap: () {
           if (model.isAuthenticated) {
@@ -160,11 +160,11 @@ class _HomeDrawer extends State<HomeDrawer> {
       return ListTile(
         leading: Icon(
           Icons.receipt,
-          color: Colors.blue,
+          color: colorCustom,
         ),
         title: Text(
           'Order History',
-          style: TextStyle(color: Colors.blue),
+          style: TextStyle(color: colorCustom),
         ),
         onTap: () {
           if (model.isAuthenticated) {
@@ -314,7 +314,7 @@ class _HomeDrawer extends State<HomeDrawer> {
               Text(
                 'AviaStore',
                 style: TextStyle(
-                    fontFamily: 'HolyFat', fontSize: 65, color: Colors.white),
+                     fontSize: 30, color: Colors.white),
               ),
               Text(
                 '1.0.0',
@@ -323,7 +323,7 @@ class _HomeDrawer extends State<HomeDrawer> {
               ),
               signInLineTile()
             ]),
-            decoration: BoxDecoration(color: Colors.blue),
+            decoration: BoxDecoration(color: colorCustom),
           ),
           ListTile(
             onTap: () {
@@ -332,11 +332,11 @@ class _HomeDrawer extends State<HomeDrawer> {
             },
             leading: Icon(
               Icons.home,
-              color: Colors.blue,
+              color: colorCustom,
             ),
             title: Text(
               'Home',
-              style: TextStyle(color: Colors.blue),
+              style: TextStyle(color: colorCustom),
             ),
           ),
           favoritesLineTile(),

@@ -4,6 +4,8 @@ import 'package:aviastore/scoped-models/main.dart';
 import 'package:aviastore/widgets/rating_bar.dart';
 import 'package:aviastore/widgets/snackbar.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:aviastore/utils/constants.dart';
+
 
 class AddToCart extends StatefulWidget {
   List<Product> todaysDealProducts;
@@ -44,7 +46,7 @@ class _AddToCartState extends State<AddToCart> {
             : widget.index == selectedIndex
                 ? Center(
                     child: CircularProgressIndicator(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: colorCustom,
                   ))
                 : buttonContent(widget.index, widget.product),
       );
@@ -56,7 +58,7 @@ Widget buttonContent(int index, Product product) {
   return Text(
     product.isOrderable ? 'ADD TO CART' : 'OUT OF STOCK',
     style: TextStyle(
-        color: product.isOrderable ? Colors.blue : Colors.grey,
+        color: product.isOrderable ? colorCustom : Colors.grey,
         fontSize: 14,
         fontWeight: FontWeight.w500),
   );

@@ -118,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: <Widget>[
                         Icon(
                           Icons.category,
-                          color: Colors.blue,
+                          color: colorCustom,
                         ),
                         SizedBox(
                           width: 8.0,
@@ -141,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: _deviceSize.height * 0.5,
                       alignment: Alignment.center,
                       child: CircularProgressIndicator(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: colorCustom,
                       ),
                     )
                   ]))
@@ -210,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: _deviceSize.height * 0.47,
                       alignment: Alignment.center,
                       child: CircularProgressIndicator(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: colorCustom,
                       ),
                     )
                   ]))
@@ -248,17 +248,17 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       items: [
         BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline, color: Colors.blue),
+          icon: Icon(Icons.person_outline, color: colorCustom),
           title: Text('SIGN IN'),
         ),
         BottomNavigationBarItem(
             icon: Icon(
               Icons.person_outline,
-              color: Colors.blue,
+              color: colorCustom,
             ),
             title: Text('CREATE ACCOUNT',
                 style: TextStyle(
-                    color: Colors.blue,
+                    color: colorCustom,
                     fontSize: 15,
                     fontWeight: FontWeight.w600))),
       ],

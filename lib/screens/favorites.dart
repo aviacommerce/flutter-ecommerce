@@ -84,7 +84,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             child: model.isLoading
                 ? LinearProgressIndicator()
                 : Theme(
-                    data: ThemeData(primarySwatch: Colors.blue),
+                    data: ThemeData(primarySwatch: colorCustom),
                     child: ListView.builder(
                         controller: scrollController,
                         itemCount: favoriteProducts.length + 1,

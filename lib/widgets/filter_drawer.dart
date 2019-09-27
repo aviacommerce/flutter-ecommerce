@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:aviastore/models/category.dart';
+import 'package:aviastore/utils/constants.dart';
+
 
 class FilterDrawer extends StatefulWidget {
   Function getSortingData;
@@ -91,7 +93,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
           ),
           Expanded(
             child: Theme(
-                data: ThemeData(primarySwatch: Colors.blue),
+                data: ThemeData(primarySwatch: colorCustom),
                 child: ListView.separated(
                   shrinkWrap: true,
                   padding: EdgeInsets.all(8.0),

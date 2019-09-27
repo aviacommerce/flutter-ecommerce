@@ -6,5 +6,5 @@
         <item name="android:windowBackground">@drawable/launch_background</item>
         <item name="android:windowFullscreen">true</item>
     </style>
-    <color name="green">#7ED956</color>
+    <color name="blue">#212e40</color>
 </resources>

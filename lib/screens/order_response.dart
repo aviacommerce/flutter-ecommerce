@@ -244,7 +244,7 @@ class _OrderResponseState extends State<OrderResponse> {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             2)),
-                                                color: Colors.blue,
+                                                color: colorCustom,
                                                 onPressed: () {
                                                   if (!_isLoading) {
                                                     retryPayment(responseBody);

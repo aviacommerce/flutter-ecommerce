@@ -6,7 +6,7 @@ class ReturnPolicy extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.blue,
+          backgroundColor: colorCustom,
           title: Text('Return Policy'),
           centerTitle: true),
       body: Padding(

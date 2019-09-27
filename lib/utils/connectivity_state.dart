@@ -4,6 +4,8 @@ import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:aviastore/utils/constants.dart';
+
 
 class ConnectivityManager {
   StreamSubscription<ConnectivityResult> subscription;
@@ -43,12 +45,12 @@ class ConnectivityManager {
 
   void showInternetOffScreen(BuildContext context) {
     Dialog errorDialog = Dialog(
-      backgroundColor: Colors.blue,
+      backgroundColor: colorCustom,
       //this right here
       child: Container(
         width: double.infinity,
         height: double.infinity,
-        color: Colors.blue,
+        color: colorCustom,
         child: Stack(
           children: <Widget>[
             Padding(
@@ -57,7 +59,7 @@ class ConnectivityManager {
                 'AviaStore',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontFamily: 'HolyFat', fontSize: 50, color: Colors.white),
+                     fontSize: 20, color: Colors.white),
               ),
             ),
             Column(
@@ -119,7 +121,7 @@ class _ConnectivityPageState extends State<ConnectivityPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        color: Colors.blue,
+        color: colorCustom,
         child: Stack(
           children: <Widget>[
             Container(
@@ -130,7 +132,7 @@ class _ConnectivityPageState extends State<ConnectivityPage> {
                   'AviaStore',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontFamily: 'HolyFat', fontSize: 50, color: Colors.white),
+                      fontSize: 20, color: Colors.white),
                 ),
               ),
             ),

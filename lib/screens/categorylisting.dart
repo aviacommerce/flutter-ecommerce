@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:aviastore/utils/constants.dart' as prefix0;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:aviastore/models/category.dart';
@@ -185,7 +186,7 @@ class _CategoryListingState extends State<CategoryListing> {
                   child: !_isLoading ? body(level) : Container(),
                 ),
                 Container(
-                  color: Colors.blue,
+                  color: colorCustom,
                   height: 59.0,
                   child: Column(
                     children: <Widget>[
@@ -310,7 +311,7 @@ class _CategoryListingState extends State<CategoryListing> {
   Widget categoryDropDown() {
     return Expanded(
       child: Theme(
-        data: ThemeData(primarySwatch: Colors.blue),
+        data: ThemeData(primarySwatch: colorCustom),
         child: ListView(
           children: [
             ExpansionTile(
@@ -396,7 +397,7 @@ class _CategoryListingState extends State<CategoryListing> {
         break;
       case 2:
         return Theme(
-          data: ThemeData(primarySwatch: Colors.blue),
+          data: ThemeData(primarySwatch: colorCustom),
           child: Padding(
             padding: const EdgeInsets.only(top: 50.0),
             child: ListView.builder(

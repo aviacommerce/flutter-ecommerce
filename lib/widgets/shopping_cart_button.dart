@@ -36,7 +36,7 @@ Widget shoppingCartIconButton() {
                   child: new Stack(
                     children: <Widget>[
                       new Icon(Icons.brightness_1,
-                          size: 21.0, color: Colors.yellow),
+                          size: 21.0, color: Colors.deepOrange),
                       new Center(
                         child: new Text(
                           model.order == null

@@ -21,6 +21,19 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final MainModel _model = MainModel();
+  static Map<int, Color> color = {
+    50: Color.fromRGBO(33, 46, 64, .1),
+    100: Color.fromRGBO(33, 46, 64, .2),
+    200: Color.fromRGBO(33, 46, 64, .3),
+    300: Color.fromRGBO(33, 46, 64, .4),
+    400: Color.fromRGBO(33, 46, 64, .5),
+    500: Color.fromRGBO(33, 46, 64, .6),
+    600: Color.fromRGBO(33, 46, 64, .7),
+    700: Color.fromRGBO(33, 46, 64, .8),
+    800: Color.fromRGBO(33, 46, 64, .9),
+    900: Color.fromRGBO(33, 46, 64, 1),
+  };
+  MaterialColor colorCustom = MaterialColor(0xFF212E40, color);
 
   @override
   void initState() {
@@ -37,11 +50,9 @@ class _MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         initialRoute: '/home',
-        routes: {
-          '/home' : (context) => HomeScreen()
-        },
+        routes: {'/home': (context) => HomeScreen()},
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          primarySwatch: colorCustom,
           accentColor: Colors.white,
         ),
         home: HomeScreen(),

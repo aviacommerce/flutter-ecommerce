@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:aviastore/utils/constants.dart' as prefix0;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:aviastore/models/brand.dart';
@@ -163,7 +164,7 @@ class _BrandListState extends State<BrandList> {
                                       }),
                                   padding: EdgeInsets.only(top: 59.0))
                               : Theme(
-                                  data: ThemeData(primarySwatch: Colors.blue),
+                                  data: ThemeData(primarySwatch: colorCustom),
                                   child: Padding(
                                     padding: const EdgeInsets.only(top: 90.0),
                                     child: ListView.builder(
@@ -207,7 +208,7 @@ class _BrandListState extends State<BrandList> {
                                   ),
                                 )),
                   Container(
-                      color: Colors.blue,
+                      color: colorCustom,
                       height: 60.0,
                       child: Column(children: [
                         Row(
@@ -341,7 +342,7 @@ class _BrandListState extends State<BrandList> {
           ),
           Expanded(
             child: Theme(
-                data: ThemeData(primarySwatch: Colors.blue),
+                data: ThemeData(primarySwatch: colorCustom),
                 child: ListView.builder(
                   shrinkWrap: true,
                   padding: EdgeInsets.all(8.0),

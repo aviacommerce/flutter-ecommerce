@@ -1,9 +1,25 @@
+import 'package:flutter/material.dart';
+
 class Settings {
   // static const String SERVER_URL = 'https://aviastore.indiepet.co.in/';
   // static const String WEB_URL = 'https://beta.aviastore.com/';
   static const String WEB_URL = 'https://www.aviastore.in/';
   static const String SERVER_URL = 'https://app.aviastore.in/';
 }
+
+   Map<int, Color> color = {
+    50: Color.fromRGBO(33, 46, 64, .1),
+    100: Color.fromRGBO(33, 46, 64, .2),
+    200: Color.fromRGBO(33, 46, 64, .3),
+    300: Color.fromRGBO(33, 46, 64, .4),
+    400: Color.fromRGBO(33, 46, 64, .5),
+    500: Color.fromRGBO(33, 46, 64, .6),
+    600: Color.fromRGBO(33, 46, 64, .7),
+    700: Color.fromRGBO(33, 46, 64, .8),
+    800: Color.fromRGBO(33, 46, 64, .9),
+    900: Color.fromRGBO(33, 46, 64, 1),
+  };
+  MaterialColor colorCustom = MaterialColor(0xFF212E40, color);
 
 final double FREE_SHIPPING_AMOUNT = 699;
 final String CURRENCY_SYMBOL = '₹';

@@ -5,6 +5,7 @@ import 'package:aviastore/screens/auth.dart';
 import 'package:aviastore/utils/connectivity_state.dart';
 import 'package:aviastore/utils/locator.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:aviastore/utils/constants.dart';
 
 class Cart extends StatefulWidget {
   @override
@@ -134,7 +135,7 @@ class _CartState extends State<Cart> {
           child: model.isLoading
               ? Center(
                   child: CircularProgressIndicator(
-                    backgroundColor: Colors.blue,
+                    backgroundColor: colorCustom,
                   ),
                 )
               : FlatButton(
@@ -377,7 +378,7 @@ class _CartState extends State<Cart> {
                         border: Border.all(
                           color:
                               model.lineItems[lineItemIndex].quantity == index
-                                  ? Colors.blue
+                                  ? colorCustom
                                   : Colors.grey,
                         ),
                         borderRadius: BorderRadius.circular(5)),
@@ -388,7 +389,7 @@ class _CartState extends State<Cart> {
                       style: TextStyle(
                           color:
                               model.lineItems[lineItemIndex].quantity == index
-                                  ? Colors.blue
+                                  ? colorCustom
                                   : Colors.grey),
                     )),
               );

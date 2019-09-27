@@ -109,7 +109,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             _character = value;
           });
         },
-        activeColor: Colors.blue,
+        activeColor: colorCustom,
       );
     });
   }
@@ -131,13 +131,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
         child: model.isLoading
             ? Center(
                 child: CircularProgressIndicator(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: colorCustom,
                 ),
               )
             : FlatButton(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8)),
-                color: Colors.blue,
+                color: colorCustom,
                 child: Text(
                   _character == ''
                       ? 'SELECT PAYMENT METHOD'
