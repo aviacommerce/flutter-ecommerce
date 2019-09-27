@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:ofypets_mobile_app/models/line_item.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/payment.dart';
-import 'package:ofypets_mobile_app/screens/update_address.dart';
-import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
-import 'package:ofypets_mobile_app/utils/locator.dart';
-import 'package:ofypets_mobile_app/widgets/order_details_card.dart';
-import 'package:ofypets_mobile_app/widgets/snackbar.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:aviastore/models/line_item.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/screens/payment.dart';
+import 'package:aviastore/screens/update_address.dart';
+import 'package:aviastore/utils/connectivity_state.dart';
+import 'package:aviastore/utils/locator.dart';
+import 'package:aviastore/widgets/order_details_card.dart';
+import 'package:aviastore/widgets/snackbar.dart';
+import 'package:aviastore/utils/constants.dart';
 
 import 'package:scoped_model/scoped_model.dart';
 
@@ -114,7 +114,7 @@ class _AddressPageState extends State<AddressPage> {
                                         ? ''
                                         : 'ADD NEW ADDRESS',
                                 style: TextStyle(
-                                    color: Colors.green,
+                                    color: Colors.blue,
                                     fontWeight: FontWeight.bold),
                               ),
                               onPressed: () {
@@ -190,7 +190,7 @@ class _AddressPageState extends State<AddressPage> {
         width: MediaQuery.of(context).size.width,
         child: model.isLoading
             ? Center(
-                child: CircularProgressIndicator(backgroundColor: Colors.green))
+                child: CircularProgressIndicator(backgroundColor: Colors.blue))
             : FlatButton(
                 disabledColor: Colors.grey.shade200,
                 // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
@@ -292,7 +292,7 @@ class _AddressPageState extends State<AddressPage> {
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.green),
+                                        color: Colors.blue),
                                   ),
                                 ),
                                 onPressed: () async {
@@ -358,14 +358,14 @@ class _AddressPageState extends State<AddressPage> {
                               child: Text(
                                 promoCodeText(model).toUpperCase(),
                                 style: TextStyle(
-                                    color: Colors.green, fontSize: 17),
+                                    color: Colors.blue, fontSize: 17),
                               ),
                             ),
                             Container(
                               padding: EdgeInsets.only(right: 10),
                               child: Icon(
                                 Icons.check_circle_outline,
-                                color: Colors.green,
+                                color: Colors.blue,
                               ),
                             ),
                           ],
@@ -460,7 +460,7 @@ class _AddressPageState extends State<AddressPage> {
                           child: Text(
                             'EDIT',
                             style: TextStyle(
-                                color: Colors.green,
+                                color: Colors.blue,
                                 fontSize: 15.0,
                                 fontWeight: FontWeight.bold),
                           )),

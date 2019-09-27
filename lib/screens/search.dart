@@ -2,15 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ofypets_mobile_app/models/brand.dart';
-import 'package:ofypets_mobile_app/models/category.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/headers.dart';
-import 'package:ofypets_mobile_app/utils/locator.dart';
-import 'package:ofypets_mobile_app/widgets/product_container.dart';
+import 'package:aviastore/models/brand.dart';
+import 'package:aviastore/models/category.dart';
+import 'package:aviastore/models/product.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/utils/connectivity_state.dart';
+import 'package:aviastore/utils/constants.dart';
+import 'package:aviastore/utils/headers.dart';
+import 'package:aviastore/utils/locator.dart';
+import 'package:aviastore/widgets/product_container.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProductSearch extends StatefulWidget {
@@ -171,7 +171,7 @@ class _ProductSearchState extends State<ProductSearch> {
                 padding: const EdgeInsets.only(top: 90.0),
                 child: isSearched && !model.isLoading
                     ? Theme(
-                        data: ThemeData(primarySwatch: Colors.green),
+                        data: ThemeData(primarySwatch: Colors.blue),
                         child: ListView.builder(
                             controller: scrollController,
                             itemCount: searchProducts.length + 1,
@@ -248,7 +248,7 @@ class _ProductSearchState extends State<ProductSearch> {
                   visible: model.isLoading,
                   child: Center(
                     child: CircularProgressIndicator(
-                      backgroundColor: Colors.green,
+                      backgroundColor: Colors.blue,
                     ),
                   )),
               // )
@@ -355,7 +355,7 @@ class _ProductSearchState extends State<ProductSearch> {
           ),
           Expanded(
             child: Theme(
-                data: ThemeData(primarySwatch: Colors.green),
+                data: ThemeData(primarySwatch: Colors.blue),
                 child: ListView.builder(
                   shrinkWrap: true,
                   padding: EdgeInsets.all(8.0),

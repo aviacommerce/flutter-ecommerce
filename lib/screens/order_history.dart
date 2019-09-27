@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:ofypets_mobile_app/models/order.dart';
-import 'package:ofypets_mobile_app/screens/order_response.dart';
-import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/headers.dart';
-import 'package:ofypets_mobile_app/utils/locator.dart';
-import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
+import 'package:aviastore/models/order.dart';
+import 'package:aviastore/screens/order_response.dart';
+import 'package:aviastore/utils/connectivity_state.dart';
+import 'package:aviastore/utils/constants.dart';
+import 'package:aviastore/utils/headers.dart';
+import 'package:aviastore/utils/locator.dart';
+import 'package:aviastore/widgets/shopping_cart_button.dart';
 
 class OrderList extends StatefulWidget {
   @override
@@ -100,7 +100,7 @@ class _OrderList extends State<OrderList> {
       body: Padding(
           padding: const EdgeInsets.only(top: 3.0),
           child: Theme(
-            data: ThemeData(primarySwatch: Colors.green),
+            data: ThemeData(primarySwatch: Colors.blue),
             child: ListView.builder(
                 controller: scrollController,
                 itemCount: ordersList.length + 1,
@@ -126,7 +126,7 @@ class _OrderList extends State<OrderList> {
                 }),
           )),
       /*Theme(
-        data: ThemeData(primarySwatch: Colors.green),
+        data: ThemeData(primarySwatch: Colors.blue),
         child: PagewiseListView(
           pageSize: PAGE_SIZE,
           itemBuilder: orderItem,
@@ -264,7 +264,7 @@ class _OrderList extends State<OrderList> {
   getOrderStatus(detailOrder) {
     if (detailOrder.paymentState == 'balance_due' &&
         detailOrder.shipState == 'shipped') {
-      return Text('Shipped', style: TextStyle(color: Colors.green));
+      return Text('Shipped', style: TextStyle(color: Colors.blue));
     } else if (detailOrder.paymentState == 'balance_due') {
       return Text('Pending', style: TextStyle(color: Colors.blue));
     } else if (detailOrder.paymentState == 'void') {

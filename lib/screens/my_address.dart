@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/update_address.dart';
-import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
-import 'package:ofypets_mobile_app/utils/locator.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/screens/update_address.dart';
+import 'package:aviastore/utils/connectivity_state.dart';
+import 'package:aviastore/utils/locator.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class MyAddressPage extends StatefulWidget {
@@ -230,7 +230,7 @@ class _MyAddressPageState extends State<MyAddressPage> {
                   margin:
                       const EdgeInsets.symmetric(horizontal: 35.0, vertical: 5),
                   child: Text(
-                    'Let us know where to ship all of your Ofypets goodies.',
+                    'Let us know where to ship all of your AviaStore goodies.',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.black, fontSize: 16.0),
                   ),

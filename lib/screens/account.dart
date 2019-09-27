@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/change_email.dart';
-import 'package:ofypets_mobile_app/screens/change_password.dart';
-import 'package:ofypets_mobile_app/screens/my_address.dart';
-import 'package:ofypets_mobile_app/screens/order_history.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/headers.dart';
-import 'package:ofypets_mobile_app/models/address.dart';
-import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
-import 'package:ofypets_mobile_app/screens/retun_policy.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/screens/change_email.dart';
+import 'package:aviastore/screens/change_password.dart';
+import 'package:aviastore/screens/my_address.dart';
+import 'package:aviastore/screens/order_history.dart';
+import 'package:aviastore/utils/constants.dart';
+import 'package:aviastore/utils/headers.dart';
+import 'package:aviastore/models/address.dart';
+import 'package:aviastore/utils/drawer_homescreen.dart';
+import 'package:aviastore/screens/retun_policy.dart';
 
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -133,11 +133,11 @@ class _AccountState extends State<Account> {
           ),
           InkWell(
             onTap: () {
-              _sendMail('support@ofypets.com');
+              _sendMail('support@aviaStore.com');
             },
             child: ListTile(
               title: Text(
-                'Email: support@ofypets.com',
+                'Email: support@aviaStore.com',
               ),
             ),
           ),

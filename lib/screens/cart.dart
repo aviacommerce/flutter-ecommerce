@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/address.dart';
-import 'package:ofypets_mobile_app/screens/auth.dart';
-import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
-import 'package:ofypets_mobile_app/utils/locator.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/screens/address.dart';
+import 'package:aviastore/screens/auth.dart';
+import 'package:aviastore/utils/connectivity_state.dart';
+import 'package:aviastore/utils/locator.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class Cart extends StatefulWidget {
@@ -134,7 +134,7 @@ class _CartState extends State<Cart> {
           child: model.isLoading
               ? Center(
                   child: CircularProgressIndicator(
-                    backgroundColor: Colors.green,
+                    backgroundColor: Colors.blue,
                   ),
                 )
               : FlatButton(
@@ -377,7 +377,7 @@ class _CartState extends State<Cart> {
                         border: Border.all(
                           color:
                               model.lineItems[lineItemIndex].quantity == index
-                                  ? Colors.green
+                                  ? Colors.blue
                                   : Colors.grey,
                         ),
                         borderRadius: BorderRadius.circular(5)),
@@ -388,7 +388,7 @@ class _CartState extends State<Cart> {
                       style: TextStyle(
                           color:
                               model.lineItems[lineItemIndex].quantity == index
-                                  ? Colors.green
+                                  ? Colors.blue
                                   : Colors.grey),
                     )),
               );

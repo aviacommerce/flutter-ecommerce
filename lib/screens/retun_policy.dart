@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:aviastore/utils/constants.dart';
 
 class ReturnPolicy extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.green,
+          backgroundColor: Colors.blue,
           title: Text('Return Policy'),
           centerTitle: true),
       body: Padding(

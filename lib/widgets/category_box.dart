@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ofypets_mobile_app/models/category.dart';
-import 'package:ofypets_mobile_app/screens/brandslisting.dart';
-import 'package:ofypets_mobile_app/screens/categorylisting.dart';
-import 'package:ofypets_mobile_app/utils/color_list.dart';
+import 'package:aviastore/models/category.dart';
+import 'package:aviastore/screens/brandslisting.dart';
+import 'package:aviastore/screens/categorylisting.dart';
+import 'package:aviastore/utils/color_list.dart';
 
 Widget categoryBox(int index, BuildContext context, Size _deviceSize,
     List<Category> categories) {

@@ -1,8 +1,8 @@
 class Settings {
-  // static const String SERVER_URL = 'https://ofypets.indiepet.co.in/';
-  // static const String WEB_URL = 'https://beta.ofypets.com/';
-  static const String WEB_URL = 'https://www.ofypets.com/';
-  static const String SERVER_URL = 'https://app.ofypets.com/';
+  // static const String SERVER_URL = 'https://aviastore.indiepet.co.in/';
+  // static const String WEB_URL = 'https://beta.aviastore.com/';
+  static const String WEB_URL = 'https://www.aviastore.in/';
+  static const String SERVER_URL = 'https://app.aviastore.in/';
 }
 
 final double FREE_SHIPPING_AMOUNT = 699;
@@ -12,7 +12,7 @@ final int ONE = 1;
 final int ZERO = 0;
 final int TWENTY = 20;
 
-final String privacyPolicy = 'By placing this order, you agree to Ofypets.com’\s Privacy Policy and Terms of Use.';
+final String privacyPolicy = 'By placing this order, you agree to aviastore.com’\s Privacy Policy and Terms of Use.';
 
 final returnPolicyHeading1 = 'Return Policy';
 final String retunPolicyText1 =
@@ -22,13 +22,13 @@ final String returnPolicyText2 =
     'Once your return is received and inspected, we will send you an email to notify you that we have received your returned item. We will also notify you of the approval or rejection of your refund.\n  If you are approved, then your refund will be processed, and a credit will automatically be applied to your credit card or original method of payment, within a 10 days.\n ';
 final String returnPolicyHeading3 = 'Late or missing refunds (if applicable)';
 final String returnPolicyText3 =
-    'If you haven’t received a refund yet, first check your bank account again.\nThen contact your credit card company, it may take some time before your refund is officially posted.\nNext contact your bank. There is often some processing time before a refund is posted.\nIf you’ve done all of this and you still have not received your refund yet, please contact us at support@ofypets.com.\n ';
+    'If you haven’t received a refund yet, first check your bank account again.\nThen contact your credit card company, it may take some time before your refund is officially posted.\nNext contact your bank. There is often some processing time before a refund is posted.\nIf you’ve done all of this and you still have not received your refund yet, please contact us at support@aviastore.com.\n ';
 final String returnPolicyHeading4 = 'Sale items (if applicable)';
 final String returnPolicyText4 =
     'Only regular priced items may be refunded, unfortunately sale items cannot be refunded.\n ';
 final String returnPolicyHeading5 = 'Exchanges (if applicable)';
 final String returnPolicyText5 =
-    'We only replace items if they are defective or damaged. If you need to exchange it for the same item, send us an email at admin@ofypets.com and send your item to: 59 MN Nagar, Kolathur, Chennai, Tamil Nadu, INDIA 600099.\n';
+    'We only replace items if they are defective or damaged. If you need to exchange it for the same item, send us an email at admin@aviastore.com and send your item to: 59 MN Nagar, Kolathur, Chennai, Tamil Nadu, INDIA 600099.\n';
 final String returnPolicyHeading6 = 'Cancellation ( If applicable)';
 final String returnPolicyText6 =
     'If you decide to cancel your order, preferably by phone, and quote your order number it\'s applicable with 2 days.';

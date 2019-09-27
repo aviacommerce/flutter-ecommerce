@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
-import 'package:ofypets_mobile_app/widgets/snackbar.dart';
+import 'package:aviastore/models/product.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/widgets/rating_bar.dart';
+import 'package:aviastore/widgets/snackbar.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class AddToCart extends StatefulWidget {
@@ -44,7 +44,7 @@ class _AddToCartState extends State<AddToCart> {
             : widget.index == selectedIndex
                 ? Center(
                     child: CircularProgressIndicator(
-                    backgroundColor: Colors.green,
+                    backgroundColor: Colors.blue,
                   ))
                 : buttonContent(widget.index, widget.product),
       );
@@ -56,7 +56,7 @@ Widget buttonContent(int index, Product product) {
   return Text(
     product.isOrderable ? 'ADD TO CART' : 'OUT OF STOCK',
     style: TextStyle(
-        color: product.isOrderable ? Colors.green : Colors.grey,
+        color: product.isOrderable ? Colors.blue : Colors.grey,
         fontSize: 14,
         fontWeight: FontWeight.w500),
   );

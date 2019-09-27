@@ -1,5 +1,5 @@
-import 'package:ofypets_mobile_app/models/option_type.dart';
-import 'package:ofypets_mobile_app/models/option_value.dart';
+import 'package:aviastore/models/option_type.dart';
+import 'package:aviastore/models/option_value.dart';
 
 class Product {
   final int id;

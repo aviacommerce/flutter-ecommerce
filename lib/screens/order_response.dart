@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/headers.dart';
-import 'package:ofypets_mobile_app/utils/locator.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/utils/connectivity_state.dart';
+import 'package:aviastore/utils/constants.dart';
+import 'package:aviastore/utils/headers.dart';
+import 'package:aviastore/utils/locator.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ofypets_mobile_app/utils/params.dart';
-import 'package:ofypets_mobile_app/screens/payubiz.dart';
+import 'package:aviastore/utils/params.dart';
+import 'package:aviastore/screens/payubiz.dart';
 
 class OrderResponse extends StatefulWidget {
   final String orderNumber;
@@ -244,7 +244,7 @@ class _OrderResponseState extends State<OrderResponse> {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             2)),
-                                                color: Colors.green,
+                                                color: Colors.blue,
                                                 onPressed: () {
                                                   if (!_isLoading) {
                                                     retryPayment(responseBody);

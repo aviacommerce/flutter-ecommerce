@@ -1,5 +1,5 @@
-import 'package:ofypets_mobile_app/models/line_item.dart';
-import 'package:ofypets_mobile_app/models/address.dart';
+import 'package:aviastore/models/line_item.dart';
+import 'package:aviastore/models/address.dart';
 
 class Order {
   final String total;

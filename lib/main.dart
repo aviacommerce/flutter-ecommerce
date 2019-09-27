@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/home.dart';
-import 'package:ofypets_mobile_app/utils/locator.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/screens/home.dart';
+import 'package:aviastore/utils/locator.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 void main() {
@@ -41,7 +41,7 @@ class _MyAppState extends State<MyApp> {
           '/home' : (context) => HomeScreen()
         },
         theme: ThemeData(
-          primarySwatch: Colors.green,
+          primarySwatch: Colors.blue,
           accentColor: Colors.white,
         ),
         home: HomeScreen(),

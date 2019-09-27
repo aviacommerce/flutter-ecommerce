@@ -265,7 +265,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks.sh",
-				"${PODS_ROOT}/../.symlinks/flutter/ios-release/Flutter.framework",
+				"${PODS_ROOT}/../.symlinks/flutter/ios/Flutter.framework",
 				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/connectivity/connectivity.framework",
 				"${BUILT_PRODUCTS_DIR}/flutter_webview_plugin/flutter_webview_plugin.framework",
@@ -414,7 +414,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ofypets.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aviastore.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -541,7 +541,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ofypets.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aviastore.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -566,7 +566,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ofypets.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.aviastore.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VERSIONING_SYSTEM = "apple-generic";
 			};

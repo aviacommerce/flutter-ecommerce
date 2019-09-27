@@ -1,4 +1,4 @@
-package com.example.ofypets_mobile_app;
+package com.example.aviastore;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

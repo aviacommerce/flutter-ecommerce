@@ -3,10 +3,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/models/address.dart';
-import 'package:ofypets_mobile_app/utils/headers.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
+import 'package:aviastore/utils/constants.dart';
+import 'package:aviastore/models/address.dart';
+import 'package:aviastore/utils/headers.dart';
+import 'package:aviastore/scoped-models/main.dart';
 
 mixin UserModel on Model {
   bool _isAuthenticated = false;

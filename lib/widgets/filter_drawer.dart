@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ofypets_mobile_app/models/category.dart';
+import 'package:aviastore/models/category.dart';
 
 class FilterDrawer extends StatefulWidget {
   Function getSortingData;
@@ -91,7 +91,7 @@ class _FilterDrawerState extends State<FilterDrawer> {
           ),
           Expanded(
             child: Theme(
-                data: ThemeData(primarySwatch: Colors.green),
+                data: ThemeData(primarySwatch: Colors.blue),
                 child: ListView.separated(
                   shrinkWrap: true,
                   padding: EdgeInsets.all(8.0),

@@ -2,13 +2,13 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/account.dart';
-import 'package:ofypets_mobile_app/screens/auth.dart';
-import 'package:ofypets_mobile_app/screens/favorites.dart';
-import 'package:ofypets_mobile_app/screens/order_history.dart';
-import 'package:ofypets_mobile_app/screens/retun_policy.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/screens/account.dart';
+import 'package:aviastore/screens/auth.dart';
+import 'package:aviastore/screens/favorites.dart';
+import 'package:aviastore/screens/order_history.dart';
+import 'package:aviastore/screens/retun_policy.dart';
+import 'package:aviastore/utils/constants.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -81,7 +81,7 @@ class _HomeDrawer extends State<HomeDrawer> {
       return ListTile(
         leading: Icon(
           Icons.favorite,
-          color: Colors.green,
+          color: Colors.blue,
         ),
         trailing: Container(
           width: 30.0,
@@ -89,7 +89,7 @@ class _HomeDrawer extends State<HomeDrawer> {
           child: favCount != null && favCount > 0
               ? Stack(
                   children: <Widget>[
-                    Icon(Icons.brightness_1, size: 30.0, color: Colors.green),
+                    Icon(Icons.brightness_1, size: 30.0, color: Colors.blue),
                     Center(
                       child: Text(
                         '${favCount}',
@@ -108,7 +108,7 @@ class _HomeDrawer extends State<HomeDrawer> {
         ),
         title: Text(
           'Favorites',
-          style: TextStyle(color: Colors.green),
+          style: TextStyle(color: Colors.blue),
         ),
         onTap: () {
           if (model.isAuthenticated) {
@@ -132,11 +132,11 @@ class _HomeDrawer extends State<HomeDrawer> {
       return ListTile(
         leading: Icon(
           Icons.person,
-          color: Colors.green,
+          color: Colors.blue,
         ),
         title: Text(
           'Account',
-          style: TextStyle(color: Colors.green),
+          style: TextStyle(color: Colors.blue),
         ),
         onTap: () {
           if (model.isAuthenticated) {
@@ -160,11 +160,11 @@ class _HomeDrawer extends State<HomeDrawer> {
       return ListTile(
         leading: Icon(
           Icons.receipt,
-          color: Colors.green,
+          color: Colors.blue,
         ),
         title: Text(
           'Order History',
-          style: TextStyle(color: Colors.green),
+          style: TextStyle(color: Colors.blue),
         ),
         onTap: () {
           if (model.isAuthenticated) {
@@ -312,7 +312,7 @@ class _HomeDrawer extends State<HomeDrawer> {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
-                'ofypets',
+                'AviaStore',
                 style: TextStyle(
                     fontFamily: 'HolyFat', fontSize: 65, color: Colors.white),
               ),
@@ -323,7 +323,7 @@ class _HomeDrawer extends State<HomeDrawer> {
               ),
               signInLineTile()
             ]),
-            decoration: BoxDecoration(color: Colors.green),
+            decoration: BoxDecoration(color: Colors.blue),
           ),
           ListTile(
             onTap: () {
@@ -332,11 +332,11 @@ class _HomeDrawer extends State<HomeDrawer> {
             },
             leading: Icon(
               Icons.home,
-              color: Colors.green,
+              color: Colors.blue,
             ),
             title: Text(
               'Home',
-              style: TextStyle(color: Colors.green),
+              style: TextStyle(color: Colors.blue),
             ),
           ),
           favoritesLineTile(),
@@ -362,14 +362,14 @@ class _HomeDrawer extends State<HomeDrawer> {
           ),
           InkWell(
             onTap: () {
-              _sendMail('support@ofypets.com');
+              _sendMail('support@aviastore.com');
             },
             child: ListTile(
               leading: Icon(
                 Icons.mail,
               ),
               title: Text(
-                'Email: support@ofypets.com',
+                'Email: support@aviastore.com',
               ),
             ),
           ),

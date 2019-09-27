@@ -3,21 +3,21 @@ import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ofypets_mobile_app/models/category.dart';
-import 'package:ofypets_mobile_app/models/option_type.dart';
-import 'package:ofypets_mobile_app/models/option_value.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/auth.dart';
-import 'package:ofypets_mobile_app/screens/search.dart';
-import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
-import 'package:ofypets_mobile_app/utils/locator.dart';
-import 'package:ofypets_mobile_app/widgets/category_box.dart';
-import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
-import 'package:ofypets_mobile_app/widgets/todays_deals_card.dart';
-import 'package:ofypets_mobile_app/models/banners.dart';
+import 'package:aviastore/models/category.dart';
+import 'package:aviastore/models/option_type.dart';
+import 'package:aviastore/models/option_value.dart';
+import 'package:aviastore/models/product.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/screens/auth.dart';
+import 'package:aviastore/screens/search.dart';
+import 'package:aviastore/utils/connectivity_state.dart';
+import 'package:aviastore/utils/constants.dart';
+import 'package:aviastore/utils/drawer_homescreen.dart';
+import 'package:aviastore/utils/locator.dart';
+import 'package:aviastore/widgets/category_box.dart';
+import 'package:aviastore/widgets/shopping_cart_button.dart';
+import 'package:aviastore/widgets/todays_deals_card.dart';
+import 'package:aviastore/models/banners.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -80,9 +80,9 @@ class _HomeScreenState extends State<HomeScreen> {
           title: Container(
               padding: EdgeInsets.all(10),
               child: Text(
-                'ofypets',
+                'Avia Store',
                 textAlign: TextAlign.start,
-                style: TextStyle(fontFamily: 'HolyFat', fontSize: 50),
+                style: TextStyle(fontSize: 20),
               )),
           actions: <Widget>[
             shoppingCartIconButton(),
@@ -141,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: _deviceSize.height * 0.5,
                       alignment: Alignment.center,
                       child: CircularProgressIndicator(
-                        backgroundColor: Colors.green,
+                        backgroundColor: Colors.blue,
                       ),
                     )
                   ]))
@@ -210,7 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       height: _deviceSize.height * 0.47,
                       alignment: Alignment.center,
                       child: CircularProgressIndicator(
-                        backgroundColor: Colors.green,
+                        backgroundColor: Colors.blue,
                       ),
                     )
                   ]))
@@ -248,17 +248,17 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       items: [
         BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline, color: Colors.green),
+          icon: Icon(Icons.person_outline, color: Colors.blue),
           title: Text('SIGN IN'),
         ),
         BottomNavigationBarItem(
             icon: Icon(
               Icons.person_outline,
-              color: Colors.green,
+              color: Colors.blue,
             ),
             title: Text('CREATE ACCOUNT',
                 style: TextStyle(
-                    color: Colors.green,
+                    color: Colors.blue,
                     fontSize: 15,
                     fontWeight: FontWeight.w600))),
       ],

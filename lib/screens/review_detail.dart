@@ -4,12 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:http/http.dart' as http;
-import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/models/review.dart';
-import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/headers.dart';
-import 'package:ofypets_mobile_app/utils/locator.dart';
+import 'package:aviastore/models/product.dart';
+import 'package:aviastore/models/review.dart';
+import 'package:aviastore/utils/connectivity_state.dart';
+import 'package:aviastore/utils/constants.dart';
+import 'package:aviastore/utils/headers.dart';
+import 'package:aviastore/utils/locator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ReviewDetailScreen extends StatefulWidget {
@@ -55,7 +55,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen>
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: AppBar(
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.blue,
             title: Text('Write Review'),
             centerTitle: true),
         body: new SingleChildScrollView(
@@ -202,7 +202,7 @@ class _ReviewDetailScreenState extends State<ReviewDetailScreen>
                       ),
                       new Container(
                         child: new RaisedButton(
-                          color: Colors.green,
+                          color: Colors.blue,
                           onPressed: () {
                             _submit(context);
                           },

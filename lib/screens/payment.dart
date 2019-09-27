@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:ofypets_mobile_app/models/payment_methods.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/order_response.dart';
-import 'package:ofypets_mobile_app/screens/payubiz.dart';
-import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
-import 'package:ofypets_mobile_app/utils/locator.dart';
-import 'package:ofypets_mobile_app/utils/params.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/widgets/order_details_card.dart';
-import 'package:ofypets_mobile_app/widgets/snackbar.dart';
-import 'package:ofypets_mobile_app/screens/update_address.dart';
+import 'package:aviastore/models/payment_methods.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/screens/order_response.dart';
+import 'package:aviastore/screens/payubiz.dart';
+import 'package:aviastore/utils/connectivity_state.dart';
+import 'package:aviastore/utils/locator.dart';
+import 'package:aviastore/utils/params.dart';
+import 'package:aviastore/utils/constants.dart';
+import 'package:aviastore/widgets/order_details_card.dart';
+import 'package:aviastore/widgets/snackbar.dart';
+import 'package:aviastore/screens/update_address.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -109,7 +109,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             _character = value;
           });
         },
-        activeColor: Colors.green,
+        activeColor: Colors.blue,
       );
     });
   }
@@ -131,13 +131,13 @@ class _PaymentScreenState extends State<PaymentScreen> {
         child: model.isLoading
             ? Center(
                 child: CircularProgressIndicator(
-                  backgroundColor: Colors.green,
+                  backgroundColor: Colors.blue,
                 ),
               )
             : FlatButton(
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8)),
-                color: Colors.green,
+                color: Colors.blue,
                 child: Text(
                   _character == ''
                       ? 'SELECT PAYMENT METHOD'

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/utils/constants.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:aviastore/utils/headers.dart';
 
 class EmailEdit extends StatefulWidget {
   @override

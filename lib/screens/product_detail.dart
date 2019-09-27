@@ -5,24 +5,24 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:ofypets_mobile_app/models/option_type.dart';
-import 'package:ofypets_mobile_app/models/option_value.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/models/review.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/auth.dart';
-import 'package:ofypets_mobile_app/screens/review_detail.dart';
-import 'package:ofypets_mobile_app/screens/search.dart';
-import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart' as prefix0;
-import 'package:ofypets_mobile_app/utils/headers.dart';
-import 'package:ofypets_mobile_app/utils/locator.dart';
-import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
-import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
-import 'package:ofypets_mobile_app/widgets/snackbar.dart';
-import 'package:ofypets_mobile_app/screens/cart.dart';
-import 'package:ofypets_mobile_app/widgets/todays_deals_card.dart';
+import 'package:aviastore/models/option_type.dart';
+import 'package:aviastore/models/option_value.dart';
+import 'package:aviastore/models/product.dart';
+import 'package:aviastore/models/review.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/screens/auth.dart';
+import 'package:aviastore/screens/review_detail.dart';
+import 'package:aviastore/screens/search.dart';
+import 'package:aviastore/utils/connectivity_state.dart';
+import 'package:aviastore/utils/constants.dart';
+import 'package:aviastore/utils/constants.dart' as prefix0;
+import 'package:aviastore/utils/headers.dart';
+import 'package:aviastore/utils/locator.dart';
+import 'package:aviastore/widgets/rating_bar.dart';
+import 'package:aviastore/widgets/shopping_cart_button.dart';
+import 'package:aviastore/widgets/snackbar.dart';
+import 'package:aviastore/screens/cart.dart';
+import 'package:aviastore/widgets/todays_deals_card.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -334,7 +334,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 child: Container(
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Colors.green,
+                      color: Colors.blue,
                       style: BorderStyle.solid,
                       width: 1.0,
                     ),
@@ -348,7 +348,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                         child: Text(
                           "WRITE A REVIEW",
                           style: TextStyle(
-                            color: Colors.green,
+                            color: Colors.blue,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 1,
@@ -463,7 +463,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                     decoration: BoxDecoration(
                         border: Border.all(
                           color: quantity == index
-                              ? Colors.green
+                              ? Colors.blue
                               : Colors.grey.shade300,
                         ),
                         borderRadius: BorderRadius.circular(5)),
@@ -475,7 +475,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       index.toString(),
                       style: TextStyle(
                           color: quantity == index
-                              ? Colors.green
+                              ? Colors.blue
                               : Colors.grey.shade300),
                     )),
               );
@@ -493,7 +493,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           value: optionValue.name,
           child: Text(
             optionValue.name,
-            style: TextStyle(color: Colors.green),
+            style: TextStyle(color: Colors.blue),
           ),
         ));
       });
@@ -509,7 +509,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
         child: DropdownButton(
           elevation: 0,
           isExpanded: true,
-          iconEnabledColor: Colors.green,
+          iconEnabledColor: Colors.blue,
           items: getVariants(),
           value: selectedProduct.optionValues[0].name,
           onChanged: (value) {
@@ -553,7 +553,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   width: 50,
                   decoration: BoxDecoration(
                       border: Border.all(
-                        color: quantity == index ? Colors.green : Colors.grey,
+                        color: quantity == index ? Colors.blue : Colors.grey,
                       ),
                       borderRadius: BorderRadius.circular(5)),
                   alignment: Alignment.center,
@@ -563,7 +563,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   child: Text(
                     index.toString(),
                     style: TextStyle(
-                        color: quantity == index ? Colors.green : Colors.grey),
+                        color: quantity == index ? Colors.blue : Colors.grey),
                   )),
             ));
           });
@@ -600,7 +600,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   //                       border: Border.all(
   //                     color: selectedProduct.optionValues[0].name ==
   //                             optionValue.name
-  //                         ? Colors.green
+  //                         ? Colors.blue
   //                         : Colors.black,
   //                   )),
   //                   alignment: Alignment.centerLeft,
@@ -611,7 +611,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
   //                     style: TextStyle(
   //                         color: selectedProduct.optionValues[0].name ==
   //                                 optionValue.name
-  //                             ? Colors.green
+  //                             ? Colors.blue
   //                             : Colors.black),
   //                   ))));
   //         });
@@ -772,7 +772,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                           style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.normal,
-                              color: Colors.green,
+                              color: Colors.blue,
                               fontFamily: fontFamily),
                         ),
                       ),
@@ -947,7 +947,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                       height: _deviceSize.height * 0.47,
                       alignment: Alignment.center,
                       child: CircularProgressIndicator(
-                        backgroundColor: Colors.green,
+                        backgroundColor: Colors.blue,
                       ),
                     )
                   : Container(
@@ -1036,7 +1036,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
               shape: RoundedRectangleBorder(
                 side: BorderSide(
                   color:
-                      selectedProduct.isOrderable ? Colors.green : Colors.grey,
+                      selectedProduct.isOrderable ? Colors.blue : Colors.grey,
                 ),
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -1044,7 +1044,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 selectedProduct.isOrderable ? 'ADD TO CART' : 'OUT OF STOCK',
                 style: TextStyle(
                     color: selectedProduct.isOrderable
-                        ? Colors.green
+                        ? Colors.blue
                         : Colors.grey),
               ),
               onPressed: selectedProduct.isOrderable
@@ -1223,7 +1223,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                 style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Colors.green),
+                    color: Colors.blue),
               ),
             ),
             onPressed: () async {

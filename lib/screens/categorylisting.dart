@@ -2,21 +2,21 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ofypets_mobile_app/models/category.dart';
-import 'package:ofypets_mobile_app/models/option_type.dart';
-import 'package:ofypets_mobile_app/models/option_value.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/search.dart';
-import 'package:ofypets_mobile_app/utils/color_list.dart';
-import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
-import 'package:ofypets_mobile_app/utils/locator.dart';
-import 'package:ofypets_mobile_app/widgets/product_container.dart';
-import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
+import 'package:aviastore/models/category.dart';
+import 'package:aviastore/models/option_type.dart';
+import 'package:aviastore/models/option_value.dart';
+import 'package:aviastore/models/product.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/screens/search.dart';
+import 'package:aviastore/utils/color_list.dart';
+import 'package:aviastore/utils/connectivity_state.dart';
+import 'package:aviastore/utils/constants.dart';
+import 'package:aviastore/utils/drawer_homescreen.dart';
+import 'package:aviastore/utils/locator.dart';
+import 'package:aviastore/widgets/product_container.dart';
+import 'package:aviastore/widgets/shopping_cart_button.dart';
 import 'package:scoped_model/scoped_model.dart';
-import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:aviastore/utils/headers.dart';
 
 class CategoryListing extends StatefulWidget {
   final String categoryName;
@@ -185,7 +185,7 @@ class _CategoryListingState extends State<CategoryListing> {
                   child: !_isLoading ? body(level) : Container(),
                 ),
                 Container(
-                  color: Colors.green,
+                  color: Colors.blue,
                   height: 59.0,
                   child: Column(
                     children: <Widget>[
@@ -310,7 +310,7 @@ class _CategoryListingState extends State<CategoryListing> {
   Widget categoryDropDown() {
     return Expanded(
       child: Theme(
-        data: ThemeData(primarySwatch: Colors.green),
+        data: ThemeData(primarySwatch: Colors.blue),
         child: ListView(
           children: [
             ExpansionTile(
@@ -396,7 +396,7 @@ class _CategoryListingState extends State<CategoryListing> {
         break;
       case 2:
         return Theme(
-          data: ThemeData(primarySwatch: Colors.green),
+          data: ThemeData(primarySwatch: Colors.blue),
           child: Padding(
             padding: const EdgeInsets.only(top: 50.0),
             child: ListView.builder(

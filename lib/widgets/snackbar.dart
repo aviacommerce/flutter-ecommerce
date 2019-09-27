@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/screens/update_address.dart';
+import 'package:aviastore/utils/constants.dart';
+import 'package:aviastore/screens/update_address.dart';
 
 final processSnackbar = SnackBar(
   content: Text('Adding Product to the cart...'),

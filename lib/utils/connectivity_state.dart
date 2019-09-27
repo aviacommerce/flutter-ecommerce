@@ -43,18 +43,18 @@ class ConnectivityManager {
 
   void showInternetOffScreen(BuildContext context) {
     Dialog errorDialog = Dialog(
-      backgroundColor: Colors.green,
+      backgroundColor: Colors.blue,
       //this right here
       child: Container(
         width: double.infinity,
         height: double.infinity,
-        color: Colors.green,
+        color: Colors.blue,
         child: Stack(
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
               child: Text(
-                'ofypets',
+                'AviaStore',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontFamily: 'HolyFat', fontSize: 50, color: Colors.white),
@@ -119,7 +119,7 @@ class _ConnectivityPageState extends State<ConnectivityPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        color: Colors.green,
+        color: Colors.blue,
         child: Stack(
           children: <Widget>[
             Container(
@@ -127,7 +127,7 @@ class _ConnectivityPageState extends State<ConnectivityPage> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 50.0),
                 child: Text(
-                  'ofypets',
+                  'AviaStore',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontFamily: 'HolyFat', fontSize: 50, color: Colors.white),

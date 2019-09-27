@@ -2,17 +2,17 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ofypets_mobile_app/models/line_item.dart';
-import 'package:ofypets_mobile_app/models/option_type.dart';
-import 'package:ofypets_mobile_app/models/option_value.dart';
-import 'package:ofypets_mobile_app/models/order.dart';
-import 'package:ofypets_mobile_app/models/payment_methods.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/models/variant.dart';
-import 'package:ofypets_mobile_app/models/address.dart';
-import 'package:ofypets_mobile_app/screens/product_detail.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/headers.dart';
+import 'package:aviastore/models/line_item.dart';
+import 'package:aviastore/models/option_type.dart';
+import 'package:aviastore/models/option_value.dart';
+import 'package:aviastore/models/order.dart';
+import 'package:aviastore/models/payment_methods.dart';
+import 'package:aviastore/models/product.dart';
+import 'package:aviastore/models/variant.dart';
+import 'package:aviastore/models/address.dart';
+import 'package:aviastore/screens/product_detail.dart';
+import 'package:aviastore/utils/constants.dart';
+import 'package:aviastore/utils/headers.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

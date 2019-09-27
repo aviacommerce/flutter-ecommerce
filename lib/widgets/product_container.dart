@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/widgets/rating_bar.dart';
+import 'package:aviastore/models/product.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/widgets/rating_bar.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 Widget productContainer(BuildContext myContext, Product product, int index) {

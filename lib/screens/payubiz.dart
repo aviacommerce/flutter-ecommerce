@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
-import 'package:ofypets_mobile_app/screens/order_response.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
+import 'package:aviastore/screens/order_response.dart';
+import 'package:aviastore/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PayubizScreen extends StatefulWidget {
@@ -74,7 +74,7 @@ class _PayubizScreenState extends State<PayubizScreen> {
             hidden: true,
             initialChild: Center(
               child: CircularProgressIndicator(
-                backgroundColor: Colors.green,
+                backgroundColor: Colors.blue,
               ),
             ),
           )),

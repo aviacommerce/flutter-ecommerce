@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/locator.dart';
+import 'package:aviastore/utils/connectivity_state.dart';
+import 'package:aviastore/utils/constants.dart';
+import 'package:aviastore/utils/locator.dart';
 
 class ForgetPassword extends StatefulWidget {
   @override
@@ -43,7 +43,7 @@ class _ForgetPasswordState extends State<ForgetPassword>
           backgroundColor: Colors.white,
           appBar: AppBar(
             centerTitle: false,
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.blue,
             leading: IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {
@@ -187,7 +187,7 @@ class _ForgetPasswordState extends State<ForgetPassword>
         FlatButton(
           child: Text('Okay',
               style: TextStyle(
-                  fontWeight: FontWeight.bold, color: Colors.green.shade300)),
+                  fontWeight: FontWeight.bold, color: Colors.blue.shade300)),
           onPressed: () {
             Navigator.pop(context);
           },

@@ -2,19 +2,19 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ofypets_mobile_app/models/brand.dart';
-import 'package:ofypets_mobile_app/models/option_type.dart';
-import 'package:ofypets_mobile_app/models/option_value.dart';
-import 'package:ofypets_mobile_app/models/product.dart';
-import 'package:ofypets_mobile_app/scoped-models/main.dart';
-import 'package:ofypets_mobile_app/screens/search.dart';
-import 'package:ofypets_mobile_app/utils/connectivity_state.dart';
-import 'package:ofypets_mobile_app/utils/constants.dart';
-import 'package:ofypets_mobile_app/utils/drawer_homescreen.dart';
-import 'package:ofypets_mobile_app/utils/headers.dart';
-import 'package:ofypets_mobile_app/utils/locator.dart';
-import 'package:ofypets_mobile_app/widgets/product_container.dart';
-import 'package:ofypets_mobile_app/widgets/shopping_cart_button.dart';
+import 'package:aviastore/models/brand.dart';
+import 'package:aviastore/models/option_type.dart';
+import 'package:aviastore/models/option_value.dart';
+import 'package:aviastore/models/product.dart';
+import 'package:aviastore/scoped-models/main.dart';
+import 'package:aviastore/screens/search.dart';
+import 'package:aviastore/utils/connectivity_state.dart';
+import 'package:aviastore/utils/constants.dart';
+import 'package:aviastore/utils/drawer_homescreen.dart';
+import 'package:aviastore/utils/headers.dart';
+import 'package:aviastore/utils/locator.dart';
+import 'package:aviastore/widgets/product_container.dart';
+import 'package:aviastore/widgets/shopping_cart_button.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class BrandList extends StatefulWidget {
@@ -163,7 +163,7 @@ class _BrandListState extends State<BrandList> {
                                       }),
                                   padding: EdgeInsets.only(top: 59.0))
                               : Theme(
-                                  data: ThemeData(primarySwatch: Colors.green),
+                                  data: ThemeData(primarySwatch: Colors.blue),
                                   child: Padding(
                                     padding: const EdgeInsets.only(top: 90.0),
                                     child: ListView.builder(
@@ -207,7 +207,7 @@ class _BrandListState extends State<BrandList> {
                                   ),
                                 )),
                   Container(
-                      color: Colors.green,
+                      color: Colors.blue,
                       height: 60.0,
                       child: Column(children: [
                         Row(
@@ -341,7 +341,7 @@ class _BrandListState extends State<BrandList> {
           ),
           Expanded(
             child: Theme(
-                data: ThemeData(primarySwatch: Colors.green),
+                data: ThemeData(primarySwatch: Colors.blue),
                 child: ListView.builder(
                   shrinkWrap: true,
                   padding: EdgeInsets.all(8.0),

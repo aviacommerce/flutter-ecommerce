@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.ofypets_mobile_app">
+    package="com.example.aviastore">
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
@@ -10,7 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="OfyPets"
+        android:label="AviaStore"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/launcher_icon">
         <activity
